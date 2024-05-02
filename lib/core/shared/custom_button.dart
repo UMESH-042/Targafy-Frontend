@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:targafy/constants/dimensions.dart';
+import 'package:targafy/core/constants/dimensions.dart';
 
 class CustomButton extends StatefulWidget {
   final String text;

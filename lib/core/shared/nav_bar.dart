@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:targafy/features/home/ui/home_screen.dart';
-import 'package:targafy/features/users/ui/users_screen.dart';
-import 'package:targafy/features/activity/ui/activity_screen.dart';
-import 'package:targafy/features/groups/ui/groups_screen.dart';
+import 'package:targafy/src/home/ui/home_screen.dart';
+import 'package:targafy/src/users/ui/users_screen.dart';
+import 'package:targafy/src/activity/ui/activity_screen.dart';
+import 'package:targafy/src/groups/ui/groups_screen.dart';
 class NavigationScreen extends StatefulWidget {
   const NavigationScreen({super.key});
 

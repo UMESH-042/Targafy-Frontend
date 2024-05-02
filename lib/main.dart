@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:targafy/features/onBoarding/ui/on_boarding_screen.dart';
-import 'package:targafy/shared/nav_bar.dart';
+import 'package:targafy/src/onBoarding/ui/on_boarding_screen.dart';
+import 'package:targafy/core/shared/nav_bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,9 +23,10 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: !hasSeenOnboarding
-          ? const OnBoardingScreen()
-          : const NavigationScreen(),
+      home: const OnBoardingScreen(),
+      // home: !hasSeenOnboarding
+      //     ? const OnBoardingScreen()
+      //     : const NavigationScreen(),
     );
   }
 }

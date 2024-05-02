@@ -1,7 +1,9 @@
-import 'package:targafy/shared/nav_bar.dart';
-import 'package:targafy/features/onBoarding/ui/intro_page2.dart';
-import 'package:targafy/features/onBoarding/ui/intro_page3.dart';
-import 'package:targafy/features/onBoarding/ui/intro_page1.dart';
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:targafy/core/shared/nav_bar.dart';
+import 'package:targafy/src/onBoarding/ui/intro_page2.dart';
+import 'package:targafy/src/onBoarding/ui/intro_page3.dart';
+import 'package:targafy/src/onBoarding/ui/intro_page1.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,11 +22,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   void _completeOnboarding() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('hasSeenOnboarding', true);
-    // ignore: use_build_context_synchronously
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => const NavigationScreen())); 
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const NavigationScreen()));
   }
 
   @override
@@ -50,26 +48,30 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (onLastPage)
-                  Container(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: _completeOnboarding,
-                      child: const SizedBox(
-                        width: 216,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              'Done',
+                  Row(
+                    
+                    children: [
+                      Container(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: _completeOnboarding,
+                          child: const SizedBox(
+                            width: 216,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'Skip',
+                                ),
+                                Icon(
+                                  Icons.arrow_right,
+                                )
+                              ],
                             ),
-                            Icon(
-                              Icons.arrow_right,
-                            )
-                          ],
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
               ],
             ),
@@ -79,5 +81,3 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     );
   }
 }
-
-

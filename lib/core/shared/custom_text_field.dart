@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:targafy/constants/dimensions.dart';
+import 'package:targafy/core/constants/dimensions.dart';
 
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
