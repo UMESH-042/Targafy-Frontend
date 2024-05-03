@@ -64,6 +64,7 @@ class IntroPage1 extends StatelessWidget {
                 fontSize: getScreenWidth(context) * 0.028,
                 fontWeight: FontWeight.w300,
                 fontFamily: 'Sofia Pro',
+                color: const Color(0xff949494),
               ),
             ),
           ),
