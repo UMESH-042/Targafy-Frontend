@@ -1,11 +1,8 @@
-import 'dart:ffi';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/shared/components/primary_button.dart';
+import 'package:targafy/src/auth/view/screens/verify_otp_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -104,7 +101,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
                 SizedBox(height: getScreenheight(context) * 0.05),
-                PrimaryButton(function: () {}, text: 'Send OTP')
+                PrimaryButton(function: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const VerifyOTPScreen()));
+                }, text: 'Send OTP')
               ],
             ),
           ),
