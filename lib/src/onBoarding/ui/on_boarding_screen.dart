@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/shared/nav_bar.dart';
+import 'package:targafy/src/auth/view/screens/send_otp_screen.dart';
 import 'package:targafy/src/onBoarding/ui/intro_page2.dart';
 import 'package:targafy/src/onBoarding/ui/intro_page3.dart';
 import 'package:targafy/src/onBoarding/ui/intro_page1.dart';
@@ -28,7 +29,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   void _completeOnboarding() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('hasSeenOnboarding', true);
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const NavigationScreen()));
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
   }
 
   @override
