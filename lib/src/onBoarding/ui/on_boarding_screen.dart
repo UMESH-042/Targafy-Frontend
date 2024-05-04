@@ -1,11 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:dots_indicator/dots_indicator.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
-import 'package:targafy/core/shared/nav_bar.dart';
 import 'package:targafy/src/auth/view/screens/send_otp_screen.dart';
 import 'package:targafy/src/onBoarding/ui/intro_page2.dart';
 import 'package:targafy/src/onBoarding/ui/intro_page3.dart';
