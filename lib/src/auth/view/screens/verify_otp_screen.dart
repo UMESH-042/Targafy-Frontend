@@ -3,6 +3,7 @@ import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/shared/components/primary_button.dart';
+import 'package:targafy/src/registration/view/screens/register_a_business_screen1.dart';
 
 class VerifyOTPScreen extends StatefulWidget {
   const VerifyOTPScreen({super.key});
@@ -65,7 +66,9 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
               margin: EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.05),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [SizedBox(height: getScreenheight(context) * 0.02), SizedBox(height: getScreenheight(context) * 0.05), PrimaryButton(function: () {}, text: 'Verify OTP')],
+                children: [SizedBox(height: getScreenheight(context) * 0.02), SizedBox(height: getScreenheight(context) * 0.05), PrimaryButton(function: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterABusinessScreen1()));
+                }, text: 'Verify OTP')],
               ),
             ),
           ],
