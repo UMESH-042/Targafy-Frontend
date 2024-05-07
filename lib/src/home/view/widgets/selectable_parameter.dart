@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
+import 'package:targafy/core/utils/texts.dart';
 
-class SelectableChartWidget extends StatelessWidget {
+class SelectableParameterWidget extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
-  final String imagePath;
+  final String text;
 
-  const SelectableChartWidget({
+  const SelectableParameterWidget({
     super.key,
     required this.isSelected,
     required this.onTap,
-    required this.imagePath,
+    required this.text,
   });
 
   @override
@@ -20,7 +21,7 @@ class SelectableChartWidget extends StatelessWidget {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
-          width: getScreenWidth(context) * 0.2,
+          padding: EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.035) ,
           decoration: BoxDecoration(
             color: isSelected ? Colors.white : const Color.fromRGBO(0, 0, 0, 0.16),
             border: Border.all(
@@ -29,7 +30,7 @@ class SelectableChartWidget extends StatelessWidget {
             ),
           ),
           child: Center(
-            child: Image.asset(imagePath),
+            child: CustomText(text: text, fontSize: getScreenWidth(context) * 0.035, color: isSelected ? primaryColor : const Color(0xff535353), fontWeight: FontWeight.w400,)
           ),
         ));
   }

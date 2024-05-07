@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/utils/texts.dart';
 import 'package:targafy/src/home/view/widgets/selectable_chart.dart';
+import 'package:targafy/src/home/view/widgets/selectable_parameter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,24 +13,36 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<String> images = ['assets/img/line_chart.png', 'assets/img/table.png', 'assets/img/chat.png', 'assets/img/pie.png', 'assets/img/lines.png'];
+  List<String> parameters = ['Sales', 'Revenue', 'Items Sold', 'Margins', 'Secondary Sales'];
   late List<bool> selectedStates;
+  late List<bool> selectedParameters;
 
   @override
   void initState() {
     super.initState();
     selectedStates = List<bool>.filled(images.length, false);
+    selectedParameters = List<bool>.filled(parameters.length, false);
   }
 
-  void handleTap(int index) {
+  void handleTapForCharts(int index) {
     setState(() {
-      // Deselect all images
       for (int i = 0; i < selectedStates.length; i++) {
         if (i != index) {
           selectedStates[i] = false;
         }
       }
-      // Toggle the selected state of the tapped item
       selectedStates[index] = !selectedStates[index];
+    });
+  }
+
+  void handleTapForParameters(int index) {
+    setState(() {
+      for (int i = 0; i < selectedParameters.length; i++) {
+        if (i != index) {
+          selectedParameters[i] = false;
+        }
+      }
+      selectedParameters[index] = !selectedParameters[index];
     });
   }
 
@@ -77,15 +89,30 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Container(
               height: getScreenheight(context) * 0.04,
-              margin: EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.035).copyWith(top: getScreenheight(context) * 0.03), 
+              margin: EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.035).copyWith(top: getScreenheight(context) * 0.03),
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: images.length,
                 itemBuilder: (context, index) {
-                  return CustomSelectableContainer(
+                  return SelectableChartWidget(
                     imagePath: images[index],
                     isSelected: selectedStates[index],
-                    onTap: () => handleTap(index),
+                    onTap: () => handleTapForCharts(index),
+                  );
+                },
+              ),
+            ),
+            Container(
+              height: getScreenheight(context) * 0.04,
+              margin: EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.035).copyWith(top: getScreenheight(context) * 0.01),
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: parameters.length,
+                itemBuilder: (context, index) {
+                  return SelectableParameterWidget(
+                    text: parameters[index],
+                    isSelected: selectedParameters[index],
+                    onTap: () => handleTapForParameters(index),
                   );
                 },
               ),
