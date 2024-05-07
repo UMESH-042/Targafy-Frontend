@@ -64,6 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: getScreenWidth(context) * 0.1,
                       child: TextField(
                         decoration: InputDecoration(
+                          contentPadding: EdgeInsets.only(top: getScreenWidth(context) * 0.05, left: getScreenWidth(context) * 0.02),
                           hintText: 'Enter contact number',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),

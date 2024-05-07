@@ -3,6 +3,7 @@ import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/shared/components/primary_button.dart';
+import 'package:targafy/src/registration/view/screens/register_a_business_screen2.dart';
 
 class RegisterABusinessScreen1 extends StatefulWidget {
   const RegisterABusinessScreen1({super.key});
@@ -158,7 +159,11 @@ class _RegisterABusinessScreen1State extends State<RegisterABusinessScreen1> {
             ),
             Container(
               margin: EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.05).copyWith(top: getScreenheight(context) * 0.05),
-              child: PrimaryButton(function: () {}, text: 'Proceed'),
+              child: PrimaryButton(
+                  function: () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const RegisterABusinessScreen2()));
+                  },
+                  text: 'Proceed'),
             )
           ],
         ),
