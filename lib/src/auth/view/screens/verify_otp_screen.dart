@@ -67,7 +67,7 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [SizedBox(height: getScreenheight(context) * 0.02), SizedBox(height: getScreenheight(context) * 0.05), PrimaryButton(function: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterABusinessScreen1()));
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const RegisterABusinessScreen1()));
                 }, text: 'Verify OTP')],
               ),
             ),

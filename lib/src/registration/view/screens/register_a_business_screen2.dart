@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/shared/components/primary_button.dart';
-import 'package:targafy/src/home/view/home_screen.dart';
+import 'package:targafy/src/home/view/screens/home_screen.dart';
 
 class RegisterABusinessScreen2 extends StatefulWidget {
   const RegisterABusinessScreen2({super.key});
@@ -158,7 +158,7 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
                   SizedBox(height: getScreenheight(context) * 0.38),
                   PrimaryButton(
                       function: () {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomeScreen()), (route) => false);
                       },
                       text: 'Continue')
                 ],

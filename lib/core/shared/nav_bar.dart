@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:targafy/src/home/view/home_screen.dart';
+import 'package:targafy/src/home/view/screens/home_screen.dart';
 import 'package:targafy/src/users/ui/users_screen.dart';
 import 'package:targafy/src/activity/ui/activity_screen.dart';
 import 'package:targafy/src/groups/ui/groups_screen.dart';
