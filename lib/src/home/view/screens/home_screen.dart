@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/utils/texts.dart';
 import 'package:targafy/src/home/view/widgets/selectable_chart.dart';
@@ -84,7 +87,66 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        drawer: const Drawer(),
+        drawer: Drawer(
+          child: Column(
+            children: [
+              DrawerHeader(
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    width: double.infinity,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: primaryColor,
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(1.5),
+                      child: CircleAvatar(
+                        radius: getScreenWidth(context) * 0.09,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: getScreenWidth(context) * 0.02),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomText(
+                          text: 'Achal Saxena',
+                          fontSize: getScreenWidth(context) * 0.045,
+                          color: primaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        CustomText(
+                          text: 'Admin',
+                          fontSize: getScreenWidth(context) * 0.04,
+                          color: primaryColor,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              )),
+              ListTile(
+                title: Text('Item 1'),
+                onTap: () {
+                  // Update the state of the app.
+                  // ...
+                },
+              ),
+              ListTile(
+                title: Text('Item 2'),
+                onTap: () {
+                  // Update the state of the app.
+                  // ...
+                },
+              ),
+            ],
+          ),
+        ),
         body: Column(
           children: [
             Container(

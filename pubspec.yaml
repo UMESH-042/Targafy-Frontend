@@ -45,6 +45,9 @@ dependencies:
   otp_text_field: ^1.1.3
   flutter_otp_text_field: ^1.1.3+2
   go_router: ^14.0.2
+  cached_network_image: ^3.3.1
+  remixicon: ^1.2.0
+  packages_info: ^0.0.1-dev.1
 
 dev_dependencies:
   flutter_test:
