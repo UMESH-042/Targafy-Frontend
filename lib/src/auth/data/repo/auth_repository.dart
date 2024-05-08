@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:targafy/core/constants/url.dart';
 import 'package:targafy/core/utils/print_log.dart';
 
-class RegistrationRepo {
+class AuthRepo {
   static Future<Map<String, dynamic>> login({required String countryCode, required String phone}) async {
     final response = await http.post(
       Uri.parse('$baseUrl/login'),
@@ -40,7 +40,7 @@ class RegistrationRepo {
       return jsonDecode(response.body);
     } else {
       PrintLog.printLog(response.body);
-      throw Exception('Failed to login');
+      throw Exception('Failed to verify otp');
     }
   }
 }
