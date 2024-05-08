@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
+import 'package:targafy/core/shared/components/back_button.dart';
 import 'package:targafy/core/utils/texts.dart';
 import 'package:targafy/src/parameters/view/widgets/parameter_tile.dart';
 import 'package:targafy/src/parameters/view/widgets/target_tile.dart';
@@ -31,16 +32,7 @@ class _AddParameterTargetScreenState extends State<AddParameterTargetScreen> wit
     return Scaffold(
       body: Column(
         children: [
-          GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.04, vertical: getScreenheight(context) * 0.04).copyWith(bottom: 0),
-              alignment: Alignment.centerLeft,
-              child: Image.asset('assets/img/back.png'),
-            ),
-          ),
+          const CustomBackButton(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -121,3 +113,5 @@ class _AddParameterTargetScreenState extends State<AddParameterTargetScreen> wit
     );
   }
 }
+
+
