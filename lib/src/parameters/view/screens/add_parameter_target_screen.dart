@@ -3,7 +3,9 @@ import 'package:flutter/widgets.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/shared/components/back_button.dart';
+import 'package:targafy/core/shared/components/primary_button.dart';
 import 'package:targafy/core/utils/texts.dart';
+import 'package:targafy/src/parameters/view/screens/add_parameter.dart';
 import 'package:targafy/src/parameters/view/widgets/parameter_tile.dart';
 import 'package:targafy/src/parameters/view/widgets/target_tile.dart';
 
@@ -82,36 +84,46 @@ class _AddParameterTargetScreenState extends State<AddParameterTargetScreen> wit
               ),
             ],
           ),
-          if(selectedValue ==1)
-          SizedBox(
-            height: getScreenheight(context) * 0.6,
-            child: ListView(
-              children: const [
-                ParameterTile(parameterName: 'Sales', userAssigned: 5),
-                ParameterTile(parameterName: 'Items Sold', userAssigned: 10),
-                ParameterTile(parameterName: 'Revenue', userAssigned: 78),
-                ParameterTile(parameterName: 'Secondary Sales', userAssigned: 15),
-                ParameterTile(parameterName: 'Margins', userAssigned: 1),
+          if (selectedValue == 1)
+            Column(
+              children: [
+                SizedBox(
+                  height: getScreenheight(context) * 0.5,
+                  child: ListView(
+                    children: const [
+                      ParameterTile(parameterName: 'Sales', userAssigned: 5),
+                      ParameterTile(parameterName: 'Items Sold', userAssigned: 10),
+                      ParameterTile(parameterName: 'Revenue', userAssigned: 78),
+                      ParameterTile(parameterName: 'Secondary Sales', userAssigned: 15),
+                      ParameterTile(parameterName: 'Margins', userAssigned: 1),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: getScreenWidth(context) * 0.25,
+                  child: PrimaryButton(
+                      function: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const AddParameter()));
+                      },
+                      text: '+ Add'),
+                ),
               ],
             ),
-          ),
-          if(selectedValue ==2)
-          SizedBox(
-            height: getScreenheight(context) * 0.6,
-            child: ListView(
-              children: const [
-                TargetTIle(parameterName: 'Sales', target: 150),
-                TargetTIle(parameterName: 'Items Sold', target: 100),
-                TargetTIle(parameterName: 'Revenue', target: 10),
-                TargetTIle(parameterName: 'Secondary Sales', target: 180),
-                TargetTIle(parameterName: 'Margins', target: 200),
-              ],
+          if (selectedValue == 2)
+            SizedBox(
+              height: getScreenheight(context) * 0.6,
+              child: ListView(
+                children: const [
+                  TargetTIle(parameterName: 'Sales', target: 150),
+                  TargetTIle(parameterName: 'Items Sold', target: 100),
+                  TargetTIle(parameterName: 'Revenue', target: 10),
+                  TargetTIle(parameterName: 'Secondary Sales', target: 180),
+                  TargetTIle(parameterName: 'Margins', target: 200),
+                ],
+              ),
             ),
-          ),
         ],
       ),
     );
   }
 }
-
-
