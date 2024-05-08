@@ -1,5 +1,4 @@
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:remixicon/remixicon.dart';
 import 'package:targafy/core/constants/colors.dart';
 
@@ -9,7 +8,7 @@ import 'package:flutter/material.dart';
 class MyDrawer extends StatefulWidget {
   final String name;
 
-  const MyDrawer({Key? key, required this.name}) : super(key: key);
+  const MyDrawer({super.key, required this.name});
 
   @override
   State<MyDrawer> createState() => _MyDrawerState();

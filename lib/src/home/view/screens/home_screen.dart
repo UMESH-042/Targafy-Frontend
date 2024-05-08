@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:popover/popover.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/utils/texts.dart';
@@ -19,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> parameters = ['Sales', 'Revenue', 'Items Sold', 'Margins', 'Secondary Sales'];
   late List<bool> selectedStates;
   late List<bool> selectedParameters;
+  final GlobalKey<State<StatefulWidget>> _popoverKey = GlobalKey();
 
   @override
   void initState() {
@@ -36,6 +38,42 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       selectedStates[index] = !selectedStates[index];
     });
+  }
+
+  List<
+      (
+        String name,
+        String path,
+      )> popoverOptions = [('Option 1', '/option-1'), ('Option 2', '/option-2'), ('Option 3', '/option-3')];
+
+  Future<Object?> _showPopover(
+    BuildContext context,
+    List<(String, String)> popoverOptions,
+  ) {
+    Size size = MediaQuery.sizeOf(context);
+    return showPopover(
+      context: context,
+      backgroundColor: Colors.white,
+      radius: 16.0,
+      bodyBuilder: (context) => ListView(
+        shrinkWrap: true,
+        padding: EdgeInsets.zero,
+        children: popoverOptions.map((option) {
+          return ListTile(
+            title: Text(option.$1),
+            onTap: () {
+              Navigator.pushNamed(context, option.$2);
+            },
+          );
+        }).toList(),
+      ),
+
+      direction: PopoverDirection.top,
+      width: size.width * 0.5,
+      arrowHeight: 16.0,
+      arrowWidth: 16.0,
+      // onPop: () {},
+    );
   }
 
   void handleTapForParameters(int index) {
@@ -79,7 +117,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: GestureDetector(
+                  child: PopupMenuButton(
+                    color: Colors.white,
+                    surfaceTintColor: Colors.white,
+                    position: PopupMenuPosition.under,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15).copyWith(topRight: const Radius.circular(0)),
+                    ),
+                    onSelected: (value) {},
+                    itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+                      PopupMenuItem<int>(
+                        value: 1,
+                        child: CustomText(text: 'Add Parametes/Target', fontSize: getScreenWidth(context) * 0.04, fontWeight: FontWeight.w600, color: primaryColor),
+                      ),
+                      PopupMenuItem<int>(
+                        value: 1,
+                        child: CustomText(text: 'Add Charts', fontSize: getScreenWidth(context) * 0.04, fontWeight: FontWeight.w600, color: primaryColor),
+                      ),
+                    ],
                     child: Image.asset('assets/img/add.png'),
                   ),
                 )
