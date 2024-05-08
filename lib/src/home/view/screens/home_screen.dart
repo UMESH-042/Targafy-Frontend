@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:popover/popover.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
@@ -21,7 +19,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> parameters = ['Sales', 'Revenue', 'Items Sold', 'Margins', 'Secondary Sales'];
   late List<bool> selectedStates;
   late List<bool> selectedParameters;
-  final GlobalKey<State<StatefulWidget>> _popoverKey = GlobalKey();
 
   @override
   void initState() {
