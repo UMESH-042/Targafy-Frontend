@@ -8,7 +8,10 @@ class AuthRepo {
     final response = await http.post(
       Uri.parse('$baseUrl/login'),
       body: jsonEncode({
-        "contactNumber": {"countryCode": countryCode, "number": phone}
+        "contactNumber": {
+          "countryCode": countryCode,
+          "number": phone,
+        }
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -16,6 +19,7 @@ class AuthRepo {
     );
 
     if (response.statusCode == 200) {
+      PrintLog.printLog(response.body);
       return jsonDecode(response.body);
     } else {
       PrintLog.printLog(response.body);
