@@ -25,7 +25,7 @@ class RegistrationRepo {
 
   static Future<Map<String, dynamic>> verifyOtp({required String countryCode, required String phone, required String otp}) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/login'),
+      Uri.parse('$baseUrl/verifyotp'),
       body: jsonEncode({
         "otp": otp,
         "contactNumber": {"countryCode": countryCode, "number": phone}
