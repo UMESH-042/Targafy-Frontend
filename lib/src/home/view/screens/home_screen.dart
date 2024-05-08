@@ -7,6 +7,7 @@ import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/utils/texts.dart';
 import 'package:targafy/src/home/view/widgets/selectable_chart.dart';
 import 'package:targafy/src/home/view/widgets/selectable_parameter.dart';
+import 'package:targafy/src/parameters/view/screens/add_parameter_target_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -124,7 +125,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15).copyWith(topRight: const Radius.circular(0)),
                     ),
-                    onSelected: (value) {},
+                    onSelected: (value) {
+                      if (value == 1) {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const AddParameterTargetScreen()));
+                      }
+                    },
                     itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
                       PopupMenuItem<int>(
                         value: 1,
