@@ -33,7 +33,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 decoration: BoxDecoration(color: secondaryColor),
                 margin: EdgeInsets.zero,
                 padding: const EdgeInsets.all(10.0),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -100,7 +100,7 @@ class _MyDrawerState extends State<MyDrawer> {
                       itemBuilder: (context, index) {
                         // final business = userModel.businesses[index];
                         return ListTile(
-                          title: Row(
+                          title: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               // FutureBuilder<String?>(
@@ -144,7 +144,7 @@ class _MyDrawerState extends State<MyDrawer> {
                               //     return const CircularProgressIndicator();
                               //   },
                               // ),
-                              const SizedBox(width: 5),
+                              SizedBox(width: 5),
                               // Flexible(
                               //   child: Text(
                               //     business.name,
@@ -154,7 +154,7 @@ class _MyDrawerState extends State<MyDrawer> {
                               //     ),
                               //   ),
                               // ),
-                              const SizedBox(width: 5),
+                              SizedBox(width: 5),
                               // FutureBuilder<int>(
                               //   future: controller.getActivityCountForBusiness(business.businessId, business.userType), // Fetch the activity count asynchronously
                               //   builder: (context, snapshot) {

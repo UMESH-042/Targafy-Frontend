@@ -12,6 +12,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+
+  
+
+
   final TextEditingController _phoneController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -36,7 +40,8 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(height: getScreenheight(context) * 0.05),
             Container(
               alignment: Alignment.centerLeft,
-              margin: EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.05),
+              margin: EdgeInsets.symmetric(
+                  horizontal: getScreenWidth(context) * 0.05),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -67,19 +72,24 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: TextField(
                           controller: _phoneController,
                           decoration: InputDecoration(
-                            contentPadding: EdgeInsets.only(top: getScreenWidth(context) * 0.05, left: getScreenWidth(context) * 0.02),
+                            contentPadding: EdgeInsets.only(
+                                top: getScreenWidth(context) * 0.05,
+                                left: getScreenWidth(context) * 0.02),
                             hintText: 'Enter contact number',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color: primaryColor, width: 2),
+                              borderSide:
+                                  BorderSide(color: primaryColor, width: 2),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color: primaryColor, width: 2),
+                              borderSide:
+                                  BorderSide(color: primaryColor, width: 2),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color: primaryColor, width: 2),
+                              borderSide:
+                                  BorderSide(color: primaryColor, width: 2),
                             ),
                           ),
                         ),
@@ -105,12 +115,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   SizedBox(height: getScreenheight(context) * 0.05),
-                  PrimaryButton(function: () async{
-                    // Map<String, dynamic> response = await AuthRepo.login(countryCode: '+91', phone: '9134548705');
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const VerifyOTPScreen()));
-                  }, text: 'Send OTP')
+                  PrimaryButton(
+                      function: () async {
+                        // Map<String, dynamic> response = await AuthRepo.login(countryCode: '+91', phone: '9134548705');
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const VerifyOTPScreen()));
+                      },
+                      text: 'Send OTP')
                 ],
-              ),
+              ),  
             ),
           ],
         ),
