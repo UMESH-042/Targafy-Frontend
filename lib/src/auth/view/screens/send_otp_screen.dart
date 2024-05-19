@@ -12,10 +12,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
-  
-
-
   final TextEditingController _phoneController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -125,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       text: 'Send OTP')
                 ],
-              ),  
+              ),
             ),
           ],
         ),
