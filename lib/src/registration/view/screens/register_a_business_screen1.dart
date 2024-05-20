@@ -16,19 +16,12 @@ class _RegisterABusinessScreen1State extends State<RegisterABusinessScreen1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       body: SingleChildScrollView(
         child: Column(
           children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.04, vertical: getScreenheight(context) * 0.04),
-                alignment: Alignment.centerLeft,
-                child: Image.asset('assets/img/back.png'),
-              ),
-            ),
+            SizedBox(height: getScreenheight(context)*0.2,),
+            
             Container(
               margin: EdgeInsets.all(getScreenWidth(context) * 0.05),
               decoration: BoxDecoration(
@@ -161,7 +154,7 @@ class _RegisterABusinessScreen1State extends State<RegisterABusinessScreen1> {
               margin: EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.05).copyWith(top: getScreenheight(context) * 0.05),
               child: PrimaryButton(
                   function: () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const RegisterABusinessScreen2()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterABusinessScreen2()));
                   },
                   text: 'Proceed'),
             )
