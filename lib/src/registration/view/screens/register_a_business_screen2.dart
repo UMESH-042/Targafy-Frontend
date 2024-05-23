@@ -429,7 +429,7 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    BottomNavigationAndAppBar()),
+                                    const BottomNavigationAndAppBar()),
                             (route) => false);
                       },
                       text: 'Continue')

@@ -3,7 +3,7 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
-import 'package:targafy/src/auth/view/screens/send_otp_screen.dart';
+import 'package:targafy/src/auth/view/screens/login_screen.dart';
 import 'package:targafy/src/onBoarding/ui/intro_page2.dart';
 import 'package:targafy/src/onBoarding/ui/intro_page3.dart';
 import 'package:targafy/src/onBoarding/ui/intro_page1.dart';
