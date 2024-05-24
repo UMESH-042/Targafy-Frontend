@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:targafy/business_home_page/controller/business_controller.dart';
+import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
+import 'package:share/share.dart';
 
-class UsersScreen extends StatefulWidget {
+class UsersScreen extends ConsumerStatefulWidget {
   const UsersScreen({super.key});
 
   @override
-  State<UsersScreen> createState() => _UsersScreenState();
+  _UsersScreenState createState() => _UsersScreenState();
 }
 
-class _UsersScreenState extends State<UsersScreen> {
+class _UsersScreenState extends ConsumerState<UsersScreen> {
   final List<Map<String, String>> users = [
     {
       'name': 'John Doe',
@@ -44,8 +48,33 @@ class _UsersScreenState extends State<UsersScreen> {
     // Add more dummy users here
   ];
 
+  bool isAscending = true;
+  String sortType = "Name";
+
+  void sortFunction(String _sortType) {
+    setState(() {
+      if (_sortType == "Name") {
+        users.sort((a, b) =>
+            a['name']!.compareTo(b['name']!) * (isAscending ? 1 : -1));
+      } else if (_sortType == "Role") {
+        users.sort((a, b) =>
+            a['role']!.compareTo(b['role']!) * (isAscending ? 1 : -1));
+      }
+      sortType = _sortType;
+      isAscending = !isAscending;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final selectedBusinessData = ref.watch(currentBusinessProvider);
+    final selectedBusiness = selectedBusinessData?['business'] as Business?;
+    final selectedUserType = selectedBusinessData?['userType'] as String?;
+    // print(selectedUserType);
+    final selectedbusinessCode =
+        selectedBusinessData?['businessCode'] as String?;
+    final businessName = selectedBusiness?.name;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -57,7 +86,14 @@ class _UsersScreenState extends State<UsersScreen> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Handle Invite User button press
+                    String shareText = 'Dear User,\n\n'
+                        'We invite you to download our app via the following link: '
+                        'Please download the app from: https://play.google.com/store/apps/details?id=com.issuecop.app\n\n'
+                        'And then join our business using code: $selectedbusinessCode\n\n'
+                        'Best regards,\n'
+                        '$businessName Team';
+                    Share.share(shareText,
+                        subject: 'Join our business on BizIssue');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: lightblue,
@@ -88,6 +124,56 @@ class _UsersScreenState extends State<UsersScreen> {
                   ),
                 ),
               ],
+            ),
+            SizedBox(
+              height: getScreenheight(context) * 0.03,
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // ElevatedButton(
+                  //   onPressed: () => sortFunction("Name"),
+                  //   style: ElevatedButton.styleFrom(
+                  //     backgroundColor: lightblue,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(15),
+                  //       side: BorderSide(color: primaryColor, width: 2),
+                  //     ),
+                  //   ),
+                  //   child: Row(
+                  //     children: [
+                  //       Text(
+                  //         'Sort by Name',
+                  //         style: TextStyle(color: primaryColor),
+                  //       ),
+                  //       Icon(isAscending ? Icons.arrow_upward : Icons.arrow_downward, color: primaryColor),
+                  //     ],
+                  //   ),
+                  // ),
+                  // SizedBox(width: 10),
+                  // ElevatedButton(
+                  //   onPressed: () => sortFunction("Role"),
+                  //   style: ElevatedButton.styleFrom(
+                  //     backgroundColor: lightblue,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(15),
+                  //       side: BorderSide(color: primaryColor, width: 2),
+                  //     ),
+                  //   ),
+                  //   child: Row(
+                  //     children: [
+                  //       Text(
+                  //         'Sort by Role',
+                  //         style: TextStyle(color: primaryColor),
+                  //       ),
+                  //       Icon(isAscending ? Icons.arrow_upward : Icons.arrow_downward, color: primaryColor),
+                  //     ],
+                  //   ),
+                  // ),
+                ],
+              ),
             ),
             SizedBox(
               height: getScreenheight(context) * 0.03,
@@ -146,9 +232,3 @@ class _UsersScreenState extends State<UsersScreen> {
     );
   }
 }
-
-
-
-
-
-

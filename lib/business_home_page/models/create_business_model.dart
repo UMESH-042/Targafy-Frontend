@@ -1,45 +1,28 @@
-import 'package:json_annotation/json_annotation.dart';
+class CreateBusiness {
+  final String buisnessName;
+  final String logo;
+  final String industryType;
+  final String city;
+  final String country;
+  final String parameters;
 
-part 'create_business_model.g.dart';
-
-@JsonSerializable()
-class CreateBusinessModel {
-  String? name;
-  String? industryType;
-  String? city;
-  String? country;
-  String? userName;
-  String? logo;
-
-  CreateBusinessModel({
-    this.name,
-    this.industryType,
-    this.city,
-    this.country,
-    this.userName,
-    this.logo,
+  CreateBusiness({
+    required this.buisnessName,
+    required this.logo,
+    required this.industryType,
+    required this.city,
+    required this.country,
+    required this.parameters,
   });
 
-  factory CreateBusinessModel.fromJson(Map<String, dynamic> json) =>
-      _$CreateBusinessModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$CreateBusinessModelToJson(this);
-
-  CreateBusinessModel copyWith({
-    String? name,
-    String? industryType,
-    String? city,
-    String? country,
-    String? userName,
-    String? logo,
-  }) {
-    return CreateBusinessModel(
-      name: name ?? this.name,
-      industryType: industryType ?? this.industryType,
-      city: city ?? this.city,
-      country: country ?? this.country,
-      userName: userName ?? this.userName,
-      logo: logo ?? this.logo,
-    );
+  Map<String, dynamic> toJson() {
+    return {
+      'buisnessName': buisnessName,
+      'logo': logo,
+      'industryType': industryType,
+      'city': city,
+      'country': country,
+      'parameters': parameters,
+    };
   }
 }

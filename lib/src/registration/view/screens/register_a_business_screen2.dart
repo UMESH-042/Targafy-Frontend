@@ -201,11 +201,12 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Row(
+            Row(  
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 GestureDetector(

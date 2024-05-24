@@ -49,6 +49,7 @@ void main() async {
   bool hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
   final expiryTime = prefs.getInt('expiryTime') ?? 0;
   final isTokenValid = DateTime.now().millisecondsSinceEpoch < expiryTime;
+  print(token);
   runApp(ProviderScope(
       child: MyApp(
     hasSeenOnboarding: hasSeenOnboarding,
