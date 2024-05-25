@@ -171,12 +171,14 @@
 //   }
 // }
 
+// ignore_for_file: unused_field
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/shared/components/primary_button.dart';
-import 'package:targafy/src/home/view/screens/home_screen.dart';
+// import 'package:targafy/src/home/view/screens/home_screen.dart';
 import 'package:targafy/src/home/view/screens/widgets/Bottom_navigation_bar.dart';
 
 class RegisterABusinessScreen2 extends StatefulWidget {

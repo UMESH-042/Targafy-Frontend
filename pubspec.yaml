@@ -60,6 +60,8 @@ dependencies:
   awesome_dialog: ^3.2.1
   country_pickers: ^2.0.0
   intl_phone_field: ^3.2.0
+  firebase_core: ^2.31.1
+  firebase_messaging: ^14.9.3
 
 dev_dependencies:
   flutter_test:
