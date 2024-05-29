@@ -5,6 +5,7 @@ import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart'
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:share/share.dart';
+import 'package:targafy/src/users/ui/AcceptUsersScreen.dart';
 
 class UsersScreen extends ConsumerStatefulWidget {
   const UsersScreen({super.key});
@@ -110,6 +111,10 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                 ElevatedButton(
                   onPressed: () {
                     // Handle Accept Users button press
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BusinessRequestsPage()));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: lightblue,

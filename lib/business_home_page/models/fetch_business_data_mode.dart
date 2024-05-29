@@ -86,7 +86,7 @@ class Business {
   final String industryType;
   final String city;
   final String country;
-  final List<String> parameters;
+  // final List<String> parameters;
 
   Business({
     required this.id,
@@ -96,7 +96,7 @@ class Business {
     required this.industryType,
     required this.city,
     required this.country,
-    required this.parameters,
+    // required this.parameters,
   });
 
   factory Business.fromJson(Map<String, dynamic> json) {
@@ -108,7 +108,7 @@ businessCode: json['businessCode'],
       industryType: json['industryType'],
       city: json['city'],
       country: json['country'],
-      parameters: List<String>.from(json['parameters']),
+      // parameters: List<String>.from(json['parameters']),
     );
   }
 }

@@ -1,9 +1,10 @@
-// import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 // import 'package:flutter/material.dart';
 // import 'package:targafy/core/constants/colors.dart';
 // import 'package:targafy/core/constants/dimensions.dart';
 // import 'package:targafy/src/home/view/screens/widgets/CustomCharts.dart';
+// import 'package:targafy/src/home/view/screens/widgets/DataTable.dart';
 // import 'package:targafy/src/home/view/screens/widgets/GraphicalStatistics.dart';
+// import 'package:targafy/src/home/view/screens/widgets/PieChart.dart';
 // import 'package:targafy/src/home/view/widgets/selectable_chart.dart';
 // import 'package:targafy/src/home/view/widgets/selectable_parameter.dart';
 
@@ -208,6 +209,23 @@
 //                       predictedData: predictedData[i],
 //                     ),
 //                   ),
+//             if (selectedStates[1] && parameters.isNotEmpty)
+//               for (int i = 0; i < parameters.length; i++)
+//                 if (selectedParameters[i])
+//                   Padding(
+//                     padding: const EdgeInsets.all(8.0),
+//                     child: DataTableWidget(
+//                       parameter: parameters[i],
+//                       actualData: actualData[i],
+//                       predictedData: predictedData[i],
+//                     ),
+//                   ),
+//             if (selectedStates[3] && parameters.isNotEmpty)
+//               for (int i = 0; i < parameters.length; i++)
+//                 if (selectedParameters[i])
+//                   Padding(
+//                       padding: const EdgeInsets.all(8.0),
+//                       child: PiechartGraph(parameter: parameters[i],actualData: actualData[i])),
 //             if (selectedStates[0] &&
 //                 !selectedParameters.any((element) => element))
 //               const Padding(
@@ -218,6 +236,21 @@
 //                   predictedData: [],
 //                 ),
 //               ),
+//             if (selectedStates[1] &&
+//                 !selectedParameters.any((element) => element))
+//               const Padding(
+//                 padding: EdgeInsets.all(8.0),
+//                 child: DataTableWidget(
+//                   parameter: '',
+//                   actualData: [],
+//                   predictedData: [],
+//                 ),
+//               ),
+//             if (selectedStates[3] &&
+//                 !selectedParameters.any((element) => element))
+//               const Padding(
+//                   padding: EdgeInsets.all(8.0),
+//                   child: PiechartGraph(parameter: '',actualData: [])),
 //             Container(
 //               margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
 //               padding: const EdgeInsets.all(8),
@@ -256,24 +289,13 @@
 //                       predictedData: predictedData[i],
 //                     ),
 //                   ),
-//             if (selectedStates[0] &&
-//                 !selectedParameters.any((element) => element))
-//               const Padding(
-//                 padding: EdgeInsets.all(8.0),
-//                 child: Graphicalstatistics(
-//                   parameter: '',
-//                   actualData: [],
-//                   predictedData: [],
-//                 ),
-//               ),
 //           ],
 //         ),
-//       )
+//       ),
 //     );
 //   }
 // }
 
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
@@ -393,6 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ['May', 195],
     ],
   ];
+
   late List<bool> selectedStates;
   late List<bool> selectedParameters;
   String selectedParameter = '';

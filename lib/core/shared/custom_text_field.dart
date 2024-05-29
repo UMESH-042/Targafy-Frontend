@@ -1,56 +1,63 @@
 import 'package:flutter/material.dart';
-import 'package:targafy/core/constants/colors.dart';
-import 'package:targafy/core/constants/dimensions.dart';
 
-class CustomTextField extends StatefulWidget {
+class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
-  final String label;
-  final bool obscure;
+  final ValueChanged<String>? onChanged;
+  final String labelText;
   final double height;
+  final double width;
+
   const CustomTextField({
-    this.obscure = false,
+    Key? key,
     required this.controller,
-    required this.label,
-    this.height = 0.04,
-    super.key,
-  });
+    this.onChanged,
+    required this.labelText,
+    this.height = 0.01,
+    this.width = 1.8,
+  }) : super(key: key);
 
-  @override
-  State<CustomTextField> createState() => _CustomTextFieldState();
-}
-
-class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: getScreenWidth(context) * 0.05,
-        vertical: getScreenWidth(context) * 0.04,
-      ).copyWith(bottom: 0),
-      child: SizedBox(
-        height: getScreenheight(context) * widget.height ,
-        child: TextField(
-          obscureText: widget.obscure,
-          controller: widget.controller,
+    double heightOfScreen = MediaQuery.of(context).size.height;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(width: 5),
+        Text(
+          labelText,
+          style: const TextStyle(
+            color: Colors.black,
+            fontFamily: "Poppins",
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+          textAlign: TextAlign.left,
+        ),
+        SizedBox(height: height * heightOfScreen),
+        TextField(
+          textCapitalization:
+              TextCapitalization.sentences, // or TextCapitalization.words
+          keyboardType: TextInputType.text,
+          controller: controller,
+          onChanged: onChanged,
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.only(top: getScreenWidth(context) * 0.0, left: getScreenWidth(context) * 0.02),
-            hintText: widget.label,
-            hintStyle: TextStyle(color: const Color(0xff787878), fontFamily: 'Sofia Pro', fontSize: getScreenWidth(context) * 0.035),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: primaryColor, width: 2),
-            ),
+            contentPadding: const EdgeInsets.all(14),
+            filled: false,
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: primaryColor, width: 2),
+              borderRadius: BorderRadius.circular(11),
+              borderSide: const BorderSide(color: Colors.grey),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: primaryColor, width: 2),
+              borderRadius: BorderRadius.circular(11),
+              borderSide: const BorderSide(color: Colors.grey),
             ),
           ),
+          cursorColor: Colors.black,
+          cursorHeight: 22,
+          cursorWidth: width,
         ),
-      ),
+        SizedBox(height: height * heightOfScreen * 1.2),
+      ],
     );
   }
 }

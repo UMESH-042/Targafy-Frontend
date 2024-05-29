@@ -17,6 +17,7 @@ class CreateBusinessController {
     required String city,
     required String country,
     required String parameters,
+      required Function(bool isSuccess) onCompletion,
   }) async {
     final token = await _getAuthToken();
     if (token == null) {
@@ -45,13 +46,15 @@ class CreateBusinessController {
       body: jsonEncode(businessData),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       final data = jsonDecode(response.body);
       print("Success");
       // Handle successful response
+      onCompletion(true); // Invoke callback with failure status
     } else {
       // Handle error
       print("Error: ${response.statusCode}");
+      onCompletion(true); // Invoke callback with success status
     }
   }
 }

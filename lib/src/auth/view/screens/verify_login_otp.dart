@@ -78,7 +78,6 @@
 //   }
 // }
 
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
@@ -86,8 +85,9 @@ import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/shared/components/primary_button.dart';
 import 'package:targafy/src/auth/view/Controllers/login.dart';
-import 'package:targafy/utils/utils.dart';
+import 'package:targafy/src/home/view/screens/Mandatory_filed.dart';
 import 'package:targafy/src/registration/view/screens/register_a_business_screen1.dart';
+import 'package:targafy/utils/utils.dart';
 
 class VerifyOTPScreen extends ConsumerStatefulWidget {
   const VerifyOTPScreen({super.key});
@@ -112,7 +112,9 @@ class _VerifyOTPScreenState extends ConsumerState<VerifyOTPScreen> {
                 Navigator.pop(context);
               },
               child: Container(
-                margin: EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.04, vertical: getScreenheight(context) * 0.04),
+                margin: EdgeInsets.symmetric(
+                    horizontal: getScreenWidth(context) * 0.04,
+                    vertical: getScreenheight(context) * 0.04),
                 alignment: Alignment.centerLeft,
                 child: Image.asset('assets/img/back.png'),
               ),
@@ -131,7 +133,11 @@ class _VerifyOTPScreenState extends ConsumerState<VerifyOTPScreen> {
             ),
             Text(
               'Manage Your Business Easily With Us',
-              style: TextStyle(fontFamily: 'Sofia Pro', fontWeight: FontWeight.w400, fontSize: getScreenWidth(context) * 0.04, color: tertiaryColor),
+              style: TextStyle(
+                  fontFamily: 'Sofia Pro',
+                  fontWeight: FontWeight.w400,
+                  fontSize: getScreenWidth(context) * 0.04,
+                  color: tertiaryColor),
             ),
             SizedBox(height: getScreenheight(context) * 0.05),
             OtpTextField(
@@ -139,7 +145,8 @@ class _VerifyOTPScreenState extends ConsumerState<VerifyOTPScreen> {
               cursorColor: Colors.black,
               fieldWidth: getScreenWidth(context) * 0.12,
               borderRadius: BorderRadius.circular(12),
-              textStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+              textStyle: const TextStyle(
+                  fontWeight: FontWeight.bold, color: Colors.black),
               showCursor: false,
               borderWidth: 2,
               numberOfFields: 4,
@@ -155,7 +162,8 @@ class _VerifyOTPScreenState extends ConsumerState<VerifyOTPScreen> {
             ),
             Container(
               alignment: Alignment.centerLeft,
-              margin: EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.05),
+              margin: EdgeInsets.symmetric(
+                  horizontal: getScreenWidth(context) * 0.05),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -164,11 +172,17 @@ class _VerifyOTPScreenState extends ConsumerState<VerifyOTPScreen> {
                   PrimaryButton(
                     function: () async {
                       loginNotifier.updateOtpCode(otp);
-                      final success = await loginNotifier.verifyLoginOtp(context);
+                      final success =
+                          await loginNotifier.verifyLoginOtp(context);
                       if (success) {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterABusinessScreen1()));
+                        // Navigator.pushReplacement(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => MandatoryFieldPage()));
                       } else {
-                        showSnackBar(context, 'Invalid OTP. Please try again.', Colors.red);
+                        showSnackBar(context, 'Invalid OTP. Please try again.',
+                            Colors.red);
                       }
                     },
                     text: 'Verify OTP',

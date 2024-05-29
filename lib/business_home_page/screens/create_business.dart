@@ -2,9 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/business_home_page/controller/create_business_controller.dart';
+import '../../core/shared/custom_text_field.dart';
 import '../../widgets/custom_back_button.dart';
-import '../../widgets/custom_text_field.dart';
 import '../../widgets/submit_button.dart';
 
 final createBusinessControllerProvider =
@@ -133,19 +134,33 @@ class _CreateBusinessPageState extends ConsumerState<CreateBusinessPage> {
                 onPressed: () {
                   createBusinessController.createBusiness(
                     buisnessName: nameController.text,
-                    logo: _selectedImagePath ??
-                        '', // Pass the logo URL here if you have it
+                    logo: _selectedImagePath ?? '',
                     industryType: industryTypeController.text,
                     city: cityController.text,
                     country: countryController.text,
                     parameters: "Sales, Revenue, Items Sold, Margins",
+                    onCompletion: (bool isSuccess) {
+                      if (isSuccess) {
+                        // Reload data for drawer content
+                        // This might involve refetching the list of businesses
+                        // and updating the UI accordingly
+                        ref.refresh(
+                            businessAndUserProvider); // Example of refreshing data using Riverpod
+                        // Show success message
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Business created successfully')),
+                        );
+                        Navigator.pop(context);
+                      } else {
+                        // Show error message
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Failed to create business')),
+                        );
+                      }
+                    },
                   );
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Submitted Successfully')),
-                    );
-                  }
                 },
               ),
             ],

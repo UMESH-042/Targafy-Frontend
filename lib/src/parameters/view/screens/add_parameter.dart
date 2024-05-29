@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:targafy/core/shared/components/back_button.dart';
-import 'package:targafy/core/shared/custom_text_field.dart';
+import 'package:targafy/core/shared/custom_textform_field.dart';
 
 class AddParameter extends StatefulWidget {
   const AddParameter({super.key});
