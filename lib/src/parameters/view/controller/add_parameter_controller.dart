@@ -22,6 +22,12 @@ class ParameterNotifier extends StateNotifier<AsyncValue<void>> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('authToken');
+      // print(token);
+      // print(businessId);
+      // print(userId);
+      // print(parameterName);
+      // print(chartType);
+      // print(duration);
 
       final response = await http.post(
         Uri.parse('http://13.234.163.59:5000/api/v1/params/add/$businessId'),
@@ -32,17 +38,19 @@ class ParameterNotifier extends StateNotifier<AsyncValue<void>> {
         body: json.encode({
           'name': parameterName,
           'charts': chartType,
-          'userIds': userId,
           'duration': duration,
           'description': description,
+          'userIds': userId,
         }),
       );
-
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         state = const AsyncValue.data(null);
+        print("Success");
         return true;
       } else {
-        state = AsyncValue.error('Failed to submit parameter', StackTrace.current);
+        print("${response.statusCode} no Success");
+        state =
+            AsyncValue.error('Failed to submit parameter', StackTrace.current);
         return false;
       }
     } catch (error, stackTrace) {
