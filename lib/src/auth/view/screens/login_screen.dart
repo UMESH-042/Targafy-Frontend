@@ -6,9 +6,9 @@ import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/shared/components/primary_button.dart';
 import 'package:targafy/src/auth/view/Controllers/login.dart';
 import 'package:targafy/src/auth/view/screens/verify_login_otp.dart';
-import 'package:targafy/utils/routes/app_route_constants.dart';
+// import 'package:targafy/utils/routes/app_route_constants.dart';
 import 'package:targafy/utils/utils.dart';
-import 'package:go_router/go_router.dart';
+// import 'package:go_router/go_router.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
