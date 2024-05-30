@@ -1,4 +1,4 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "cmake.sourceDirectory": "D:/Intern/Targafy-Frontend/windows/runner"
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "cmake.sourceDirectory": "D:/Intern/Targafy-Frontend/windows/runner"
 }
