@@ -247,7 +247,7 @@ class _RegisterABusinessScreen1State
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Business already exists')),
                     );
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
