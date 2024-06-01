@@ -19,7 +19,7 @@ final joinBusinessProvider =
   if (token == null) throw Exception('No token found');
 
   final response = await http.post(
-    Uri.parse('http://13.234.163.59:5000/api/v1/business/send/request/JMJTKF'),
+    Uri.parse('http://13.234.163.59:5000/api/v1/business/send/request/${request.businessCode}'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
