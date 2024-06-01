@@ -12,6 +12,7 @@ import 'package:targafy/core/utils/texts.dart';
 import 'package:targafy/src/activity/ui/activity_screen.dart';
 import 'package:targafy/src/groups/ui/groups_screen.dart';
 import 'package:targafy/src/home/view/screens/AddScreen.dart';
+import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
 import 'package:targafy/src/home/view/screens/home_screen.dart';
 import 'package:targafy/src/parameters/view/screens/add_parameter_target_screen.dart';
 import 'package:targafy/src/users/ui/UsersScreen.dart';
@@ -54,103 +55,6 @@ class _BottomNavigationAndAppBarState
     print(selectedbusinessCode);
 
     return Scaffold(
-      // appBar: PreferredSize(
-      //   preferredSize: Size.fromHeight(getScreenheight(context) * 0.08),
-      //   child: Container(
-      //     alignment: Alignment.center,
-      //     padding:
-      //         EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.035),
-      //     margin: EdgeInsets.only(top: getScreenheight(context) * 0.01),
-      //     child: AppBar(
-      //       title: CustomText(
-      //         text: selectedBusiness != null && selectedUserType != null
-      //             ? '${selectedBusiness.name}\n($selectedUserType)'
-      //             : 'Hi Admin',
-      //         fontSize: getScreenWidth(context) * 0.055,
-      //       ),
-      //       centerTitle: false,
-      //       actions: [
-      //         Padding(
-      //           padding: const EdgeInsets.symmetric(horizontal: 10),
-      //           child: GestureDetector(
-      //             child: Image.asset('assets/img/search.png'),
-      //           ),
-      //         ),
-      //         Padding(
-      //           padding: const EdgeInsets.symmetric(horizontal: 10),
-      //           child: GestureDetector(
-      //             child: Image.asset('assets/img/filter.png'),
-      //           ),
-      //         ),
-      //         Padding(
-      //           padding: const EdgeInsets.symmetric(horizontal: 10),
-      //           child: GestureDetector(
-      //             onTap: () {
-      //               if (_selectedIndex == 1) {
-      //                 Navigator.push(
-      //                   context,
-      //                   MaterialPageRoute(
-      //                     builder: (context) =>
-      //                         const AddParameterTargetScreen(),
-      //                   ),
-      //                 );
-      //               }
-      //             },
-      //             child: _selectedIndex == 1
-      //                 ? const CircleAvatar(
-      //                     radius: 20,
-      //                     backgroundImage: NetworkImage(
-      //                       'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
-      //                     ),
-      //                   )
-      //                 : PopupMenuButton(
-      //                     color: Colors.white,
-      //                     surfaceTintColor: Colors.white,
-      //                     position: PopupMenuPosition.under,
-      //                     shape: RoundedRectangleBorder(
-      //                       borderRadius: BorderRadius.circular(15)
-      //                           .copyWith(topRight: const Radius.circular(0)),
-      //                     ),
-      //                     onSelected: (value) {
-      //                       if (value == 1) {
-      //                         Navigator.push(
-      //                           context,
-      //                           MaterialPageRoute(
-      //                             builder: (context) =>
-      //                                 const AddParameterTargetScreen(),
-      //                           ),
-      //                         );
-      //                       }
-      //                     },
-      //                     itemBuilder: (BuildContext context) =>
-      //                         <PopupMenuEntry<int>>[
-      //                       PopupMenuItem<int>(
-      //                         value: 1,
-      //                         child: CustomText(
-      //                           text: 'Add Parameters/Target',
-      //                           fontSize: getScreenWidth(context) * 0.04,
-      //                           fontWeight: FontWeight.w600,
-      //                           color: primaryColor,
-      //                         ),
-      //                       ),
-      //                       PopupMenuItem<int>(
-      //                         value: 1,
-      //                         child: CustomText(
-      //                           text: 'Add Charts',
-      //                           fontSize: getScreenWidth(context) * 0.04,
-      //                           fontWeight: FontWeight.w600,
-      //                           color: primaryColor,
-      //                         ),
-      //                       ),
-      //                     ],
-      //                     child: Image.asset('assets/img/add.png'),
-      //                   ),
-      //           ),
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      // ),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(getScreenheight(context) * 0.08),
         child: Container(
@@ -179,86 +83,178 @@ class _BottomNavigationAndAppBarState
                   child: Image.asset('assets/img/filter.png'),
                 ),
               ),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 10),
+              //   child: GestureDetector(
+              //     onTap: () {
+              //       if (_selectedIndex == 1) {
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (context) =>
+              //                 const AddParameterTargetScreen(),
+              //           ),
+              //         );
+              //       }
+              //     },
+              //     child: PopupMenuButton<int>(
+              //       icon: Icon(Icons.more_vert), // Three dots icon
+              //       color: Colors.white,
+              //       surfaceTintColor: Colors.white,
+              //       position: PopupMenuPosition.under,
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(15)
+              //             .copyWith(topRight: const Radius.circular(0)),
+              //       ),
+              //       onSelected: (value) {
+              //         if (value == 1) {
+              //           Navigator.push(
+              //             context,
+              //             MaterialPageRoute(
+              //               builder: (context) =>
+              //                   const AddParameterTargetScreen(),
+              //             ),
+              //           );
+              //         } else if (value == 2) {
+              //           // Navigator.push(
+              //           //   context,
+              //           //   MaterialPageRoute(
+              //           //     builder: (context) => const AddChartsScreen(), // Assuming you have a screen for Add Charts
+              //           //   ),
+              //           // );
+              //         } else if (value == 3) {
+              //           Navigator.push(
+              //             context,
+              //             MaterialPageRoute(
+              //               builder: (context) =>
+              //                   const BusinessProfile(), // Assuming you have a screen for Business Profile
+              //             ),
+              //           );
+              //         }
+              //       },
+              //       itemBuilder: (BuildContext context) =>
+              //           <PopupMenuEntry<int>>[
+              //         PopupMenuItem<int>(
+              //           value: 1,
+              //           child: CustomText(
+              //             text: 'Add Parameters/Target',
+              //             fontSize: getScreenWidth(context) * 0.04,
+              //             fontWeight: FontWeight.w600,
+              //             color: primaryColor,
+              //           ),
+              //         ),
+              //         PopupMenuItem<int>(
+              //           value: 2,
+              //           child: CustomText(
+              //             text: 'Add Charts',
+              //             fontSize: getScreenWidth(context) * 0.04,
+              //             fontWeight: FontWeight.w600,
+              //             color: primaryColor,
+              //           ),
+              //         ),
+              //         PopupMenuItem<int>(
+              //           value: 3,
+              //           child: CustomText(
+              //             text: 'Business Profile',
+              //             fontSize: getScreenWidth(context) * 0.04,
+              //             fontWeight: FontWeight.w600,
+              //             color: primaryColor,
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+              // Modify the PopupMenuButton in the appBar
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: GestureDetector(
-                  onTap: () {
-                    if (_selectedIndex == 1) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              const AddParameterTargetScreen(),
-                        ),
-                      );
-                    }
+                child: Consumer(
+                  builder: (context, ref, _) {
+                    final userRoleAsyncValue = ref.watch(userRoleProvider);
+
+                    return userRoleAsyncValue.when(
+                      data: (role) {
+                        // Check if the role is user or miniAdmin
+                        if (role == 'user' || role == 'miniAdmin') {
+                          // Don't show the three-dot option
+                          return SizedBox.shrink();
+                        } else {
+                          // Show the three-dot option
+                          return PopupMenuButton<int>(
+                            icon: Icon(Icons.more_vert),
+                            color: Colors.white,
+                            surfaceTintColor: Colors.white,
+                            position: PopupMenuPosition.under,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)
+                                  .copyWith(topRight: const Radius.circular(0)),
+                            ),
+                            onSelected: (value) {
+                              if (value == 1) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AddParameterTargetScreen(),
+                                  ),
+                                );
+                              } else if (value == 2) {
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (context) => const AddChartsScreen(), // Assuming you have a screen for Add Charts
+                                //   ),
+                                // );
+                              } else if (value == 3) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const BusinessProfile(), // Assuming you have a screen for Business Profile
+                                  ),
+                                );
+                              }
+                            },
+                            itemBuilder: (BuildContext context) =>
+                                <PopupMenuEntry<int>>[
+                              PopupMenuItem<int>(
+                                value: 1,
+                                child: CustomText(
+                                  text: 'Add Parameters/Target',
+                                  fontSize: getScreenWidth(context) * 0.04,
+                                  fontWeight: FontWeight.w600,
+                                  color: primaryColor,
+                                ),
+                              ),
+                              PopupMenuItem<int>(
+                                value: 2,
+                                child: CustomText(
+                                  text: 'Add Charts',
+                                  fontSize: getScreenWidth(context) * 0.04,
+                                  fontWeight: FontWeight.w600,
+                                  color: primaryColor,
+                                ),
+                              ),
+                              PopupMenuItem<int>(
+                                value: 3,
+                                child: CustomText(
+                                  text: 'Business Profile',
+                                  fontSize: getScreenWidth(context) * 0.04,
+                                  fontWeight: FontWeight.w600,
+                                  color: primaryColor,
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+                      },
+                      loading: () => SizedBox.shrink(),
+                      error: (error, stack) {
+                        // Handle error case
+                        return SizedBox.shrink();
+                      },
+                    );
                   },
-                  child: PopupMenuButton<int>(
-                    icon: Icon(Icons.more_vert), // Three dots icon
-                    color: Colors.white,
-                    surfaceTintColor: Colors.white,
-                    position: PopupMenuPosition.under,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)
-                          .copyWith(topRight: const Radius.circular(0)),
-                    ),
-                    onSelected: (value) {
-                      if (value == 1) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const AddParameterTargetScreen(),
-                          ),
-                        );
-                      } else if (value == 2) {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => const AddChartsScreen(), // Assuming you have a screen for Add Charts
-                        //   ),
-                        // );
-                      } else if (value == 3) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const BusinessProfile(), // Assuming you have a screen for Business Profile
-                          ),
-                        );
-                      }
-                    },
-                    itemBuilder: (BuildContext context) =>
-                        <PopupMenuEntry<int>>[
-                      PopupMenuItem<int>(
-                        value: 1,
-                        child: CustomText(
-                          text: 'Add Parameters/Target',
-                          fontSize: getScreenWidth(context) * 0.04,
-                          fontWeight: FontWeight.w600,
-                          color: primaryColor,
-                        ),
-                      ),
-                      PopupMenuItem<int>(
-                        value: 2,
-                        child: CustomText(
-                          text: 'Add Charts',
-                          fontSize: getScreenWidth(context) * 0.04,
-                          fontWeight: FontWeight.w600,
-                          color: primaryColor,
-                        ),
-                      ),
-                      PopupMenuItem<int>(
-                        value: 3,
-                        child: CustomText(
-                          text: 'Business Profile',
-                          fontSize: getScreenWidth(context) * 0.04,
-                          fontWeight: FontWeight.w600,
-                          color: primaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ],
@@ -415,7 +411,6 @@ class _BottomNavigationAndAppBarState
           },
         ),
       ),
-
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),

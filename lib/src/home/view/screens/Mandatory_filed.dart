@@ -20,7 +20,7 @@ class _MandatoryFieldPageState extends ConsumerState<MandatoryFieldPage> {
   @override
   void initState() {
     super.initState();
-    // ref.read(nameControllerProvider.notifier).checkFirstTime();
+    ref.read(nameControllerProvider.notifier).checkFirstTime();
   }
 
   @override
@@ -74,17 +74,16 @@ class _MandatoryFieldPageState extends ConsumerState<MandatoryFieldPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-             TextFormField(controller: nameController,autofocus: true),
+              TextFormField(controller: nameController, autofocus: true),
               const SizedBox(height: 20),
               SubmitButton(
                 onPressed: () async {
-                
                   if (nameController.text.isEmpty ||
                       nameController.text == "Guest") {
                     showSnackBar(context, "Enter Correct Name!!", invalidColor);
                     return;
                   }
-
+                  
                   try {
                     await ref
                         .read(nameControllerProvider.notifier)

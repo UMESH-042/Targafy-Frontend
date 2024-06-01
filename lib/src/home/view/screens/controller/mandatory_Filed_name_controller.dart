@@ -1,8 +1,10 @@
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-final nameControllerProvider = StateNotifierProvider<NameController, NameState>((ref) {
+final nameControllerProvider =
+    StateNotifierProvider<NameController, NameState>((ref) {
   return NameController();
 });
 
@@ -37,6 +39,7 @@ class NameController extends StateNotifier<NameState> {
       await prefs.setBool('isFirstTime', false);
       state = NameState(isFirstTime: false, name: name);
     } else {
+      print(response.statusCode);
       throw Exception('Failed to update name');
     }
   }
