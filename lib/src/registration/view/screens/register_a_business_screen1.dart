@@ -174,23 +174,23 @@ class _RegisterABusinessScreen1State
                       ),
                     ],
                   ),
-                  OtpTextField(
-                    autoFocus: true,
-                    cursorColor: Colors.black,
-                    fieldWidth: getScreenWidth(context) * 0.08,
-                    fieldHeight: getScreenheight(context) * 0.045,
-                    borderRadius: BorderRadius.circular(12),
-                    textStyle: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.black),
-                    showCursor: false,
-                    borderWidth: 1,
-                    numberOfFields: 4,
-                    borderColor: primaryColor,
-                    showFieldAsBox: true,
-                    onSubmit: (String code) {},
-                    disabledBorderColor: primaryColor,
-                    enabledBorderColor: primaryColor,
-                  ),
+                  // OtpTextField(
+                  //   autoFocus: true,
+                  //   cursorColor: Colors.black,
+                  //   fieldWidth: getScreenWidth(context) * 0.08,
+                  //   fieldHeight: getScreenheight(context) * 0.045,
+                  //   borderRadius: BorderRadius.circular(12),
+                  //   textStyle: const TextStyle(
+                  //       fontWeight: FontWeight.bold, color: Colors.black),
+                  //   showCursor: false,
+                  //   borderWidth: 1,
+                  //   numberOfFields: 4,
+                  //   borderColor: primaryColor,
+                  //   showFieldAsBox: true,
+                  //   onSubmit: (String code) {},
+                  //   disabledBorderColor: primaryColor,
+                  //   enabledBorderColor: primaryColor,
+                  // ),
                   const SizedBox(height: 5),
                   Container(
                     alignment: Alignment.center,
@@ -247,7 +247,7 @@ class _RegisterABusinessScreen1State
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Business already exists')),
                     );
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>

@@ -153,8 +153,7 @@ class AddParameter extends ConsumerStatefulWidget {
 }
 
 class _AddParameterState extends ConsumerState<AddParameter> {
-  final TextEditingController _parameterNameController =
-      TextEditingController();
+  final TextEditingController _parameterNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   List<String> _selectedUserIds = [];
   List<String> _selectedUsersNames = [];
@@ -183,7 +182,7 @@ class _AddParameterState extends ConsumerState<AddParameter> {
         _selectedDuration != null &&
         _descriptionController.text.isNotEmpty) {
       ref
-          .read(parameterProvider.notifier)
+          .read(parameterNotifierProvider.notifier)
           .addParameter(
             businessId,
             _parameterNameController.text,
@@ -194,7 +193,7 @@ class _AddParameterState extends ConsumerState<AddParameter> {
           )
           .then((success) {
         if (success) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(true);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Failed to submit parameter')),
@@ -210,8 +209,7 @@ class _AddParameterState extends ConsumerState<AddParameter> {
 
   Widget _buildChips() {
     if (_selectedUsersNames.isEmpty) {
-      return SizedBox
-          .shrink(); // Return an empty widget if there are no selected users
+      return SizedBox.shrink(); // Return an empty widget if there are no selected users
     }
     return Wrap(
       spacing: 8.0,
@@ -222,8 +220,10 @@ class _AddParameterState extends ConsumerState<AddParameter> {
           onDeleted: () {
             setState(() {
               final index = _selectedUsersNames.indexOf(userName);
-              _selectedUsersNames.removeAt(index);
-              _selectedUserIds.removeAt(index);
+              if (index >= 0 && index < _selectedUsersNames.length) {
+                _selectedUsersNames.removeAt(index);
+                _selectedUserIds.removeAt(index);
+              }
             });
           },
         );
@@ -235,6 +235,7 @@ class _AddParameterState extends ConsumerState<AddParameter> {
   Widget build(BuildContext context) {
     final asyncUsers = ref.watch(businessUsersProvider);
     print(_selectedUserIds);
+ 
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -261,14 +262,14 @@ class _AddParameterState extends ConsumerState<AddParameter> {
                   );
                 }).toList(),
                 onChanged: (value) {
-                  setState(() {
-                    if (!_selectedUserIds.contains(value)) {
-                      _selectedUserIds.add(value!);
+                  if (value != null && !_selectedUserIds.contains(value)) {
+                    setState(() {
+                      _selectedUserIds.add(value);
                       _selectedUsersNames.add(users
                           .firstWhere((user) => user.userId == value)
                           .name);
-                    }
-                  });
+                    });
+                  }
                 },
                 selectedItemBuilder: (BuildContext context) {
                   return _selectedUsersNames.map<Widget>((String item) {
@@ -277,16 +278,13 @@ class _AddParameterState extends ConsumerState<AddParameter> {
                 },
                 isExpanded: true,
                 hint: Text('Select Users'),
-                // For multiple selection
                 icon: Icon(Icons.arrow_drop_down),
                 iconSize: 24,
                 elevation: 16,
-                // Style of the dropdown
                 style: TextStyle(color: Colors.deepPurple),
               ),
               loading: () => Center(child: CircularProgressIndicator()),
-              error: (error, stackTrace) =>
-                  Text('Failed to load users: $error'),
+              error: (error, stackTrace) => Text('Failed to load users: $error'),
             ),
             SizedBox(height: 20),
             _buildChips(),
@@ -295,8 +293,7 @@ class _AddParameterState extends ConsumerState<AddParameter> {
               label: 'Select charts',
               dropdownValue: _selectedChart,
               dropdownItems: const [
-                DropdownMenuItem(
-                    value: 'Line Chart', child: Text('Line Chart')),
+                DropdownMenuItem(value: 'Line Chart', child: Text('Line Chart')),
                 DropdownMenuItem(value: 'Table', child: Text('Table')),
                 DropdownMenuItem(value: 'Pie Chart', child: Text('Pie Chart')),
                 DropdownMenuItem(value: 'Lines', child: Text('Lines')),
@@ -313,8 +310,7 @@ class _AddParameterState extends ConsumerState<AddParameter> {
               dropdownValue: _selectedDuration,
               dropdownItems: [
                 DropdownMenuItem(value: '1stTo31st', child: Text('1stTo31st')),
-                DropdownMenuItem(
-                    value: 'upto30days', child: Text('upto30days')),
+                DropdownMenuItem(value: 'upto30days', child: Text('upto30days')),
                 DropdownMenuItem(value: '30days', child: Text('30days')),
               ],
               onChanged: (value) {
