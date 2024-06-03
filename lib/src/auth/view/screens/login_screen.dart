@@ -97,8 +97,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         },
                       ),
                       SizedBox(width: getScreenWidth(context) * 0.02),
-                      SizedBox(
-                        width: getScreenWidth(context) * 0.7,
+                      Flexible(
                         child: Text(
                           'I agree to the Terms and Conditions and Privacy Policy',
                           style: TextStyle(
@@ -120,7 +119,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const VerifyOTPScreen()));
+                                  builder: (context) =>
+                                      const VerifyOTPScreen()));
                         }
                       } else {
                         showSnackBar(
@@ -141,3 +141,5 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 }
+
+

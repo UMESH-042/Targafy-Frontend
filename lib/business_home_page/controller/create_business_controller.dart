@@ -16,7 +16,6 @@ class CreateBusinessController {
     required String industryType,
     required String city,
     required String country,
-    required String parameters,
       required Function(bool isSuccess) onCompletion,
   }) async {
     final token = await _getAuthToken();
@@ -37,7 +36,6 @@ class CreateBusinessController {
       'industryType': industryType,
       'city': city,
       'country': country,
-      'parameters': parameters,
     };
 
     final response = await http.post(

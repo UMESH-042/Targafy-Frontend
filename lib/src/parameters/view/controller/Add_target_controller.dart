@@ -14,7 +14,8 @@ class UserNotifier extends StateNotifier<AsyncValue<List<User>>> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('authToken');
       final response = await http.get(
-        Uri.parse('http://13.234.163.59:5000/api/v1/params/get-assign-user/$paramName/$businessId'),
+        Uri.parse(
+            'http://13.234.163.59:5000/api/v1/params/get-assign-user/$paramName/$businessId'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -22,7 +23,8 @@ class UserNotifier extends StateNotifier<AsyncValue<List<User>>> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['data'] as List;
-        state = AsyncValue.data(data.map((user) => User.fromJson(user)).toList());
+        state =
+            AsyncValue.data(data.map((user) => User.fromJson(user)).toList());
       } else {
         state = AsyncValue.error('Failed to load users', StackTrace.current);
       }
@@ -41,7 +43,8 @@ class TargetNotifier extends StateNotifier<AsyncValue<void>> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('authToken');
       final response = await http.post(
-        Uri.parse('http://13.234.163.59:5000/api/v1/target/add-target/$businessId'),
+        Uri.parse(
+            'http://13.234.163.59:5000/api/v1/target/add-target/$businessId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -60,10 +63,12 @@ class TargetNotifier extends StateNotifier<AsyncValue<void>> {
   }
 }
 
-final userProvider = StateNotifierProvider<UserNotifier, AsyncValue<List<User>>>((ref) {
+final userProvider =
+    StateNotifierProvider<UserNotifier, AsyncValue<List<User>>>((ref) {
   return UserNotifier();
 });
 
-final targetProvider = StateNotifierProvider<TargetNotifier, AsyncValue<void>>((ref) {
+final targetProvider =
+    StateNotifierProvider<TargetNotifier, AsyncValue<void>>((ref) {
   return TargetNotifier();
 });

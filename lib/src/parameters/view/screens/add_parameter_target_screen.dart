@@ -797,12 +797,31 @@ class _AddParameterTargetScreenState extends ConsumerState<AddParameterTargetScr
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stackTrace) => Center(child: Text('Failed to load targets: $error')),
+              error: (error, stackTrace) {
+                return Column(
+                  children: [
+                    // Center(child: Text('Failed to load targets: $error')),
+                    SizedBox(
+                      height: getScreenheight(context) * 0.6,
+                      child: ListView.builder(
+                        itemCount: parameters.length,
+                        itemBuilder: (context, index) {
+                          final parameter = parameters[index];
+                          return TargetTile(
+                            parameterName: parameter.name,
+                            target: 0,
+                            businessId: businessId,
+                            onDataAdded: _refreshTargets,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
         ],
       ),
     );
   }
 }
-
-

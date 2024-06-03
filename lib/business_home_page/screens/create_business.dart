@@ -138,7 +138,6 @@ class _CreateBusinessPageState extends ConsumerState<CreateBusinessPage> {
                     industryType: industryTypeController.text,
                     city: cityController.text,
                     country: countryController.text,
-                    parameters: "Sales, Revenue, Items Sold, Margins",
                     onCompletion: (bool isSuccess) {
                       if (isSuccess) {
                         // Reload data for drawer content

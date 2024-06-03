@@ -242,6 +242,172 @@
 //   }
 // }
 
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:targafy/business_home_page/controller/business_controller.dart';
+// import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
+// import 'package:targafy/core/constants/colors.dart';
+// import 'package:targafy/core/constants/dimensions.dart';
+// import 'package:share/share.dart';
+// import 'package:targafy/src/users/ui/RequestUsersScreen.dart';
+// import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
+
+// class UsersScreen extends ConsumerStatefulWidget {
+//   const UsersScreen({super.key});
+
+//   @override
+//   _UsersScreenState createState() => _UsersScreenState();
+// }
+
+// class _UsersScreenState extends ConsumerState<UsersScreen> {
+//   @override
+//   void initState() {
+//     super.initState();
+//     final selectedBusinessData = ref.read(currentBusinessProvider);
+//     final businessId = selectedBusinessData?['business']?.id;
+//     if (businessId != null) {
+//       ref.read(businessUsersProvider.notifier).fetchBusinessUsers(businessId);
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final selectedBusinessData = ref.watch(currentBusinessProvider);
+//     final selectedBusiness = selectedBusinessData?['business'] as Business?;
+//     final selectedUserType = selectedBusinessData?['userType'] as String?;
+//     final selectedbusinessCode =
+//         selectedBusinessData?['businessCode'] as String?;
+//     final businessName = selectedBusiness?.name;
+//     final businessId = selectedBusiness?.id;
+
+//     final usersState = ref.watch(businessUsersProvider);
+//     print(businessId);
+
+//     // Placeholder image URL
+//     const placeholderImageUrl =
+//         'https://randomuser.me/api/portraits/lego/2.jpg';
+
+//     return Scaffold(
+//       body: Padding(
+//         padding: const EdgeInsets.all(8.0),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.stretch,
+//           children: [
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//               children: [
+//                 ElevatedButton(
+//                   onPressed: () {
+//                     String shareText = 'Dear User,\n\n'
+//                         'We invite you to download our app via the following link: '
+//                         'Please download the app from: https://play.google.com/store/apps/details?id=com.issuecop.app\n\n'
+//                         'And then join our business using code: $selectedbusinessCode\n\n'
+//                         'Best regards,\n'
+//                         '$businessName Team';
+//                     Share.share(shareText,
+//                         subject: 'Join our business on BizIssue');
+//                   },
+//                   style: ElevatedButton.styleFrom(
+//                     backgroundColor: lightblue,
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(15),
+//                       side: BorderSide(color: primaryColor, width: 2),
+//                     ),
+//                   ),
+//                   child: Text(
+//                     'Invite Users',
+//                     style: TextStyle(color: primaryColor),
+//                   ),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () {
+//                     // Handle Accept Users button press
+//                     Navigator.push(
+//                         context,
+//                         MaterialPageRoute(
+//                             builder: (context) => BusinessRequestsPage(
+//                                   businessId: businessId,
+//                                 )));
+//                   },
+//                   style: ElevatedButton.styleFrom(
+//                     backgroundColor: lightblue,
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(15),
+//                       side: BorderSide(color: primaryColor, width: 2),
+//                     ),
+//                   ),
+//                   child: Text(
+//                     'Accept Users',
+//                     style: TextStyle(color: primaryColor),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//             SizedBox(
+//               height: getScreenheight(context) * 0.03,
+//             ),
+//             usersState.when(
+//               data: (users) => Expanded(
+//                 child: ListView.separated(
+//                   itemCount: users.length,
+//                   separatorBuilder: (context, index) => SizedBox(
+//                     height: getScreenheight(context) * 0.03,
+//                   ),
+//                   itemBuilder: (context, index) {
+//                     final user = users[index];
+//                     return Container(
+//                       padding: const EdgeInsets.all(10),
+//                       decoration: BoxDecoration(
+//                         borderRadius: BorderRadius.circular(15),
+//                         border: Border.all(color: primaryColor, width: 2),
+//                       ),
+//                       child: Row(
+//                         children: [
+//                           CircleAvatar(
+//                             backgroundImage: NetworkImage(
+//                               placeholderImageUrl,
+//                             ),
+//                           ),
+//                           SizedBox(width: getScreenheight(context) * 0.02),
+//                           Expanded(
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 Text(
+//                                   user.name,
+//                                   style: TextStyle(
+//                                     color: primaryColor,
+//                                     fontWeight: FontWeight.bold,
+//                                   ),
+//                                 ),
+//                                 Text(
+//                                   'UserType: ${user.userType}',
+//                                   style: TextStyle(color: primaryColor),
+//                                 ),
+//                                 Text(
+//                                   'Role: ${user.role}',
+//                                   style: TextStyle(color: primaryColor),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     );
+//                   },
+//                 ),
+//               ),
+//               loading: () => const Center(child: CircularProgressIndicator()),
+//               error: (error, stackTrace) =>
+//                   Center(child: Text('Error: $error')),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
@@ -261,16 +427,6 @@ class UsersScreen extends ConsumerStatefulWidget {
 
 class _UsersScreenState extends ConsumerState<UsersScreen> {
   @override
-  void initState() {
-    super.initState();
-    final selectedBusinessData = ref.read(currentBusinessProvider);
-    final businessId = selectedBusinessData?['business']?.id;
-    if (businessId != null) {
-      ref.read(businessUsersProvider.notifier).fetchBusinessUsers(businessId);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final selectedBusinessData = ref.watch(currentBusinessProvider);
     final selectedBusiness = selectedBusinessData?['business'] as Business?;
@@ -280,7 +436,9 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
     final businessName = selectedBusiness?.name;
     final businessId = selectedBusiness?.id;
 
-    final usersState = ref.watch(businessUsersProvider);
+    final usersStream =
+        ref.watch(businessUsersStreamProvider(businessId ?? ''));
+
     print(businessId);
 
     // Placeholder image URL
@@ -323,11 +481,12 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                   onPressed: () {
                     // Handle Accept Users button press
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => BusinessRequestsPage(
-                                  businessId: businessId,
-                                )));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            BusinessRequestsPage(businessId: businessId),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: lightblue,
@@ -346,7 +505,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
             SizedBox(
               height: getScreenheight(context) * 0.03,
             ),
-            usersState.when(
+            usersStream.when(
               data: (users) => Expanded(
                 child: ListView.separated(
                   itemCount: users.length,

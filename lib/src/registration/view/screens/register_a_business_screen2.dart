@@ -203,12 +203,11 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Row(  
+            Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 GestureDetector(
@@ -246,71 +245,6 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
                         contentPadding: EdgeInsets.only(
                             top: getScreenWidth(context) * 0.0,
                             left: getScreenWidth(context) * 0.02),
-                        hintText: 'Enter your email address',
-                        hintStyle: TextStyle(
-                            color: const Color(0xff787878),
-                            fontFamily: 'Sofia Pro',
-                            fontSize: getScreenWidth(context) * 0.035),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: primaryColor, width: 2),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: primaryColor, width: 2),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: primaryColor, width: 2),
-                        ),
-                        labelText: 'Email', // Label added
-                        labelStyle:
-                            TextStyle(color: primaryColor), // Label text color
-                        // suffixIcon: Icon(Icons.email, color: primaryColor), // Icon at the end
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: getScreenheight(context) * 0.025),
-                  // Similar modifications for other text fields
-                  // TextField for 'Enter your name'
-                  SizedBox(
-                    height: getScreenWidth(context) * 0.1,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.only(
-                            top: getScreenWidth(context) * 0.0,
-                            left: getScreenWidth(context) * 0.02),
-                        hintText: 'Enter your name',
-                        hintStyle: TextStyle(
-                            color: const Color(0xff787878),
-                            fontFamily: 'Sofia Pro',
-                            fontSize: getScreenWidth(context) * 0.035),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: primaryColor, width: 2),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: primaryColor, width: 2),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: primaryColor, width: 2),
-                        ),
-                        labelText: 'Name',
-                        labelStyle: TextStyle(color: primaryColor),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: getScreenheight(context) * 0.025),
-                  // TextField for 'Enter your business name'
-                  SizedBox(
-                    height: getScreenWidth(context) * 0.1,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.only(
-                            top: getScreenWidth(context) * 0.0,
-                            left: getScreenWidth(context) * 0.02),
                         hintText: 'Enter your business name',
                         hintStyle: TextStyle(
                             color: const Color(0xff787878),
@@ -328,7 +262,72 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(color: primaryColor, width: 2),
                         ),
-                        labelText: 'Business Name',
+                        labelText: 'Business Name', // Label added
+                        labelStyle:
+                            TextStyle(color: primaryColor), // Label text color
+                        // suffixIcon: Icon(Icons.email, color: primaryColor), // Icon at the end
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: getScreenheight(context) * 0.025),
+                  // Similar modifications for other text fields
+                  // TextField for 'Enter your name'
+                  SizedBox(
+                    height: getScreenWidth(context) * 0.1,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.only(
+                            top: getScreenWidth(context) * 0.0,
+                            left: getScreenWidth(context) * 0.02),
+                        hintText: 'Enter Industry type',
+                        hintStyle: TextStyle(
+                            color: const Color(0xff787878),
+                            fontFamily: 'Sofia Pro',
+                            fontSize: getScreenWidth(context) * 0.035),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: primaryColor, width: 2),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: primaryColor, width: 2),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: primaryColor, width: 2),
+                        ),
+                        labelText: 'Industry Type',
+                        labelStyle: TextStyle(color: primaryColor),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: getScreenheight(context) * 0.025),
+                  // TextField for 'Enter your business name'
+                  SizedBox(
+                    height: getScreenWidth(context) * 0.1,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.only(
+                            top: getScreenWidth(context) * 0.0,
+                            left: getScreenWidth(context) * 0.02),
+                        hintText: 'Enter your city',
+                        hintStyle: TextStyle(
+                            color: const Color(0xff787878),
+                            fontFamily: 'Sofia Pro',
+                            fontSize: getScreenWidth(context) * 0.035),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: primaryColor, width: 2),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: primaryColor, width: 2),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: primaryColor, width: 2),
+                        ),
+                        labelText: 'City',
                         labelStyle: TextStyle(color: primaryColor),
                       ),
                     ),
@@ -403,7 +402,7 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
                         contentPadding: EdgeInsets.only(
                             top: getScreenWidth(context) * 0.0,
                             left: getScreenWidth(context) * 0.02),
-                        hintText: 'Enter parameters to monitor',
+                        hintText: 'Enter your Country',
                         hintStyle: TextStyle(
                             color: const Color(0xff787878),
                             fontFamily: 'Sofia Pro',
@@ -420,7 +419,7 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(color: primaryColor, width: 2),
                         ),
-                        labelText: 'Parameters to Monitor',
+                        labelText: 'Country',
                         labelStyle: TextStyle(color: primaryColor),
                       ),
                     ),

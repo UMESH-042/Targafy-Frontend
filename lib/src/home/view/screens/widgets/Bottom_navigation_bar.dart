@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,7 +52,7 @@ class _BottomNavigationAndAppBarState
     final selectedUserType = selectedBusinessData?['userType'] as String?;
     final selectedbusinessCode =
         selectedBusinessData?['businessCode'] as String?;
-    print(selectedUserType);
+    final SelectedRole = selectedBusinessData?['role'] as String?;
     print(selectedbusinessCode);
 
     return Scaffold(
@@ -83,88 +84,6 @@ class _BottomNavigationAndAppBarState
                   child: Image.asset('assets/img/filter.png'),
                 ),
               ),
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(horizontal: 10),
-              //   child: GestureDetector(
-              //     onTap: () {
-              //       if (_selectedIndex == 1) {
-              //         Navigator.push(
-              //           context,
-              //           MaterialPageRoute(
-              //             builder: (context) =>
-              //                 const AddParameterTargetScreen(),
-              //           ),
-              //         );
-              //       }
-              //     },
-              //     child: PopupMenuButton<int>(
-              //       icon: Icon(Icons.more_vert), // Three dots icon
-              //       color: Colors.white,
-              //       surfaceTintColor: Colors.white,
-              //       position: PopupMenuPosition.under,
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(15)
-              //             .copyWith(topRight: const Radius.circular(0)),
-              //       ),
-              //       onSelected: (value) {
-              //         if (value == 1) {
-              //           Navigator.push(
-              //             context,
-              //             MaterialPageRoute(
-              //               builder: (context) =>
-              //                   const AddParameterTargetScreen(),
-              //             ),
-              //           );
-              //         } else if (value == 2) {
-              //           // Navigator.push(
-              //           //   context,
-              //           //   MaterialPageRoute(
-              //           //     builder: (context) => const AddChartsScreen(), // Assuming you have a screen for Add Charts
-              //           //   ),
-              //           // );
-              //         } else if (value == 3) {
-              //           Navigator.push(
-              //             context,
-              //             MaterialPageRoute(
-              //               builder: (context) =>
-              //                   const BusinessProfile(), // Assuming you have a screen for Business Profile
-              //             ),
-              //           );
-              //         }
-              //       },
-              //       itemBuilder: (BuildContext context) =>
-              //           <PopupMenuEntry<int>>[
-              //         PopupMenuItem<int>(
-              //           value: 1,
-              //           child: CustomText(
-              //             text: 'Add Parameters/Target',
-              //             fontSize: getScreenWidth(context) * 0.04,
-              //             fontWeight: FontWeight.w600,
-              //             color: primaryColor,
-              //           ),
-              //         ),
-              //         PopupMenuItem<int>(
-              //           value: 2,
-              //           child: CustomText(
-              //             text: 'Add Charts',
-              //             fontSize: getScreenWidth(context) * 0.04,
-              //             fontWeight: FontWeight.w600,
-              //             color: primaryColor,
-              //           ),
-              //         ),
-              //         PopupMenuItem<int>(
-              //           value: 3,
-              //           child: CustomText(
-              //             text: 'Business Profile',
-              //             fontSize: getScreenWidth(context) * 0.04,
-              //             fontWeight: FontWeight.w600,
-              //             color: primaryColor,
-              //           ),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
               // Modify the PopupMenuButton in the appBar
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -175,7 +94,7 @@ class _BottomNavigationAndAppBarState
                     return userRoleAsyncValue.when(
                       data: (role) {
                         // Check if the role is user or miniAdmin
-                        if (role == 'user' || role == 'miniAdmin') {
+                        if (role == 'User' || role == 'MiniAdmin') {
                           // Don't show the three-dot option
                           return SizedBox.shrink();
                         } else {
@@ -264,7 +183,7 @@ class _BottomNavigationAndAppBarState
       drawer: Drawer(
         child: Consumer(
           builder: (context, ref, _) {
-            // Retrieve the async value containing the data
+            // Retrieve the stream containing the data
             final asyncValue = ref.watch(businessAndUserProvider);
 
             return asyncValue.when(
