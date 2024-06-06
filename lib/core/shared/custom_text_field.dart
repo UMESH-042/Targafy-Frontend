@@ -8,13 +8,13 @@ class CustomTextField extends StatelessWidget {
   final double width;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     required this.controller,
     this.onChanged,
     required this.labelText,
     this.height = 0.01,
     this.width = 1.8,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

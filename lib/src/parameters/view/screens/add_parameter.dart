@@ -146,7 +146,7 @@ import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 
 class AddParameter extends ConsumerStatefulWidget {
-  const AddParameter({Key? key}) : super(key: key);
+  const AddParameter({super.key});
 
   @override
   ConsumerState<AddParameter> createState() => _AddParameterState();
@@ -155,8 +155,8 @@ class AddParameter extends ConsumerStatefulWidget {
 class _AddParameterState extends ConsumerState<AddParameter> {
   final TextEditingController _parameterNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  List<String> _selectedUserIds = [];
-  List<String> _selectedUsersNames = [];
+  final List<String> _selectedUserIds = [];
+  final List<String> _selectedUsersNames = [];
   String? _selectedChart;
   String? _selectedDuration;
 
@@ -196,20 +196,20 @@ class _AddParameterState extends ConsumerState<AddParameter> {
           Navigator.of(context).pop(true);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to submit parameter')),
+            const SnackBar(content: Text('Failed to submit parameter')),
           );
         }
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill all fields')),
+        const SnackBar(content: Text('Please fill all fields')),
       );
     }
   }
 
   Widget _buildChips() {
     if (_selectedUsersNames.isEmpty) {
-      return SizedBox.shrink(); // Return an empty widget if there are no selected users
+      return const SizedBox.shrink(); // Return an empty widget if there are no selected users
     }
     return Wrap(
       spacing: 8.0,
@@ -245,15 +245,15 @@ class _AddParameterState extends ConsumerState<AddParameter> {
             const CustomBackButton(
               text: 'Add Parameter',
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             CustomFieldParameter(
               controller: _parameterNameController,
               label: 'Enter Parameter Name',
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             asyncUsers.when(
               data: (users) => DropdownButtonFormField<String>(
-                decoration: InputDecoration(labelText: 'Select User'),
+                decoration: const InputDecoration(labelText: 'Select User'),
                 value: null,
                 items: users.map((user) {
                   return DropdownMenuItem<String>(
@@ -277,18 +277,18 @@ class _AddParameterState extends ConsumerState<AddParameter> {
                   }).toList();
                 },
                 isExpanded: true,
-                hint: Text('Select Users'),
-                icon: Icon(Icons.arrow_drop_down),
+                hint: const Text('Select Users'),
+                icon: const Icon(Icons.arrow_drop_down),
                 iconSize: 24,
                 elevation: 16,
-                style: TextStyle(color: Colors.deepPurple),
+                style: const TextStyle(color: Colors.deepPurple),
               ),
-              loading: () => Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stackTrace) => Text('Failed to load users: $error'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildChips(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             CustomFieldParameter(
               label: 'Select charts',
               dropdownValue: _selectedChart,
@@ -304,11 +304,11 @@ class _AddParameterState extends ConsumerState<AddParameter> {
                 });
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             CustomFieldParameter(
               label: 'Duration',
               dropdownValue: _selectedDuration,
-              dropdownItems: [
+              dropdownItems: const [
                 DropdownMenuItem(value: '1stTo31st', child: Text('1stTo31st')),
                 DropdownMenuItem(value: 'upto30days', child: Text('upto30days')),
                 DropdownMenuItem(value: '30days', child: Text('30days')),
@@ -319,15 +319,15 @@ class _AddParameterState extends ConsumerState<AddParameter> {
                 });
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             CustomFieldParameter(
               controller: _descriptionController,
               label: 'Enter Description',
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _submitParameter,
-              child: Text('Submit'),
+              child: const Text('Submit'),
             ),
           ],
         ),

@@ -117,7 +117,7 @@ class _VerifyOTPScreenState extends ConsumerState<VerifyOTPScreen> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MandatoryFieldPage(),
+                            builder: (context) => const MandatoryFieldPage(),
                           ),
                         );
                       } else {
@@ -125,7 +125,7 @@ class _VerifyOTPScreenState extends ConsumerState<VerifyOTPScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                RegisterABusinessScreen1(),
+                                const RegisterABusinessScreen1(),
                           ),
                         );
                       }

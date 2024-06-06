@@ -12,7 +12,7 @@ final createBusinessControllerProvider =
     Provider((ref) => CreateBusinessController());
 
 class CreateBusinessPage extends ConsumerStatefulWidget {
-  const CreateBusinessPage({Key? key}) : super(key: key);
+  const CreateBusinessPage({super.key});
 
   @override
   _CreateBusinessPageState createState() => _CreateBusinessPageState();

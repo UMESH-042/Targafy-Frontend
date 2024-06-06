@@ -630,7 +630,7 @@ import 'package:targafy/src/parameters/view/widgets/target_tile.dart';
 import 'package:targafy/src/parameters/view/screens/add_parameter.dart';
 
 class AddParameterTargetScreen extends ConsumerStatefulWidget {
-  const AddParameterTargetScreen({Key? key}) : super(key: key);
+  const AddParameterTargetScreen({super.key});
 
   @override
   ConsumerState<AddParameterTargetScreen> createState() => _AddParameterTargetScreenState();

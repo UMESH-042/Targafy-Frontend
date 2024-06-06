@@ -11,14 +11,14 @@ class RequestTile extends StatelessWidget {
   final Function() onReject;
 
   const RequestTile({
-    Key? key,
+    super.key,
     this.logoUrl,
     required this.name,
     required this.date,
     required this.contactNumber,
     required this.onAccept,
     required this.onReject,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

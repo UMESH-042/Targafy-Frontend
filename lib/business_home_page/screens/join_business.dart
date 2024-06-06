@@ -7,6 +7,8 @@
 
 
   class JoinBusinessScreen extends ConsumerStatefulWidget {
+  const JoinBusinessScreen({super.key});
+
     @override
     _JoinBusinessScreenState createState() => _JoinBusinessScreenState();
   }
@@ -19,10 +21,10 @@
     Widget build(BuildContext context) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Join Business'),
+          title: const Text('Join Business'),
         ),
         body: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
             child: Column(
@@ -30,7 +32,7 @@
               children: [
                 TextFormField(
                   controller: _controller,
-                  decoration: InputDecoration(labelText: 'Business Code'),
+                  decoration: const InputDecoration(labelText: 'Business Code'),
                   maxLength: 6,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -42,7 +44,7 @@
                     return null;
                   },
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Consumer(builder: (context, ref, child) {
                   return ElevatedButton(
                     onPressed: () async {
@@ -52,16 +54,16 @@
                           final joinBusinessState = ref.read(joinBusinessProvider(request).future);
                           final success = await joinBusinessState;
                           if (success) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Successfully joined business')));
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Successfully joined business')));
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to join business')));
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to join business')));
                           }
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
                         }
                       }
                     },
-                    child: Text('Submit'),
+                    child: const Text('Submit'),
                   );
                 }),
               ],

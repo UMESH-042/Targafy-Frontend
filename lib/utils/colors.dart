@@ -28,3 +28,21 @@ problemColor
 invalidColor
 errorHighlightColor
 negativeFeedbackColor */
+//tile color
+
+Color reassignColor = Colors.blue.withOpacity(0.2);
+Color changeDateColor = Colors.purple.withOpacity(0.2);
+Color criticalColor = Colors.red.withOpacity(0.2);
+Color blockedColor = Colors.black.withOpacity(0.5);
+Color closedColor = Colors.green.withOpacity(0.2);
+Color changeTitleColor = Colors.yellow.withOpacity(0.2);
+// Colors.green.shade600 good color
+
+/* errorColor
+alertColor
+failureColor
+warningColor
+problemColor
+invalidColor
+errorHighlightColor
+negativeFeedbackColor */

@@ -6,11 +6,11 @@ class DataTableWidget extends StatelessWidget {
   final List<List<dynamic>> predictedData;
 
   const DataTableWidget({
-    Key? key,
+    super.key,
     required this.parameter,
     required this.actualData,
     required this.predictedData,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

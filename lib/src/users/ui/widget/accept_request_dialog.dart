@@ -1,4 +1,3 @@
-
 // // user_selection_dialog.dart
 // import 'package:flutter/material.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,7 +45,7 @@
 
 //     return Dialog(
 //       shape: RoundedRectangleBorder(
-//         borderRadius: BorderRadius.circular(10.0),  
+//         borderRadius: BorderRadius.circular(10.0),
 //       ),
 //       child: Padding(
 //         padding: const EdgeInsets.all(16.0),
@@ -231,11 +230,11 @@ class UserSelectionDialog extends ConsumerStatefulWidget {
   final String businessId;
 
   const UserSelectionDialog({
-    Key? key,
+    super.key,
     required this.userId,
     required this.userRequestCallback,
     required this.businessId,
-  }) : super(key: key);
+  });
 
   @override
   _UserSelectionDialogState createState() => _UserSelectionDialogState();
@@ -250,7 +249,9 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(businessUsersProvider.notifier).fetchBusinessUsers(widget.businessId);
+      ref
+          .read(businessUsersProvider.notifier)
+          .fetchBusinessUsers(widget.businessId);
     });
   }
 
@@ -415,7 +416,8 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                                     selectedRole!,
                                   );
                               Navigator.pop(context);
-                              widget.userRequestCallback(true); // Notify parent widget
+                              widget.userRequestCallback(
+                                  true); // Notify parent widget
                             } catch (e) {
                               widget.userRequestCallback(false);
                             }
@@ -424,14 +426,15 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: Text("Error"),
-                                content: Text("Please select a user and role."),
+                                title: const Text("Error"),
+                                content: const Text(
+                                    "Please select a user and role."),
                                 actions: [
                                   TextButton(
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text("OK"),
+                                    child: const Text("OK"),
                                   ),
                                 ],
                               ),
@@ -447,7 +450,7 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
             if (userRequestState is AsyncError)
               Text(
                 'Error: ${userRequestState.error}',
-                style: TextStyle(color: Colors.red),
+                style: const TextStyle(color: Colors.red),
               ),
           ],
         ),

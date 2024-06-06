@@ -419,7 +419,7 @@ final dataAddedControllerProvider =
     Provider<DataAddedController>((ref) => DataAddedController());
 
 class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -563,13 +563,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               );
             },
-            loading: () => Center(child: CircularProgressIndicator()),
+            loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, stackTrace) => Center(child: Text('Error: $error')),
           ),
           if (selectedStates.isNotEmpty &&
               selectedStates[0] &&
               selectedParameter.isEmpty)
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(8.0),
               child: CustomChart(
                 parameter: '',
@@ -586,14 +586,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               builder: (context,
                   AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
                   final data = snapshot.data!;
                   print(data);
                   return Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: CustomChart(
                       parameter: selectedParameter,
                       actualData: data['userEntries'] ?? [],
@@ -612,14 +612,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               builder: (context,
                   AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
                   final data = snapshot.data!;
                   print(data);
                   return Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: PiechartGraph(
                         parameter: selectedParameter,
                         actualData: data['userEntries'] ?? [],
@@ -636,14 +636,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               builder: (context,
                   AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
                   final data = snapshot.data!;
                   print(data);
                   return Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: DataTableWidget(
                         parameter: selectedParameter,
                         actualData: data['userEntries'] ?? [],

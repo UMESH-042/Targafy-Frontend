@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:targafy/src/parameters/view/model/parameter_model.dart';
 import 'package:targafy/src/parameters/view/model/user_target_model.dart';
 
 // User Notifier

@@ -8,8 +8,7 @@ import 'package:targafy/widgets/custom_back_button.dart';
 class BusinessRequestsPage extends ConsumerStatefulWidget {
   final String? businessId;
 
-  const BusinessRequestsPage({Key? key, required this.businessId})
-      : super(key: key);
+  const BusinessRequestsPage({super.key, required this.businessId});
 
   @override
   _BusinessRequestsPageState createState() => _BusinessRequestsPageState();
@@ -118,31 +117,28 @@ class _BusinessRequestsPageState extends ConsumerState<BusinessRequestsPage> {
                                         name: user.name,
                                         contactNumber: user.contactNumber,
                                         onAccept: () {
-                                          if (user.userId != null) {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) =>
-                                                  UserSelectionDialog(
-                                                userId: user.userId!,
-                                                userRequestCallback: (success) {
-                                                  if (success) {
-                                                    requestController.clear();
-                                                    setState(() {
-                                                      ref
-                                                          .read(
-                                                              businessRequestsProvider
-                                                                  .notifier)
-                                                          .getRequestsList(
-                                                              context,
-                                                              widget
-                                                                  .businessId!);
-                                                    });
-                                                  }
-                                                },
-                                                businessId: widget.businessId!,
-                                              ),
-                                            );
-                                          }
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                UserSelectionDialog(
+                                              userId: user.userId!,
+                                              userRequestCallback: (success) {
+                                                if (success) {
+                                                  requestController.clear();
+                                                  setState(() {
+                                                    ref
+                                                        .read(
+                                                            businessRequestsProvider
+                                                                .notifier)
+                                                        .getRequestsList(
+                                                            context,
+                                                            widget.businessId!);
+                                                  });
+                                                }
+                                              },
+                                              businessId: widget.businessId!,
+                                            ),
+                                          );
                                         },
                                         onReject: () {
                                           // Handle reject action

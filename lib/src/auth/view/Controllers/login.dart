@@ -172,7 +172,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
   Future<void> _storeAuthToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     final expiryTime =
-        DateTime.now().add(Duration(days: 1)).millisecondsSinceEpoch;
+        DateTime.now().add(const Duration(days: 1)).millisecondsSinceEpoch;
     await prefs.setString('authToken', token);
     await prefs.setInt('expiryTime', expiryTime);
   }
@@ -189,7 +189,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
           context, "Session expired. Please log in again.", Colors.red);
       // Navigate to login screen or handle re-login logic
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => LoginScreen()));
+          context, MaterialPageRoute(builder: (context) => const LoginScreen()));
     }
   }
 
@@ -206,7 +206,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
     return false;
   }
 
-  final url = 'http://13.234.163.59:5000/api/v1/business/checkBusiness';
+  const url = 'http://13.234.163.59:5000/api/v1/business/checkBusiness';
   
   final response = await http.get(
     Uri.parse(url),

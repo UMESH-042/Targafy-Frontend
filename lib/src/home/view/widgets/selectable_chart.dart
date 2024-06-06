@@ -6,7 +6,7 @@ class SelectableChartWidget extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const SelectableChartWidget({
+  const SelectableChartWidget({super.key, 
     required this.imagePath,
     required this.isSelected,
     required this.onTap,

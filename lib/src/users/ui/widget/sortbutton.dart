@@ -41,7 +41,7 @@ class SortButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(text, style: TextStyle(color: Colors.white)),
+                Text(text, style: const TextStyle(color: Colors.white)),
                 child ?? const SizedBox.shrink(),
                 if (currentSortType == text)
                   Icon(

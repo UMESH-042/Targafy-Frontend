@@ -410,16 +410,24 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:share/share.dart';
+import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
+import 'package:targafy/src/users/UserBusinessProfile.dart';
 import 'package:targafy/src/users/ui/RequestUsersScreen.dart';
 import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
+import 'package:targafy/src/users/ui/controller/demote_user.dart';
+import 'package:targafy/src/users/ui/controller/promote_to_MiniAdmin.dart';
+import 'package:targafy/src/users/ui/controller/promote_to_admin.dart';
+import 'package:targafy/src/users/ui/widget/user_hierarchy_view.dart';
+import 'package:targafy/utils/colors.dart';
 
 class UsersScreen extends ConsumerStatefulWidget {
-  const UsersScreen({super.key});
+  const UsersScreen({Key? key}) : super(key: key);
 
   @override
   _UsersScreenState createState() => _UsersScreenState();
@@ -430,18 +438,18 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
   Widget build(BuildContext context) {
     final selectedBusinessData = ref.watch(currentBusinessProvider);
     final selectedBusiness = selectedBusinessData?['business'] as Business?;
-    final selectedUserType = selectedBusinessData?['userType'] as String?;
     final selectedbusinessCode =
         selectedBusinessData?['businessCode'] as String?;
     final businessName = selectedBusiness?.name;
     final businessId = selectedBusiness?.id;
+    print(businessId);
+
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
 
     final usersStream =
         ref.watch(businessUsersStreamProvider(businessId ?? ''));
 
-    print(businessId);
-
-    // Placeholder image URL
     const placeholderImageUrl =
         'https://randomuser.me/api/portraits/lego/2.jpg';
 
@@ -477,9 +485,50 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                     style: TextStyle(color: primaryColor),
                   ),
                 ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     Navigator.push(
+                //         context,
+                //         MaterialPageRoute(
+                //             builder: (context) =>
+                //                 UserHierarchy(businessId: businessId!)));
+                //   },
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor: lightblue,
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(15),
+                //       side: BorderSide(color: primaryColor, width: 2),
+                //     ),
+                //   ),
+                //   child: Text(
+                //     'Graph',
+                //     style: TextStyle(color: primaryColor),
+                //   ),
+                // ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            UserHierarchy(businessId: businessId!)));
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: SvgPicture.asset(
+                      "assets/svgs/hierarchy.svg",
+                      semanticsLabel: 'Acme Logo',
+                      height: 25,
+                      width: width * 0.1,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+
                 ElevatedButton(
                   onPressed: () {
-                    // Handle Accept Users button press
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -510,47 +559,182 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                 child: ListView.separated(
                   itemCount: users.length,
                   separatorBuilder: (context, index) => SizedBox(
-                    height: getScreenheight(context) * 0.03,
+                    height: getScreenheight(context) * 0.016,
                   ),
                   itemBuilder: (context, index) {
                     final user = users[index];
-                    return Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: primaryColor, width: 2),
-                      ),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              placeholderImageUrl,
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UserBusinessProfilePage(
+                              userId: user.userId,
                             ),
                           ),
-                          SizedBox(width: getScreenheight(context) * 0.02),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  user.name,
-                                  style: TextStyle(
-                                    color: primaryColor,
-                                    fontWeight: FontWeight.bold,
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(color: primaryColor, width: 2),
+                        ),
+                        child: Row(
+                          children: [
+                            const CircleAvatar(
+                              // backgroundImage: NetworkImage(
+                              //   user.imageUrl ?? placeholderImageUrl,
+                              // ),
+                              backgroundImage:
+                                  NetworkImage(placeholderImageUrl),
+                            ),
+                            SizedBox(width: getScreenheight(context) * 0.02),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    user.name,
+                                    style: TextStyle(
+                                      color: primaryColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  'UserType: ${user.userType}',
-                                  style: TextStyle(color: primaryColor),
-                                ),
-                                Text(
-                                  'Role: ${user.role}',
-                                  style: TextStyle(color: primaryColor),
-                                ),
-                              ],
+                                  // Text(
+                                  //   'UserType: ${user.userType}',
+                                  //   style: TextStyle(color: primaryColor),
+                                  // ),
+                                  // Display the user's role
+                                  Text(
+                                    'Role: ${user.role}',
+                                    style: TextStyle(color: primaryColor),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Consumer(
+                                builder: (context, ref, _) {
+                                  final userRoleAsyncValue =
+                                      ref.watch(userRoleProvider);
+                                  // print('userId :- ${user.userId}');
+                                  return userRoleAsyncValue.when(
+                                    data: (role) {
+                                      if (role == 'User' ||
+                                          role == 'MiniAdmin') {
+                                        return const SizedBox.shrink();
+                                      } else {
+                                        return PopupMenuButton<int>(
+                                          icon: const Icon(Icons.more_vert),
+                                          color: Colors.white,
+                                          surfaceTintColor: Colors.white,
+                                          position: PopupMenuPosition.under,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15)
+                                                    .copyWith(
+                                                        topRight: const Radius
+                                                            .circular(0)),
+                                          ),
+                                          onSelected: (value) {
+                                            switch (value) {
+                                              case 1:
+                                                // Call the promote user to admin function
+                                                ref
+                                                    .read(
+                                                        promoteUserToAdminProvider)
+                                                    .promote(
+                                                      businessId!,
+                                                      user.userId,
+                                                    );
+
+                                                print(
+                                                    'user Id:- ${user.userId}');
+                                                print(
+                                                    'business Id :-${businessId}');
+                                                break;
+                                              case 2:
+                                                // Call the promote user to MiniAdmin function
+                                                ref
+                                                    .read(
+                                                        promoteUserToMiniAdminProvider)
+                                                    .promote(
+                                                      businessId!,
+                                                      user.userId,
+                                                    );
+                                                break;
+                                              case 3:
+                                                // Call the promote user to MiniAdmin function
+                                                ref
+                                                    .read(demoteUserProvider)
+                                                    .demoteUser(
+                                                      businessId!,
+                                                      user.userId,
+                                                    );
+                                                break;
+
+                                              // Add cases for other options here
+                                            }
+                                          },
+                                          itemBuilder: (BuildContext context) =>
+                                              <PopupMenuEntry<int>>[
+                                            PopupMenuItem<int>(
+                                              value: 1,
+                                              child: Text(
+                                                'Promote to Admin',
+                                                style: TextStyle(
+                                                    color: primaryColor),
+                                              ),
+                                            ),
+                                            PopupMenuItem<int>(
+                                              value: 2,
+                                              child: Text(
+                                                'Promote to MiniAdmin',
+                                                style: TextStyle(
+                                                    color: primaryColor),
+                                              ),
+                                            ),
+                                            PopupMenuItem<int>(
+                                              value: 3,
+                                              child: Text(
+                                                'Demote to User',
+                                                style: TextStyle(
+                                                    color: primaryColor),
+                                              ),
+                                            ),
+                                            PopupMenuItem<int>(
+                                              value: 4,
+                                              child: Text(
+                                                'Remove User',
+                                                style: TextStyle(
+                                                    color: primaryColor),
+                                              ),
+                                            ),
+                                            PopupMenuItem<int>(
+                                              value: 5,
+                                              child: Text(
+                                                'Change Manager',
+                                                style: TextStyle(
+                                                    color: primaryColor),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                    },
+                                    loading: () => const SizedBox.shrink(),
+                                    error: (error, stack) {
+                                      return const SizedBox.shrink();
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },

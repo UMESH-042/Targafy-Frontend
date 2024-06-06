@@ -40,7 +40,7 @@ final businessAndUserProvider =
 
     // Wait for a short duration before fetching data again
     await Future.delayed(
-        Duration(seconds: 3)); // Adjust the duration as needed
+        const Duration(seconds: 3)); // Adjust the duration as needed
   }
 });
 

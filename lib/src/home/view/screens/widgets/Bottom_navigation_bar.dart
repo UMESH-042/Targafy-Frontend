@@ -96,11 +96,11 @@ class _BottomNavigationAndAppBarState
                         // Check if the role is user or miniAdmin
                         if (role == 'User' || role == 'MiniAdmin') {
                           // Don't show the three-dot option
-                          return SizedBox.shrink();
+                          return const SizedBox.shrink();
                         } else {
                           // Show the three-dot option
                           return PopupMenuButton<int>(
-                            icon: Icon(Icons.more_vert),
+                            icon: const Icon(Icons.more_vert),
                             color: Colors.white,
                             surfaceTintColor: Colors.white,
                             position: PopupMenuPosition.under,
@@ -167,10 +167,10 @@ class _BottomNavigationAndAppBarState
                           );
                         }
                       },
-                      loading: () => SizedBox.shrink(),
+                      loading: () => const SizedBox.shrink(),
                       error: (error, stack) {
                         // Handle error case
-                        return SizedBox.shrink();
+                        return const SizedBox.shrink();
                       },
                     );
                   },
@@ -322,7 +322,7 @@ class _BottomNavigationAndAppBarState
                   ],
                 );
               },
-              loading: () => CircularProgressIndicator(),
+              loading: () => const CircularProgressIndicator(),
               error: (error, stack) => ListTile(
                 title: Text('Error: $error'),
               ),

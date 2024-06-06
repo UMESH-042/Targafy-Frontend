@@ -339,11 +339,11 @@ class ParameterTargetScreen extends ConsumerStatefulWidget {
   final VoidCallback onDataAdded;
 
   const ParameterTargetScreen({
-    Key? key,
+    super.key,
     required this.parameterName,
     required this.businessId,
     required this.onDataAdded,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<ParameterTargetScreen> createState() =>

@@ -7,7 +7,7 @@ import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart'
 import 'package:targafy/utils/utils.dart';
 
 class BusinessProfile extends ConsumerStatefulWidget {
-  const BusinessProfile({Key? key}) : super(key: key);
+  const BusinessProfile({super.key});
 
   @override
   ConsumerState<BusinessProfile> createState() => _BusinessProfileState();
@@ -60,11 +60,11 @@ class _BusinessProfileState extends ConsumerState<BusinessProfile> {
                     children: [
                       Center(
                         child: uploading
-                            ? CircularProgressIndicator()
+                            ? const CircularProgressIndicator()
                             : CircleAvatar(
                                 radius: 60,
                                 backgroundImage: selectedBusiness.logo.isEmpty
-                                    ? AssetImage("assets/images/placeholder.png") as ImageProvider
+                                    ? const AssetImage("assets/images/placeholder.png") as ImageProvider
                                     : NetworkImage(selectedBusiness.logo),
                               ),
                       ),

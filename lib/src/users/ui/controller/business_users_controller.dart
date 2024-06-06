@@ -78,7 +78,7 @@ final businessUsersStreamProvider = StreamProvider.autoDispose
   yield users;
 
   // Simulate real-time updates
-  await for (final _ in Stream.periodic(const Duration(seconds: 3))) {
+  await for (final _ in Stream.periodic(const Duration(seconds: 1))) {
     final response = await http.get(
       Uri.parse(
           'http://13.234.163.59:5000/api/v1/business/get/all/users/$businessId'),
@@ -132,6 +132,7 @@ class UserRequestNotifier extends StateNotifier<AsyncValue<void>> {
 
       if (response.statusCode != 200) {
         print(response.statusCode);
+        print(response.body);
         throw Exception('Failed to submit request');
       }
 

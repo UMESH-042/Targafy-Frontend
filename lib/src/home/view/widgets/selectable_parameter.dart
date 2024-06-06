@@ -52,7 +52,7 @@ class SelectableParameterWidget extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const SelectableParameterWidget({
+  const SelectableParameterWidget({super.key, 
     required this.text,
     required this.isSelected,
     required this.onTap,

@@ -38,7 +38,7 @@ class _MandatoryFieldPageState extends ConsumerState<MandatoryFieldPage> {
 
     if (!state.isFirstTime) {
       // Navigate to the next screen if not first time
-      WidgetsBinding.instance?.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         // Navigator.pushReplacementNamed(context, '/nextScreen');
         Navigator.push(
             context,

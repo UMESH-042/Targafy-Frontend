@@ -9,13 +9,13 @@ class CustomFieldParameter extends StatelessWidget {
   final ValueChanged<String?>? onChanged;
 
   const CustomFieldParameter({
-    Key? key,
+    super.key,
     this.controller,
     required this.label,
     this.dropdownValue,
     this.dropdownItems,
     this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class CustomFieldParameter extends StatelessWidget {
           ? DropdownButtonFormField<String>(
               decoration: InputDecoration(
                 labelText: label,
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
               value: dropdownValue,
               items: dropdownItems,
@@ -36,7 +36,7 @@ class CustomFieldParameter extends StatelessWidget {
               controller: controller,
               decoration: InputDecoration(
                 labelText: label,
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
             ),
     );

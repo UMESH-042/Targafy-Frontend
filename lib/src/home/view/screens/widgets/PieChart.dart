@@ -7,10 +7,10 @@ class PiechartGraph extends StatelessWidget {
   final List<List<dynamic>> actualData;
 
   const PiechartGraph({
-    Key? key,
+    super.key,
     required this.parameter,
     required this.actualData,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

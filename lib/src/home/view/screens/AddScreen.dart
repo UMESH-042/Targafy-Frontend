@@ -57,7 +57,7 @@ final addDataForParameterProvider =
 );
 
 class Addscreen extends ConsumerStatefulWidget {
-  const Addscreen({Key? key}) : super(key: key);
+  const Addscreen({super.key});
 
   @override
   _AddscreenState createState() => _AddscreenState();
@@ -153,7 +153,7 @@ class _AddscreenState extends ConsumerState<Addscreen> {
                           .then((_) {
                         // Data added successfully
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Data added successfully')),
+                          const SnackBar(content: Text('Data added successfully')),
                         );
                         // Clear the input fields
                         todayDataController.clear();
@@ -164,18 +164,18 @@ class _AddscreenState extends ConsumerState<Addscreen> {
                       }).catchError((error) {
                         // Handle error
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed to add data')),
+                          const SnackBar(content: Text('Failed to add data')),
                         );
                       });
                     }
                   },
-                  child: const Text('Add Data'),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                   ),
+                  child: const Text('Add Data'),
                 ),
               ],
             );
