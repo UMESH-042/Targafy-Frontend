@@ -109,7 +109,7 @@ class UserRequestNotifier extends StateNotifier<AsyncValue<void>> {
   UserRequestNotifier() : super(const AsyncValue.data(null));
 
   Future<void> submitUserRequest(
-      String businessId, String userId, String role) async {
+      String businessId, String userId, String role,String parentId) async {
     state = const AsyncValue.loading(); // Indicate loading state
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -125,6 +125,7 @@ class UserRequestNotifier extends StateNotifier<AsyncValue<void>> {
         body: json.encode({
           'role': role,
           'userId': userId,
+          'parentId':parentId
         }),
       );
       print('userId :- $userId');

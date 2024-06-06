@@ -414,6 +414,7 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                                     widget.businessId,
                                     widget.userId,
                                     selectedRole!,
+                                    selectedUserListItem!.userId,
                                   );
                               Navigator.pop(context);
                               widget.userRequestCallback(

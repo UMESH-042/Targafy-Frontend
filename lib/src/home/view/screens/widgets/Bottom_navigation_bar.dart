@@ -60,9 +60,12 @@ class _BottomNavigationAndAppBarState
         preferredSize: Size.fromHeight(getScreenheight(context) * 0.08),
         child: Container(
           alignment: Alignment.center,
-          padding:
-              EdgeInsets.symmetric(horizontal: getScreenWidth(context) * 0.035),
-          margin: EdgeInsets.only(top: getScreenheight(context) * 0.01),
+           padding: const EdgeInsets.only(
+          top: 5,
+          bottom: 5,
+          left: 5,
+        ),
+          // margin: EdgeInsets.only(top: getScreenheight(context) * 0.01),
           child: AppBar(
             title: CustomText(
               text: selectedBusiness != null && selectedUserType != null
@@ -73,21 +76,19 @@ class _BottomNavigationAndAppBarState
             centerTitle: false,
             actions: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: GestureDetector(
                   child: Image.asset('assets/img/search.png'),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: GestureDetector(
                   child: Image.asset('assets/img/filter.png'),
                 ),
               ),
               // Modify the PopupMenuButton in the appBar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Consumer(
+           Consumer(
                   builder: (context, ref, _) {
                     final userRoleAsyncValue = ref.watch(userRoleProvider);
 
@@ -175,7 +176,7 @@ class _BottomNavigationAndAppBarState
                     );
                   },
                 ),
-              ),
+              
             ],
           ),
         ),
