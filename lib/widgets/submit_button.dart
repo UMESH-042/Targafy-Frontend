@@ -1,3 +1,5 @@
+import 'package:targafy/core/constants/colors.dart';
+
 import '../utils/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +21,7 @@ class SubmitButton extends StatelessWidget {
           onPressed: onPressed,
           style: ButtonStyle(
             foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-            backgroundColor: WidgetStateProperty.all<Color>(kprimaryColor),
+            backgroundColor: WidgetStateProperty.all<Color>(primaryColor),
             shape: WidgetStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),

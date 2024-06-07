@@ -416,6 +416,7 @@ import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart'
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:share/share.dart';
+import 'package:targafy/src/groups/ui/groups_screen.dart';
 import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
 import 'package:targafy/src/users/UserBusinessProfile.dart';
 import 'package:targafy/src/users/ui/RequestUsersScreen.dart';
@@ -459,97 +460,111 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    String shareText = 'Dear User,\n\n'
-                        'We invite you to download our app via the following link: '
-                        'Please download the app from: https://play.google.com/store/apps/details?id=com.issuecop.app\n\n'
-                        'And then join our business using code: $selectedbusinessCode\n\n'
-                        'Best regards,\n'
-                        '$businessName Team';
-                    Share.share(shareText,
-                        subject: 'Join our business on BizIssue');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: lightblue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      side: BorderSide(color: primaryColor, width: 2),
-                    ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 10,
                   ),
-                  child: Text(
-                    'Invite Users',
-                    style: TextStyle(color: primaryColor),
-                  ),
-                ),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     Navigator.push(
-                //         context,
-                //         MaterialPageRoute(
-                //             builder: (context) =>
-                //                 UserHierarchy(businessId: businessId!)));
-                //   },
-                //   style: ElevatedButton.styleFrom(
-                //     backgroundColor: lightblue,
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(15),
-                //       side: BorderSide(color: primaryColor, width: 2),
-                //     ),
-                //   ),
-                //   child: Text(
-                //     'Graph',
-                //     style: TextStyle(color: primaryColor),
-                //   ),
-                // ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            UserHierarchy(businessId: businessId!)));
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: SvgPicture.asset(
-                      "assets/svgs/hierarchy.svg",
-                      semanticsLabel: 'Acme Logo',
-                      height: 25,
-                      width: width * 0.1,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            BusinessRequestsPage(businessId: businessId),
+                  ElevatedButton(
+                    onPressed: () {
+                      String shareText = 'Dear User,\n\n'
+                          'We invite you to download our app via the following link: '
+                          'Please download the app from: https://play.google.com/store/apps/details?id=com.issuecop.app\n\n'
+                          'And then join our business using code: $selectedbusinessCode\n\n'
+                          'Best regards,\n'
+                          '$businessName Team';
+                      Share.share(shareText,
+                          subject: 'Join our business on BizIssue');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                      backgroundColor: lightblue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        side: BorderSide(color: primaryColor, width: 2),
                       ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: lightblue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      side: BorderSide(color: primaryColor, width: 2),
+                    ),
+                    child: Text(
+                      'Invite Users',
+                      style: TextStyle(color: primaryColor),
                     ),
                   ),
-                  child: Text(
-                    'Accept Users',
-                    style: TextStyle(color: primaryColor),
+                  SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              UserHierarchy(businessId: businessId!)));
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: primaryColor.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: SvgPicture.asset(
+                        "assets/svgs/hierarchy.svg",
+                        semanticsLabel: 'Acme Logo',
+                        height: 25,
+                        width: width * 0.1,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              BusinessRequestsPage(businessId: businessId),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                      backgroundColor: lightblue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        side: BorderSide(color: primaryColor, width: 2),
+                      ),
+                    ),
+                    child: Text(
+                      'Accept Users',
+                      style: TextStyle(color: primaryColor),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GroupsScreen(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                      backgroundColor: lightblue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        side: BorderSide(color: primaryColor, width: 2),
+                      ),
+                    ),
+                    child: Text(
+                      'Group',
+                      style: TextStyle(color: primaryColor),
+                    ),
+                  ),
+                ],
+              ),
             ),
             SizedBox(
               height: getScreenheight(context) * 0.03,
