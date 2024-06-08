@@ -537,8 +537,7 @@ class _BottomNavigationAndAppBarState
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const BusinessProfile(),
+                                builder: (context) => const BusinessProfile(),
                               ),
                             );
                           }

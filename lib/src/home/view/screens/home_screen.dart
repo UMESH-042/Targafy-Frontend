@@ -381,6 +381,585 @@
 //   }
 // }
 
+// import 'dart:convert';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:targafy/business_home_page/controller/business_controller.dart';
+// import 'package:targafy/src/home/view/screens/controller/actual_predicted_data_controller.dart';
+// import 'package:targafy/src/home/view/screens/controller/parameter_group_list_controller.dart';
+// import 'package:targafy/src/home/view/screens/widgets/CustomCharts.dart';
+// import 'package:targafy/src/home/view/screens/widgets/DataTable.dart';
+// import 'package:targafy/src/home/view/screens/widgets/PieChart.dart';
+// import 'package:targafy/src/home/view/widgets/selectable_chart.dart';
+// import 'package:targafy/src/home/view/widgets/selectable_parameter.dart';
+// import 'package:targafy/src/parameters/view/controller/add_parameter_controller.dart';
+// import 'package:targafy/src/parameters/view/model/parameter_model.dart';
+
+// final selectedBusinessData = Provider<Map<String, dynamic>?>((ref) {
+//   return ref.watch(currentBusinessProvider);
+// });
+
+// final parameterListProvider =
+//     FutureProvider.autoDispose<List<Parameter>>((ref) async {
+//   final selectedBusinessData = ref.watch(currentBusinessProvider);
+//   final businessId = selectedBusinessData?['business']?.id;
+
+//   if (businessId != null) {
+//     final notifier = ref.read(parameterNotifierProvider.notifier);
+//     await notifier.fetchParameters(businessId);
+//     return ref.watch(parameterNotifierProvider);
+//   } else {
+//     return <Parameter>[];
+//   }
+// });
+
+// final dataAddedControllerProvider =
+//     Provider<DataAddedController>((ref) => DataAddedController());
+
+// class HomeScreen extends ConsumerStatefulWidget {
+//   const HomeScreen({super.key});
+
+//   @override
+//   _HomeScreenState createState() => _HomeScreenState();
+// }
+
+// class _HomeScreenState extends ConsumerState<HomeScreen> {
+//   Future<void> _getToken() async {
+//     try {
+//       // Fetch the FCM token
+//       String? fcmToken = await FirebaseMessaging.instance.getToken();
+//       print('FCM Token: $fcmToken');
+
+//       // Retrieve the bearer token from shared preferences
+//       SharedPreferences prefs = await SharedPreferences.getInstance();
+//       String? bearerToken = prefs.getString('authToken');
+
+//       // Ensure both tokens are available
+//       if (fcmToken != null && bearerToken != null) {
+//         // Make a POST request to your server
+//         await _sendTokenToServer(fcmToken, bearerToken);
+//       } else {
+//         print('Failed to retrieve FCM token or bearer token.');
+//       }
+//     } catch (e) {
+//       print('Error fetching token: $e');
+//     }
+//   }
+
+//   Future<void> _sendTokenToServer(String fcmToken, String bearerToken) async {
+//     try {
+//       // Define the URL of your server endpoint
+//       final url = Uri.parse(
+//           'http://13.234.163.59:5000/api/v1/user/update/fcmToken?fcmToken=$fcmToken');
+
+//       // Make the POST request
+//       final response = await http.patch(
+//         url,
+//         headers: {
+//           'Content-Type': 'application/json',
+//           'Authorization': 'Bearer $bearerToken',
+//         },
+//       );
+
+//       // Check the response status
+//       if (response.statusCode == 200) {
+//         print('Token sent successfully.');
+//       } else {
+//         print('Failed to send token: ${response.statusCode} ${response.body}');
+//       }
+//     } catch (e) {
+//       print('Error sending token to server: $e');
+//     }
+//   }
+
+//   static const List<String> images = [
+//     'assets/img/line_chart.png',
+//     'assets/img/table.png',
+//     'assets/img/chat.png',
+//     'assets/img/pie.png',
+//     'assets/img/lines.png'
+//   ];
+
+//   late List<bool> selectedStates;
+//   late String selectedParameter; // Store the selected parameter name here
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     selectedStates = List<bool>.filled(images.length, false);
+//     selectedParameter = ''; // Initialize selected parameter to empty string
+//     _getToken();
+//   }
+
+//   void handleTapForCharts(int index) {
+//     setState(() {
+//       for (int i = 0; i < selectedStates.length; i++) {
+//         if (i != index) {
+//           selectedStates[i] = false;
+//         }
+//       }
+//       selectedStates[index] = !selectedStates[index];
+//     });
+//   }
+
+//   void _handleTapForParameters(String parameterName) {
+//     setState(() {
+//       selectedParameter =
+//           selectedParameter == parameterName ? '' : parameterName;
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final parameterListAsync = ref.watch(parameterListProvider);
+//     final dataAddedController = ref.read(dataAddedControllerProvider);
+//     final selectedBusinessData = ref.watch(currentBusinessProvider);
+//     final businessId = selectedBusinessData?['business']?.id;
+//       final subGroupAsync = ref.watch(subGroupProvider(selectedParameter));
+
+//     return Scaffold(
+//       body: Column(
+//         children: [
+//           Container(
+//             height: MediaQuery.of(context).size.height * 0.04,
+//             margin: EdgeInsets.symmetric(
+//               horizontal: MediaQuery.of(context).size.width * 0.035,
+//             ).copyWith(
+//               top: MediaQuery.of(context).size.height * 0.03,
+//             ),
+//             child: ListView.builder(
+//               scrollDirection: Axis.horizontal,
+//               itemCount: images.length,
+//               itemBuilder: (context, index) {
+//                 return SelectableChartWidget(
+//                   imagePath: images[index],
+//                   isSelected: selectedStates[index],
+//                   onTap: () => handleTapForCharts(index),
+//                 );
+//               },
+//             ),
+//           ),
+//           parameterListAsync.when(
+//             data: (parameterList) {
+//               return Container(
+//                 height: MediaQuery.of(context).size.height * 0.04,
+//                 margin: EdgeInsets.symmetric(
+//                   horizontal: MediaQuery.of(context).size.width * 0.035,
+//                 ).copyWith(
+//                   top: MediaQuery.of(context).size.height * 0.01,
+//                 ),
+//                 child: ListView.builder(
+//                   scrollDirection: Axis.horizontal,
+//                   itemCount: parameterList.length,
+//                   itemBuilder: (context, index) {
+//                     final parameterName = parameterList[index].name;
+//                     return SelectableParameterWidget(
+//                       text: parameterName,
+//                       isSelected: parameterName == selectedParameter,
+//                       onTap: () => _handleTapForParameters(parameterName),
+//                     );
+//                   },
+//                 ),
+//               );
+//             },
+//             loading: () => const Center(child: CircularProgressIndicator()),
+//             error: (error, stackTrace) => Center(child: Text('Error: $error')),
+//           ),
+//           if (selectedStates.isNotEmpty &&
+//               selectedStates[0] &&
+//               selectedParameter.isEmpty)
+//             const Padding(
+//               padding: EdgeInsets.all(8.0),
+//               child: CustomChart(
+//                 parameter: '',
+//                 actualData: [],
+//                 predictedData: [],
+//               ),
+//             ),
+//           if (selectedStates.isNotEmpty &&
+//               selectedStates[0] &&
+//               selectedParameter.isNotEmpty)
+//             FutureBuilder(
+//               future: dataAddedController.fetchDataAdded(
+//                   businessId, selectedParameter),
+//               builder: (context,
+//                   AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
+//                 if (snapshot.connectionState == ConnectionState.waiting) {
+//                   return const Center(child: CircularProgressIndicator());
+//                 } else if (snapshot.hasError) {
+//                   return Center(child: Text('Error: ${snapshot.error}'));
+//                 } else {
+//                   final data = snapshot.data!;
+//                   print(data);
+//                   return Padding(
+//                     padding: const EdgeInsets.all(8.0),
+//                     child: CustomChart(
+//                       parameter: selectedParameter,
+//                       actualData: data['userEntries'] ?? [],
+//                       predictedData: data['dailyTarget'] ?? [],
+//                     ),
+//                   );
+//                 }
+//               },
+//             ),
+//           if (selectedStates.isNotEmpty &&
+//               selectedStates[3] &&
+//               selectedParameter.isNotEmpty)
+//             FutureBuilder(
+//               future: dataAddedController.fetchDataAdded(
+//                   businessId, selectedParameter),
+//               builder: (context,
+//                   AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
+//                 if (snapshot.connectionState == ConnectionState.waiting) {
+//                   return const Center(child: CircularProgressIndicator());
+//                 } else if (snapshot.hasError) {
+//                   return Center(child: Text('Error: ${snapshot.error}'));
+//                 } else {
+//                   final data = snapshot.data!;
+//                   print(data);
+//                   return Padding(
+//                       padding: const EdgeInsets.all(8.0),
+//                       child: PiechartGraph(
+//                         parameter: selectedParameter,
+//                         actualData: data['userEntries'] ?? [],
+//                       ));
+//                 }
+//               },
+//             ),
+//           if (selectedStates.isNotEmpty &&
+//               selectedStates[1] &&
+//               selectedParameter.isNotEmpty)
+//             FutureBuilder(
+//               future: dataAddedController.fetchDataAdded(
+//                   businessId, selectedParameter),
+//               builder: (context,
+//                   AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
+//                 if (snapshot.connectionState == ConnectionState.waiting) {
+//                   return const Center(child: CircularProgressIndicator());
+//                 } else if (snapshot.hasError) {
+//                   return Center(child: Text('Error: ${snapshot.error}'));
+//                 } else {
+//                   final data = snapshot.data!;
+//                   print(data);
+//                   return Padding(
+//                     padding: const EdgeInsets.all(8.0),
+//                     child: DataTableWidget(
+//                         parameter: selectedParameter,
+//                         actualData: data['userEntries'] ?? [],
+//                         predictedData: data['dailyTarget'] ?? []),
+//                   );
+//                 }
+//               },
+//             ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// // home_screen.dart
+// import 'dart:convert';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:targafy/business_home_page/controller/business_controller.dart';
+// import 'package:targafy/src/home/view/screens/controller/actual_predicted_data_controller.dart';
+// import 'package:targafy/src/home/view/screens/controller/parameter_group_list_controller.dart';
+// import 'package:targafy/src/home/view/widgets/selectable_chart.dart';
+// import 'package:targafy/src/home/view/widgets/selectable_parameter.dart';
+// import 'package:targafy/src/parameters/view/controller/add_parameter_controller.dart';
+// import 'package:targafy/src/parameters/view/model/parameter_model.dart';
+
+// import 'widgets/CustomCharts.dart';
+// import 'widgets/DataTable.dart';
+// import 'widgets/PieChart.dart';
+
+// final selectedBusinessData = Provider<Map<String, dynamic>?>((ref) {
+//   return ref.watch(currentBusinessProvider);
+// });
+
+// final parameterListProvider =
+//     FutureProvider.autoDispose<List<Parameter>>((ref) async {
+//   final selectedBusinessData = ref.watch(currentBusinessProvider);
+//   final businessId = selectedBusinessData?['business']?.id;
+
+//   if (businessId != null) {
+//     final notifier = ref.read(parameterNotifierProvider.notifier);
+//     await notifier.fetchParameters(businessId);
+//     return ref.watch(parameterNotifierProvider);
+//   } else {
+//     return <Parameter>[];
+//   }
+// });
+
+// final dataAddedControllerProvider =
+//     Provider<DataAddedController>((ref) => DataAddedController());
+
+// class HomeScreen extends ConsumerStatefulWidget {
+//   const HomeScreen({super.key});
+
+//   @override
+//   _HomeScreenState createState() => _HomeScreenState();
+// }
+
+// class _HomeScreenState extends ConsumerState<HomeScreen> {
+//   Future<void> _getToken() async {
+//     try {
+//       // Fetch the FCM token
+//       String? fcmToken = await FirebaseMessaging.instance.getToken();
+//       print('FCM Token: $fcmToken');
+
+//       // Retrieve the bearer token from shared preferences
+//       SharedPreferences prefs = await SharedPreferences.getInstance();
+//       String? bearerToken = prefs.getString('authToken');
+
+//       // Ensure both tokens are available
+//       if (fcmToken != null && bearerToken != null) {
+//         // Make a POST request to your server
+//         await _sendTokenToServer(fcmToken, bearerToken);
+//       } else {
+//         print('Failed to retrieve FCM token or bearer token.');
+//       }
+//     } catch (e) {
+//       print('Error fetching token: $e');
+//     }
+//   }
+
+//   Future<void> _sendTokenToServer(String fcmToken, String bearerToken) async {
+//     try {
+//       // Define the URL of your server endpoint
+//       final url = Uri.parse(
+//           'http://13.234.163.59:5000/api/v1/user/update/fcmToken?fcmToken=$fcmToken');
+
+//       // Make the POST request
+//       final response = await http.patch(
+//         url,
+//         headers: {
+//           'Content-Type': 'application/json',
+//           'Authorization': 'Bearer $bearerToken',
+//         },
+//       );
+
+//       // Check the response status
+//       if (response.statusCode == 200) {
+//         print('Token sent successfully.');
+//       } else {
+//         print('Failed to send token: ${response.statusCode} ${response.body}');
+//       }
+//     } catch (e) {
+//       print('Error sending token to server: $e');
+//     }
+//   }
+
+//   static const List<String> images = [
+//     'assets/img/line_chart.png',
+//     'assets/img/table.png',
+//     'assets/img/chat.png',
+//     'assets/img/pie.png',
+//     'assets/img/lines.png'
+//   ];
+
+//   late List<bool> selectedStates;
+//   late String selectedParameter; // Store the selected parameter name here
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     selectedStates = List<bool>.filled(images.length, false);
+//     selectedParameter = ''; // Initialize selected parameter to empty string
+//     _getToken();
+//   }
+
+//   void handleTapForCharts(int index) {
+//     setState(() {
+//       for (int i = 0; i < selectedStates.length; i++) {
+//         if (i != index) {
+//           selectedStates[i] = false;
+//         }
+//       }
+//       selectedStates[index] = !selectedStates[index];
+//     });
+//   }
+
+//   void _handleTapForParameters(String parameterName) {
+//     setState(() {
+//       selectedParameter =
+//           selectedParameter == parameterName ? '' : parameterName;
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final parameterListAsync = ref.watch(parameterListProvider);
+//     final dataAddedController = ref.read(dataAddedControllerProvider);
+//     final selectedBusinessData = ref.watch(currentBusinessProvider);
+//     final businessId = selectedBusinessData?['business']?.id;
+//     final subGroupAsync = ref.watch(subGroupProvider(selectedParameter));
+
+//     return Scaffold(
+//       body: Column(
+//         children: [
+//           Container(
+//             height: MediaQuery.of(context).size.height * 0.04,
+//             margin: EdgeInsets.symmetric(
+//               horizontal: MediaQuery.of(context).size.width * 0.035,
+//             ).copyWith(
+//               top: MediaQuery.of(context).size.height * 0.03,
+//             ),
+//             child: ListView.builder(
+//               scrollDirection: Axis.horizontal,
+//               itemCount: images.length,
+//               itemBuilder: (context, index) {
+//                 return SelectableChartWidget(
+//                   imagePath: images[index],
+//                   isSelected: selectedStates[index],
+//                   onTap: () => handleTapForCharts(index),
+//                 );
+//               },
+//             ),
+//           ),
+//           parameterListAsync.when(
+//             data: (parameterList) {
+//               return Container(
+//                 height: MediaQuery.of(context).size.height * 0.04,
+//                 margin: EdgeInsets.symmetric(
+//                   horizontal: MediaQuery.of(context).size.width * 0.035,
+//                 ).copyWith(
+//                   top: MediaQuery.of(context).size.height * 0.01,
+//                 ),
+//                 child: ListView.builder(
+//                   scrollDirection: Axis.horizontal,
+//                   itemCount: parameterList.length,
+//                   itemBuilder: (context, index) {
+//                     final parameterName = parameterList[index].name;
+//                     return SelectableParameterWidget(
+//                       text: parameterName,
+//                       isSelected: parameterName == selectedParameter,
+//                       onTap: () => _handleTapForParameters(parameterName),
+//                     );
+//                   },
+//                 ),
+//               );
+//             },
+//             loading: () => const Center(child: CircularProgressIndicator()),
+//             error: (error, stackTrace) => Center(child: Text('Error: $error')),
+//           ),
+//           if (selectedParameter.isNotEmpty)
+//             subGroupAsync.when(
+//               data: (subGroups) {
+//                 return Container(
+//                   height: MediaQuery.of(context).size.height * 0.2,
+//                   child: ListView.builder(
+//                     itemCount: subGroups.length,
+//                     itemBuilder: (context, index) {
+//                       return ListTile(
+//                         title: Text(subGroups[index].groupName),
+//                       );
+//                     },
+//                   ),
+//                 );
+//               },
+//               loading: () => const Center(child: CircularProgressIndicator()),
+//               error: (error, stackTrace) => Center(child: Text('Error: $error')),
+//             ),
+//           if (selectedStates.isNotEmpty &&
+//               selectedStates[0] &&
+//               selectedParameter.isEmpty)
+//             const Padding(
+//               padding: EdgeInsets.all(8.0),
+//               child: CustomChart(
+//                 parameter: '',
+//                 actualData: [],
+//                 predictedData: [],
+//               ),
+//             ),
+//           if (selectedStates.isNotEmpty &&
+//               selectedStates[0] &&
+//               selectedParameter.isNotEmpty)
+//             FutureBuilder(
+//               future: dataAddedController.fetchDataAdded(
+//                   businessId, selectedParameter),
+//               builder: (context,
+//                   AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
+//                 if (snapshot.connectionState == ConnectionState.waiting) {
+//                   return const Center(child: CircularProgressIndicator());
+//                 } else if (snapshot.hasError) {
+//                   return Center(child: Text('Error: ${snapshot.error}'));
+//                 } else {
+//                   final data = snapshot.data!;
+//                   print(data);
+//                   return Padding(
+//                     padding: const EdgeInsets.all(8.0),
+//                     child: CustomChart(
+//                       parameter: selectedParameter,
+//                       actualData: data['userEntries'] ?? [],
+//                       predictedData: data['dailyTarget'] ?? [],
+//                     ),
+//                   );
+//                 }
+//               },
+//             ),
+//           if (selectedStates.isNotEmpty &&
+//               selectedStates[3] &&
+//               selectedParameter.isNotEmpty)
+//             FutureBuilder(
+//               future: dataAddedController.fetchDataAdded(
+//                   businessId, selectedParameter),
+//               builder: (context,
+//                   AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
+//                 if (snapshot.connectionState == ConnectionState.waiting) {
+//                   return const Center(child: CircularProgressIndicator());
+//                 } else if (snapshot.hasError) {
+//                   return Center(child: Text('Error: ${snapshot.error}'));
+//                 } else {
+//                   final data = snapshot.data!;
+//                   print(data);
+//                   return Padding(
+//                       padding: const EdgeInsets.all(8.0),
+//                       child: PiechartGraph(
+//                         parameter: selectedParameter,
+//                         actualData: data['userEntries'] ?? [],
+//                       ));
+//                 }
+//               },
+//             ),
+//           if (selectedStates.isNotEmpty &&
+//               selectedStates[1] &&
+//               selectedParameter.isNotEmpty)
+//             FutureBuilder(
+//               future: dataAddedController.fetchDataAdded(
+//                   businessId, selectedParameter),
+//               builder: (context,
+//                   AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
+//                 if (snapshot.connectionState == ConnectionState.waiting) {
+//                   return const Center(child: CircularProgressIndicator());
+//                 } else if (snapshot.hasError) {
+//                   return Center(child: Text('Error: ${snapshot.error}'));
+//                 } else {
+//                   final data = snapshot.data!;
+//                   print(data);
+//                   return Padding(
+//                     padding: const EdgeInsets.all(8.0),
+//                     child: DataTableWidget(
+//                         parameter: selectedParameter,
+//                         actualData: data['userEntries'] ?? [],
+//                         predictedData: data['dailyTarget'] ?? []),
+//                   );
+//                 }
+//               },
+//             ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// home_screen.dart
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
@@ -388,14 +967,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
+import 'package:targafy/src/groups/ui/controller/group_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/actual_predicted_data_controller.dart';
-import 'package:targafy/src/home/view/screens/widgets/CustomCharts.dart';
-import 'package:targafy/src/home/view/screens/widgets/DataTable.dart';
-import 'package:targafy/src/home/view/screens/widgets/PieChart.dart';
+import 'package:targafy/src/home/view/screens/controller/fetching_id_controller.dart';
+import 'package:targafy/src/home/view/screens/controller/parameter_group_list_controller.dart';
+import 'package:targafy/src/home/view/screens/controller/sub_group_data_provider_controller.dart';
 import 'package:targafy/src/home/view/widgets/selectable_chart.dart';
 import 'package:targafy/src/home/view/widgets/selectable_parameter.dart';
+import 'package:targafy/src/home/view/widgets/selectable_sub_group.dart';
 import 'package:targafy/src/parameters/view/controller/add_parameter_controller.dart';
 import 'package:targafy/src/parameters/view/model/parameter_model.dart';
+import 'widgets/CustomCharts.dart';
+import 'widgets/DataTable.dart';
+import 'widgets/PieChart.dart';
 
 final selectedBusinessData = Provider<Map<String, dynamic>?>((ref) {
   return ref.watch(currentBusinessProvider);
@@ -414,9 +998,6 @@ final parameterListProvider =
     return <Parameter>[];
   }
 });
-
-final dataAddedControllerProvider =
-    Provider<DataAddedController>((ref) => DataAddedController());
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -484,12 +1065,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   late List<bool> selectedStates;
   late String selectedParameter; // Store the selected parameter name here
+  late String selectedSubGroup; // Store the selected subgroup name here
 
   @override
   void initState() {
     super.initState();
     selectedStates = List<bool>.filled(images.length, false);
     selectedParameter = ''; // Initialize selected parameter to empty string
+    selectedSubGroup = ''; // Initialize selected subgroup to empty string
     _getToken();
   }
 
@@ -508,6 +1091,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     setState(() {
       selectedParameter =
           selectedParameter == parameterName ? '' : parameterName;
+      selectedSubGroup = ''; // Reset subgroup when a new parameter is selected
+    });
+  }
+
+  void _handleTapForSubGroups(String subGroupName) {
+    setState(() {
+      selectedSubGroup = selectedSubGroup == subGroupName ? '' : subGroupName;
     });
   }
 
@@ -515,8 +1105,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final parameterListAsync = ref.watch(parameterListProvider);
     final dataAddedController = ref.read(dataAddedControllerProvider);
+    final SubGroupDataController = ref.read(SubGroupDataControllerProvider);
     final selectedBusinessData = ref.watch(currentBusinessProvider);
     final businessId = selectedBusinessData?['business']?.id;
+    final subGroupAsync = ref.watch(subGroupProvider(selectedParameter));
+
+    final groupId = '6662c2f7dbda65a0952c9d28';
+    final groupController = ref.read(groupControllerProvider);
+    // String groupId = '';
+
+    // groupController.getGroupId(businessId, selectedParameter).then((value) {
+    //   if (value != null) {
+    //     groupId = value;
+    //     print(groupId); // Use groupId here or pass it to another function
+    //   } else {
+    //     print('Failed to fetch Group ID');
+    //   }
+    // });
+
+    // print(groupId);
+
+// final groupId =  groupController.getGroupId(businessId, selectedParameter);
+// if (groupId != null) {
+//   print(groupId);
+// } else {
+//   print('Failed to fetch Group ID');
+// }
+
+    // Fetch the groupId based on the groupName
 
     return Scaffold(
       body: Column(
@@ -566,6 +1182,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, stackTrace) => Center(child: Text('Error: $error')),
           ),
+          if (selectedParameter.isNotEmpty)
+            subGroupAsync.when(
+              data: (subGroups) {
+                return Container(
+                  height: MediaQuery.of(context).size.height * 0.04,
+                  margin: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.035,
+                  ).copyWith(
+                    top: MediaQuery.of(context).size.height * 0.01,
+                  ),
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: subGroups.length,
+                    itemBuilder: (context, index) {
+                      final subGroupName = subGroups[index].groupName;
+                      return SelectableSubGroupWidget(
+                        text: subGroupName,
+                        isSelected: subGroupName == selectedSubGroup,
+                        onTap: () => _handleTapForSubGroups(subGroupName),
+                      );
+                    },
+                  ),
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stackTrace) =>
+                  Center(child: Text('Error: $error')),
+            ),
           if (selectedStates.isNotEmpty &&
               selectedStates[0] &&
               selectedParameter.isEmpty)
@@ -579,7 +1223,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           if (selectedStates.isNotEmpty &&
               selectedStates[0] &&
-              selectedParameter.isNotEmpty)
+              selectedParameter.isNotEmpty &&
+              selectedSubGroup.isEmpty)
             FutureBuilder(
               future: dataAddedController.fetchDataAdded(
                   businessId, selectedParameter),
@@ -648,6 +1293,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         parameter: selectedParameter,
                         actualData: data['userEntries'] ?? [],
                         predictedData: data['dailyTarget'] ?? []),
+                  );
+                }
+              },
+            ),
+          if (selectedStates.isNotEmpty &&
+              selectedStates[0] &&
+              selectedParameter.isNotEmpty &&
+              selectedSubGroup.isNotEmpty)
+            FutureBuilder(
+              future: SubGroupDataController.fetchDataAdded(
+                  businessId, groupId, selectedSubGroup),
+              builder: (context,
+                  AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else {
+                  final data = snapshot.data!;
+                  print(data);
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CustomChart(
+                      parameter: selectedParameter,
+                      actualData: data['userEntries'] ?? [],
+                      predictedData: data['dailyTarget'] ?? [],
+                    ),
                   );
                 }
               },

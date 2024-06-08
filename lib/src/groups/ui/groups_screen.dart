@@ -1,34 +1,71 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/src/groups/ui/Create_group.dart';
+import 'package:targafy/src/groups/ui/controller/group_data_controller.dart';
+import 'package:targafy/src/groups/ui/widget/group_tile.dart';
 
-class GroupsScreen extends StatefulWidget {
+class GroupScreen extends ConsumerStatefulWidget {
   @override
-  _GroupsScreenState createState() => _GroupsScreenState();
+  _GroupScreenState createState() => _GroupScreenState();
 }
 
-class _GroupsScreenState extends State<GroupsScreen> {
+class _GroupScreenState extends ConsumerState<GroupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
         title: Text('Groups'),
       ),
-      body: Center(
-        child: Text('Groups Content Here'),
+
+      body: Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Consumer(
+          builder: (context, ref, child) {
+            final selectedBusinessData = ref.watch(currentBusinessProvider);
+            final businessId = selectedBusinessData?['business']?.id;
+            ref
+                .read(GroupDataControllerProvider.notifier)
+                .fetchGroups(businessId);
+
+            final groups = ref.watch(GroupDataControllerProvider);
+
+            return groups.isEmpty
+                ? Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    itemCount: groups.length,
+                    itemBuilder: (context, index) {
+                      final group = groups[index];
+                      return GroupTile(
+                        group: group,
+                        onDataAdded: () {
+                          ref
+                              .read(GroupDataControllerProvider.notifier)
+                              .fetchGroups(businessId);
+                        },
+                      );
+                    },
+                  );
+          },
+        ),
       ),
+      // In GroupScreen
       floatingActionButton: FloatingActionButton(
         backgroundColor: lightblue,
-        onPressed: () {
-          // Add functionality for the floating action button
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => CreateGroupPage()));
+        onPressed: () async {
+          final created = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CreateGroupPage()),
+          );
+
+          if (created == true) {
+            final selectedBusinessData = ref.watch(currentBusinessProvider);
+            final businessId = selectedBusinessData?['business']?.id;
+            ref
+                .read(GroupDataControllerProvider.notifier)
+                .fetchGroups(businessId);
+          }
         },
         child: Icon(Icons.add),
       ),

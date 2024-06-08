@@ -60,14 +60,14 @@
 //   }
 // }
 
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/src/parameters/view/model/parameter_model.dart';
 
-final parameterNotifierProvider = StateNotifierProvider<ParameterNotifier, List<Parameter>>((ref) {
+final parameterNotifierProvider =
+    StateNotifierProvider<ParameterNotifier, List<Parameter>>((ref) {
   return ParameterNotifier();
 });
 
@@ -79,7 +79,8 @@ class ParameterNotifier extends StateNotifier<List<Parameter>> {
     final token = prefs.getString('authToken');
 
     final response = await http.get(
-      Uri.parse('http://13.234.163.59:5000/api/v1/params/get/assigned-parameter/$businessId'),
+      Uri.parse(
+          'http://13.234.163.59:5000/api/v1/params/get/assigned-parameter/$businessId'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -93,31 +94,36 @@ class ParameterNotifier extends StateNotifier<List<Parameter>> {
     }
   }
 
+  Future<List<String>> fetchParameterNames(String businessId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
 
+    final response = await http.get(
+      Uri.parse(
+          'http://13.234.163.59:5000/api/v1/params/get/assigned-parameter/$businessId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
 
-Future<List<String>> fetchParameterNames(String businessId) async {
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('authToken');
-
-  final response = await http.get(
-    Uri.parse('http://13.234.163.59:5000/api/v1/params/get/assigned-parameter/$businessId'),
-    headers: {
-      'Authorization': 'Bearer $token',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body)['data'] as List;
-    // Extract parameter names from the response
-    List<String> parameterNames = data.map((param) => param['name'].toString()).toList();
-    return parameterNames;
-  } else {
-    throw Exception('Failed to load parameters');
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body)['data'] as List;
+      // Extract parameter names from the response
+      List<String> parameterNames =
+          data.map((param) => param['name'].toString()).toList();
+      return parameterNames;
+    } else {
+      throw Exception('Failed to load parameters');
+    }
   }
-}
 
-
-  Future<bool> addParameter(String businessId, String parameterName, List<String> userId, String chartType, String duration, String description) async {
+  Future<bool> addParameter(
+      String businessId,
+      String parameterName,
+      List<String> userId,
+      String chartType,
+      String duration,
+      String description) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
