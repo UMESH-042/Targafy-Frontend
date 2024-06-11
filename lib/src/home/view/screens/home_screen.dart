@@ -454,7 +454,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   }
                 },
               ),
-               if (selectedStates.isNotEmpty &&
+            if (selectedStates.isNotEmpty &&
                 selectedStates[1] &&
                 selectedParameter.isNotEmpty &&
                 selectedUser.isNotEmpty)
@@ -481,7 +481,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   }
                 },
               ),
-              if (selectedStates.isNotEmpty &&
+            if (selectedStates.isNotEmpty &&
                 selectedStates[3] &&
                 selectedParameter.isNotEmpty &&
                 selectedUser.isNotEmpty)

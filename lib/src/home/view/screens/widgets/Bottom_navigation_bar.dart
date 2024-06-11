@@ -414,10 +414,17 @@ import 'package:targafy/feedback/feedback.dart';
 import 'package:targafy/src/activity/ui/activity_screen.dart';
 import 'package:targafy/src/groups/ui/groups_screen.dart';
 import 'package:targafy/src/home/view/screens/AddScreen.dart';
+import 'package:targafy/src/home/view/screens/UserProfile.dart';
+import 'package:targafy/src/home/view/screens/controller/user_profile_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
 import 'package:targafy/src/home/view/screens/home_screen.dart';
 import 'package:targafy/src/parameters/view/screens/add_parameter_target_screen.dart';
 import 'package:targafy/src/users/ui/UsersScreen.dart';
+
+final userAvatarProvider = FutureProvider<String>((ref) async {
+  final controller = ref.read(userProfileLogoControllerProvider);
+  return await controller.fetchUserAvatar();
+});
 
 class BottomNavigationAndAppBar extends ConsumerStatefulWidget {
   const BottomNavigationAndAppBar({super.key});
@@ -598,12 +605,14 @@ class _BottomNavigationAndAppBarState
         child: SingleChildScrollView(
           child: Consumer(
             builder: (context, ref, _) {
-              final asyncValue = ref.watch(businessAndUserProvider);
-
               return asyncValue.when(
                 data: (data) {
+                  print('this is the :-$data');
                   final businesses = data['businesses'] as List<Business>?;
                   final user = data['user'] as User?;
+
+                  // Fetch user avatar
+                  final userAvatar = ref.watch(userAvatarProvider);
 
                   return Column(
                     children: [
@@ -611,36 +620,36 @@ class _BottomNavigationAndAppBarState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (businesses != null && businesses.isNotEmpty)
-                              Container(
-                                alignment: Alignment.centerLeft,
-                                width: double.infinity,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: primaryColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  padding: const EdgeInsets.all(1.5),
-                                  child: Center(
-                                    child: CircleAvatar(
-                                      radius: getScreenWidth(context) * 0.09,
-                                      backgroundImage: businesses.first.logo !=
-                                              null
-                                          ? NetworkImage(businesses.first.logo)
-                                          : null,
-                                      onBackgroundImageError:
-                                          (exception, stackTrace) {
-                                        // Fallback image if loading fails
-                                      },
-                                      child: businesses.first.logo == null
-                                          ? Icon(
-                                              Icons.business,
-                                              size: getScreenWidth(context) *
-                                                  0.09,
-                                            )
-                                          : null,
+                            if (userAvatar != null)
+                              userAvatar.when(
+                                data: (avatarUrl) => Container(
+                                  alignment: Alignment.centerLeft,
+                                  width: double.infinity,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: primaryColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    padding: const EdgeInsets.all(1.5),
+                                    child: Center(
+                                      child: CircleAvatar(
+                                        radius: getScreenWidth(context) * 0.09,
+                                        backgroundImage:
+                                            NetworkImage(avatarUrl),
+                                        onBackgroundImageError:
+                                            (exception, stackTrace) {
+                                          // Fallback image if loading fails
+                                        },
+                                        child: null,
+                                      ),
                                     ),
                                   ),
+                                ),
+                                loading: () =>
+                                    const CircularProgressIndicator(),
+                                error: (error, stack) => Icon(
+                                  Icons.error,
+                                  size: getScreenWidth(context) * 0.09,
                                 ),
                               ),
                             Padding(
@@ -743,7 +752,10 @@ class _BottomNavigationAndAppBarState
                         leading: const Icon(Icons.person),
                         title: const Text('Profile'),
                         onTap: () {
-                          // Action for Profile
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => UserProfile()));
                         },
                       ),
                       ListTile(

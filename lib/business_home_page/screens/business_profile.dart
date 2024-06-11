@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
+import 'package:targafy/src/groups/ui/controller/create_subgroup_controller.dart';
 import 'package:targafy/utils/utils.dart';
 
 class BusinessProfile extends ConsumerStatefulWidget {
@@ -18,9 +19,17 @@ class _BusinessProfileState extends ConsumerState<BusinessProfile> {
   String _industryType = '';
   String _city = '';
   String _country = '';
+  String _imageUrl = '';
+
   XFile? profileImage;
   String? imageUrl;
   bool uploading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBusinessLogo();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +59,6 @@ class _BusinessProfileState extends ConsumerState<BusinessProfile> {
           _industryType = selectedBusiness.industryType;
           _city = selectedBusiness.city;
           _country = selectedBusiness.country;
-
           return SafeArea(
             child: ListView(
               children: [
@@ -64,8 +72,10 @@ class _BusinessProfileState extends ConsumerState<BusinessProfile> {
                             : CircleAvatar(
                                 radius: 60,
                                 backgroundImage: selectedBusiness.logo.isEmpty
-                                    ? const AssetImage("assets/images/placeholder.png") as ImageProvider
-                                    : NetworkImage(selectedBusiness.logo),
+                                    ? const AssetImage(
+                                            "assets/images/placeholder.png")
+                                        as ImageProvider
+                                    : NetworkImage(_imageUrl),
                               ),
                       ),
                       const SizedBox(height: 20),
@@ -78,7 +88,8 @@ class _BusinessProfileState extends ConsumerState<BusinessProfile> {
                           ),
                           child: const Padding(
                             padding: EdgeInsets.all(8.0),
-                            child: Text("Change Picture", style: TextStyle(fontSize: 16)),
+                            child: Text("Change Picture",
+                                style: TextStyle(fontSize: 16)),
                           ),
                         ),
                       ),
@@ -92,19 +103,23 @@ class _BusinessProfileState extends ConsumerState<BusinessProfile> {
                   });
                 }),
                 const SizedBox(height: 10),
-                _buildInfoTile("Industry Type", _industryType, Icons.work, context, (val) {
+                _buildInfoTile(
+                    "Industry Type", _industryType, Icons.work, context, (val) {
                   setState(() {
                     _industryType = val;
                   });
                 }),
                 const SizedBox(height: 10),
-                _buildInfoTile("City", _city, Icons.location_city, context, (val) {
+                _buildInfoTile("City", _city, Icons.location_city, context,
+                    (val) {
                   setState(() {
                     _city = val;
                   });
                 }),
                 const SizedBox(height: 10),
-                _buildInfoTile("Country", _country, Icons.location_on_sharp, context, (val) {
+                _buildInfoTile(
+                    "Country", _country, Icons.location_on_sharp, context,
+                    (val) {
                   setState(() {
                     _country = val;
                   });
@@ -119,7 +134,8 @@ class _BusinessProfileState extends ConsumerState<BusinessProfile> {
     );
   }
 
-  Widget _buildInfoTile(String label, String value, IconData icon, BuildContext context, ValueChanged<String> onChanged) {
+  Widget _buildInfoTile(String label, String value, IconData icon,
+      BuildContext context, ValueChanged<String> onChanged) {
     return ListTile(
       leading: Icon(icon),
       title: Column(
@@ -142,11 +158,29 @@ class _BusinessProfileState extends ConsumerState<BusinessProfile> {
     );
   }
 
+  Future<void> _fetchBusinessLogo() async {
+    final selectedBusinessData = ref.read(currentBusinessProvider);
+    final selectedBusiness = selectedBusinessData?['business'] as Business?;
+    if (selectedBusiness != null) {
+      try {
+        final logoUrl = await ref
+            .read(BusinessLogoControllerProvider)
+            .fetchBusinessLogo(selectedBusiness.id);
+        setState(() {
+          _imageUrl = logoUrl;
+        });
+      } catch (e) {
+        showSnackBar(context, "Failed to fetch business logo", Colors.red);
+      }
+    }
+  }
+
   Future<void> _changePicture(String businessId) async {
     final imagePicker = ImagePicker();
-    profileImage = await imagePicker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile =
+        await imagePicker.pickImage(source: ImageSource.gallery);
 
-    if (profileImage != null) {
+    if (pickedFile != null) {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -154,14 +188,19 @@ class _BusinessProfileState extends ConsumerState<BusinessProfile> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.file(File(profileImage!.path), width: 200, height: 200, fit: BoxFit.cover),
+              Image.file(File(pickedFile.path),
+                  width: 200, height: 200, fit: BoxFit.cover),
               const SizedBox(height: 10),
               const Text('Do you want to upload this image?'),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
-            ElevatedButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Upload')),
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel')),
+            ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Upload')),
           ],
         ),
       );
@@ -170,27 +209,28 @@ class _BusinessProfileState extends ConsumerState<BusinessProfile> {
         setState(() {
           uploading = true;
         });
-        // imageUrl = await uploadFileAndFolder(File(profileImage!.path), "bprofile");
+        try {
+          final logoUrl = await ref
+              .read(BusinessLogoControllerProvider)
+              .uploadLogo(File(pickedFile.path));
 
-        if (imageUrl == null || imageUrl!.isEmpty) {
+          await ref
+              .read(BusinessLogoControllerProvider)
+              .updateBusinessLogo(businessId, logoUrl);
+
+          setState(() {
+            _imageUrl = logoUrl;
+          });
+          print('this is image URL :- $_imageUrl');
+          showSnackBar(context, "Logo updated successfully", Colors.green);
+        } catch (e) {
           showSnackBar(context, "Image upload failed", Colors.red);
-        } else {
-          // Assuming a method to update the business logo in the backend
-          bool isUploaded = await updateBusinessLogo(businessId, imageUrl!);
-          if (isUploaded) {
-            showSnackBar(context, "Logo updated successfully", Colors.green);
-          }
+        } finally {
+          setState(() {
+            uploading = false;
+          });
         }
-        setState(() {
-          uploading = false;
-        });
       }
     }
-  }
-
-  Future<bool> updateBusinessLogo(String businessId, String newLogoUrl) async {
-    // Implement your API call to update the business logo here
-    // Return true if the update was successful, otherwise false
-    return true;
   }
 }
