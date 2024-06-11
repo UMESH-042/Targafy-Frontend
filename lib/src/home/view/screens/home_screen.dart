@@ -454,6 +454,60 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   }
                 },
               ),
+               if (selectedStates.isNotEmpty &&
+                selectedStates[1] &&
+                selectedParameter.isNotEmpty &&
+                selectedUser.isNotEmpty)
+              FutureBuilder<Map<String, List<List<dynamic>>>>(
+                future: ref.read(userDataControllerProvider).fetchUserData(
+                    businessId!, selectedParameter, selectedUserId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (snapshot.hasData) {
+                    final data = snapshot.data!;
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: DataTableWidget(
+                        parameter: selectedParameter,
+                        actualData: data['userEntries'] ?? [],
+                        predictedData: data['dailyTarget'] ?? [],
+                      ),
+                    );
+                  } else {
+                    return const Center(child: Text('No data available'));
+                  }
+                },
+              ),
+              if (selectedStates.isNotEmpty &&
+                selectedStates[3] &&
+                selectedParameter.isNotEmpty &&
+                selectedUser.isNotEmpty)
+              FutureBuilder<Map<String, List<List<dynamic>>>>(
+                future: ref.read(userDataControllerProvider).fetchUserData(
+                    businessId!, selectedParameter, selectedUserId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (snapshot.hasData) {
+                    final data = snapshot.data!;
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: PiechartGraph(
+                        parameter: selectedParameter,
+                        actualData: data['userEntries'] ?? [],
+                        // predictedData: data['dailyTarget'] ?? [],
+                      ),
+                    );
+                  } else {
+                    return const Center(child: Text('No data available'));
+                  }
+                },
+              ),
           ],
         ),
       ),
