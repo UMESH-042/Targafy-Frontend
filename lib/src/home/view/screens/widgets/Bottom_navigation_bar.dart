@@ -500,18 +500,18 @@ class _BottomNavigationAndAppBarState
             ),
             centerTitle: false,
             actions: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: GestureDetector(
-                  child: Image.asset('assets/img/search.png'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: GestureDetector(
-                  child: Image.asset('assets/img/filter.png'),
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 5),
+              //   child: GestureDetector(
+              //     child: Image.asset('assets/img/search.png'),
+              //   ),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 15),
+              //   child: GestureDetector(
+              //     child: Image.asset('assets/img/filter.png'),
+              //   ),
+              // ),
               Consumer(
                 builder: (context, ref, _) {
                   final userRoleAsyncValue = ref.watch(userRoleProvider);
@@ -561,16 +561,16 @@ class _BottomNavigationAndAppBarState
                                 color: primaryColor,
                               ),
                             ),
-                          if (role != 'User' && role != 'MiniAdmin')
-                            PopupMenuItem<int>(
-                              value: 2,
-                              child: CustomText(
-                                text: 'Add Charts',
-                                fontSize: getScreenWidth(context) * 0.04,
-                                fontWeight: FontWeight.w600,
-                                color: primaryColor,
-                              ),
-                            ),
+                          // if (role != 'User' && role != 'MiniAdmin')
+                          //   PopupMenuItem<int>(
+                          //     value: 2,
+                          //     child: CustomText(
+                          //       text: 'Add Charts',
+                          //       fontSize: getScreenWidth(context) * 0.04,
+                          //       fontWeight: FontWeight.w600,
+                          //       color: primaryColor,
+                          //     ),
+                          //   ),
                           PopupMenuItem<int>(
                             value: 3,
                             child: CustomText(
@@ -758,13 +758,13 @@ class _BottomNavigationAndAppBarState
                                   builder: (context) => UserProfile()));
                         },
                       ),
-                      ListTile(
-                        leading: const Icon(Icons.logout),
-                        title: const Text('Log out'),
-                        onTap: () {
-                          // Action for Log out
-                        },
-                      ),
+                      // ListTile(
+                      //   leading: const Icon(Icons.logout),
+                      //   title: const Text('Log out'),
+                      //   onTap: () {
+                      //     // Action for Log out
+                      //   },
+                      // ),
                     ],
                   );
                 },
@@ -810,13 +810,13 @@ class _BottomNavigationAndAppBarState
                         // Action for Profile
                       },
                     ),
-                    ListTile(
-                      leading: const Icon(Icons.logout),
-                      title: const Text('Log out'),
-                      onTap: () {
-                        // Action for Log out
-                      },
-                    ),
+                    // ListTile(
+                    //   leading: const Icon(Icons.logout),
+                    //   title: const Text('Log out'),
+                    //   onTap: () {
+                    //     // Action for Log out
+                    //   },
+                    // ),
                   ],
                 ),
               );
@@ -828,9 +828,9 @@ class _BottomNavigationAndAppBarState
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: CurvedNavigationBar(
-        color: Colors.black,
+        color: primaryColor,
         backgroundColor: Colors.transparent,
-        buttonBackgroundColor: Colors.black,
+        buttonBackgroundColor: primaryColor,
         height: 60,
         animationCurve: Curves.easeInOut,
         animationDuration: const Duration(milliseconds: 600),
