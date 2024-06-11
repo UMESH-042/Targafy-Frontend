@@ -3,29 +3,22 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final SubGroupDataControllerProvider =
-    Provider<SubGroupDataController>((ref) => SubGroupDataController());
+// Provider for UserDataController
+final userDataControllerProvider =
+    Provider<UserDataController>((ref) => UserDataController());
 
-class SubGroupDataController {
-  Future<Map<String, List<List<dynamic>>>> fetchDataAdded(
-      String businessId, String groupId, String groupName) async {
+class UserDataController {
+  Future<Map<String, List<List<dynamic>>>> fetchUserData(
+      String businessId, String parameter, String userId) async {
     final String url =
-        'http://13.234.163.59:5000/api/v1/group/get-level-data/$businessId/$groupId';
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('authToken');
+        'http://13.234.163.59:5000/api/v1/data/get-user-data/$businessId/$parameter/$userId';
+    final authToken = await _getAuthToken(); // Get the auth token
 
     try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: json.encode({'groupName': groupName}),
-      );
-      print('This is groupId:-${groupId}');
+      final response = await http
+          .get(Uri.parse(url), headers: {'Authorization': 'Bearer $authToken'});
+
       if (response.statusCode == 200) {
-        print('success');
         final Map<String, dynamic> responseData = json.decode(response.body);
         if (responseData.containsKey('data')) {
           final Map<String, dynamic> data = responseData['data'];
@@ -39,9 +32,14 @@ class SubGroupDataController {
         }
       }
     } catch (e) {
-      print('Error fetching growth data: $e');
+      print('Error fetching user data: $e');
     }
-
     return {'userEntries': [], 'dailyTarget': []};
   }
+}
+
+// Function to get the auth token
+Future<String> _getAuthToken() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('authToken') ?? '';
 }

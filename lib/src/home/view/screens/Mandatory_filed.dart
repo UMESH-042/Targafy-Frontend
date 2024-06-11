@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:targafy/core/shared/custom_textform_field.dart';
 import 'package:targafy/src/home/view/screens/controller/mandatory_Filed_name_controller.dart';
 import 'package:targafy/src/registration/view/screens/register_a_business_screen1.dart';
 import 'package:targafy/utils/colors.dart';

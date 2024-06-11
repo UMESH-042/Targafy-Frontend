@@ -292,15 +292,15 @@ import 'package:targafy/widgets/submit_button.dart';
 
 class CreateSubGroupPage extends ConsumerStatefulWidget {
   final GroupDataModel group;
-  const CreateSubGroupPage(this.group, {Key? key}) : super(key: key);
+  const CreateSubGroupPage(this.group, {super.key});
 
   @override
   _CreateSubGroupPageState createState() => _CreateSubGroupPageState();
 }
 
 class _CreateSubGroupPageState extends ConsumerState<CreateSubGroupPage> {
-  late List<String> _selectedUsers = [];
-  Map<String, String> _userNames = {};
+  late final List<String> _selectedUsers = [];
+  final Map<String, String> _userNames = {};
   File? _logoImage;
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _subgroupNameController = TextEditingController();
@@ -373,7 +373,7 @@ class _CreateSubGroupPageState extends ConsumerState<CreateSubGroupPage> {
               child: Padding(
                 padding: EdgeInsets.symmetric(
                     vertical: height * 0.02, horizontal: width * .04),
-                child: Row(
+                child: const Row(
                   children: [
                     BackButton(),
                     SizedBox(width: 20),
@@ -397,7 +397,7 @@ class _CreateSubGroupPageState extends ConsumerState<CreateSubGroupPage> {
                   children: [
                     Container(
                       alignment: Alignment.centerLeft,
-                      child: Row(
+                      child: const Row(
                         children: [
                           Text(
                             "Name* ",
@@ -425,7 +425,7 @@ class _CreateSubGroupPageState extends ConsumerState<CreateSubGroupPage> {
                     SizedBox(height: height * 0.02),
                     Container(
                       alignment: Alignment.centerLeft,
-                      child: Row(
+                      child: const Row(
                         children: [
                           Text(
                             "Add Logo Image: ",
@@ -451,7 +451,7 @@ class _CreateSubGroupPageState extends ConsumerState<CreateSubGroupPage> {
                           border: Border.all(color: Colors.grey),
                         ),
                         child: _logoImage == null
-                            ? Icon(
+                            ? const Icon(
                                 Icons.add_a_photo,
                                 color: Colors.grey,
                                 size: 50,
@@ -468,7 +468,7 @@ class _CreateSubGroupPageState extends ConsumerState<CreateSubGroupPage> {
                     SizedBox(height: height * 0.02),
                     Container(
                       alignment: Alignment.centerLeft,
-                      child: Row(
+                      child: const Row(
                         children: [
                           Text(
                             "Select Users To Add: ",
@@ -490,7 +490,7 @@ class _CreateSubGroupPageState extends ConsumerState<CreateSubGroupPage> {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           // While waiting for data, show a loading indicator
-                          return CircularProgressIndicator();
+                          return const CircularProgressIndicator();
                         } else if (snapshot.hasError) {
                           // If there's an error, display the error message
                           return Text('Error: ${snapshot.error}');
@@ -515,9 +515,9 @@ class _CreateSubGroupPageState extends ConsumerState<CreateSubGroupPage> {
                                 }
                               });
                             },
-                            hint: Text('Choose Users'),
+                            hint: const Text('Choose Users'),
                             decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                   vertical: 15, horizontal: 10),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15.0),
@@ -549,7 +549,7 @@ class _CreateSubGroupPageState extends ConsumerState<CreateSubGroupPage> {
                     if (_errorMessage.isNotEmpty)
                       Text(
                         _errorMessage,
-                        style: TextStyle(color: Colors.red),
+                        style: const TextStyle(color: Colors.red),
                       ),
                     SubmitButton(onPressed: _submitSubGroup)
                   ],

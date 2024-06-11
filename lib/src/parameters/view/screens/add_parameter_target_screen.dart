@@ -126,8 +126,6 @@
 //     );
 //   }
 // }
-  
-
 
 // import 'package:flutter/material.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -261,25 +259,23 @@
 //               error: (error, stackTrace) => Text('Failed to load parameters: $error'),
 //             ),
 //           if (selectedValue == 2)
-            // SizedBox(
-            //   height: getScreenheight(context) * 0.6,
-            //   child: ListView(
-            //     children: const [
-            //       TargetTIle(parameterName: 'Sales', target: 150),
-            //       TargetTIle(parameterName: 'Items Sold', target: 100),
-            //       TargetTIle(parameterName: 'Revenue', target: 10),
-            //       TargetTIle(parameterName: 'Secondary Sales', target: 180),
-            //       TargetTIle(parameterName: 'Margins', target: 200),
-            //     ],
-            //   ),
-            // ),
+// SizedBox(
+//   height: getScreenheight(context) * 0.6,
+//   child: ListView(
+//     children: const [
+//       TargetTIle(parameterName: 'Sales', target: 150),
+//       TargetTIle(parameterName: 'Items Sold', target: 100),
+//       TargetTIle(parameterName: 'Revenue', target: 10),
+//       TargetTIle(parameterName: 'Secondary Sales', target: 180),
+//       TargetTIle(parameterName: 'Margins', target: 200),
+//     ],
+//   ),
+// ),
 //         ],
 //       ),
 //     );
 //   }
 // }
-
-
 
 // import 'package:flutter/material.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -603,7 +599,7 @@
 //                         target: targetValue,
 //                         businessId: businessId,
 //                       );
-                    
+
 //                     },
 //                   ),
 //                 );
@@ -633,10 +629,13 @@ class AddParameterTargetScreen extends ConsumerStatefulWidget {
   const AddParameterTargetScreen({super.key});
 
   @override
-  ConsumerState<AddParameterTargetScreen> createState() => _AddParameterTargetScreenState();
+  ConsumerState<AddParameterTargetScreen> createState() =>
+      _AddParameterTargetScreenState();
 }
 
-class _AddParameterTargetScreenState extends ConsumerState<AddParameterTargetScreen> with SingleTickerProviderStateMixin {
+class _AddParameterTargetScreenState
+    extends ConsumerState<AddParameterTargetScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int selectedValue = 1;
 
@@ -707,7 +706,9 @@ class _AddParameterTargetScreenState extends ConsumerState<AddParameterTargetScr
                   decoration: BoxDecoration(
                     border: Border.all(color: primaryColor, width: 1),
                     color: selectedValue == 1 ? primaryColor : Colors.white,
-                    borderRadius: BorderRadius.circular(8).copyWith(topRight: const Radius.circular(0), bottomRight: const Radius.circular(0)),
+                    borderRadius: BorderRadius.circular(8).copyWith(
+                        topRight: const Radius.circular(0),
+                        bottomRight: const Radius.circular(0)),
                   ),
                   width: getScreenWidth(context) * 0.3,
                   child: CustomText(
@@ -730,7 +731,9 @@ class _AddParameterTargetScreenState extends ConsumerState<AddParameterTargetScr
                   decoration: BoxDecoration(
                     border: Border.all(color: primaryColor, width: 1),
                     color: selectedValue == 2 ? primaryColor : Colors.white,
-                    borderRadius: BorderRadius.circular(8).copyWith(topLeft: const Radius.circular(0), bottomLeft: const Radius.circular(0)),
+                    borderRadius: BorderRadius.circular(8).copyWith(
+                        topLeft: const Radius.circular(0),
+                        bottomLeft: const Radius.circular(0)),
                   ),
                   width: getScreenWidth(context) * 0.3,
                   child: CustomText(
@@ -765,7 +768,8 @@ class _AddParameterTargetScreenState extends ConsumerState<AddParameterTargetScr
                     function: () async {
                       final result = await Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const AddParameter()),
+                        MaterialPageRoute(
+                            builder: (context) => const AddParameter()),
                       );
                       if (result == true) {
                         _refreshParameters();

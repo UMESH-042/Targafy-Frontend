@@ -7,6 +7,8 @@ import 'package:targafy/src/groups/ui/controller/group_data_controller.dart';
 import 'package:targafy/src/groups/ui/widget/group_tile.dart';
 
 class GroupScreen extends ConsumerStatefulWidget {
+  const GroupScreen({super.key});
+
   @override
   _GroupScreenState createState() => _GroupScreenState();
 }
@@ -16,7 +18,7 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Groups'),
+        title: const Text('Groups'),
       ),
 
       body: Padding(
@@ -32,7 +34,7 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
             final groups = ref.watch(GroupDataControllerProvider);
 
             return groups.isEmpty
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
                     itemCount: groups.length,
                     itemBuilder: (context, index) {
@@ -51,24 +53,24 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
         ),
       ),
       // In GroupScreen
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: lightblue,
-        onPressed: () async {
-          final created = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CreateGroupPage()),
-          );
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: lightblue,
+      //   onPressed: () async {
+      //     final created = await Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => const CreateGroupPage()),
+      //     );
 
-          if (created == true) {
-            final selectedBusinessData = ref.watch(currentBusinessProvider);
-            final businessId = selectedBusinessData?['business']?.id;
-            ref
-                .read(GroupDataControllerProvider.notifier)
-                .fetchGroups(businessId);
-          }
-        },
-        child: Icon(Icons.add),
-      ),
+      //     if (created == true) {
+      //       final selectedBusinessData = ref.watch(currentBusinessProvider);
+      //       final businessId = selectedBusinessData?['business']?.id;
+      //       ref
+      //           .read(GroupDataControllerProvider.notifier)
+      //           .fetchGroups(businessId);
+      //     }
+      //   },
+      //   child: const Icon(Icons.add),
+      // ),
     );
   }
 }

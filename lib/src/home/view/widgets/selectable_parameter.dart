@@ -44,8 +44,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:targafy/core/constants/colors.dart';
-import 'package:targafy/core/constants/dimensions.dart';
-import 'package:targafy/core/utils/texts.dart';
 
 class SelectableParameterWidget extends StatelessWidget {
   final String text;

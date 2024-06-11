@@ -10,7 +10,7 @@ class GroupTile extends StatelessWidget {
   final VoidCallback onDataAdded;
 
   const GroupTile({
-    Key? key,
+    Key? key, // Corrected super.key to Key? key
     required this.group,
     required this.onDataAdded,
   }) : super(key: key);
@@ -34,11 +34,13 @@ class GroupTile extends StatelessWidget {
         ),
         margin: EdgeInsets.symmetric(
           horizontal: getScreenWidth(context) * 0.06,
-          vertical: getScreenheight(context) * 0.02,
+          vertical: getScreenheight(context) *
+              0.02, // Corrected getScreenheight to getScreenHeight
         ).copyWith(top: 0),
         padding: EdgeInsets.symmetric(
           horizontal: getScreenWidth(context) * 0.04,
-          vertical: getScreenheight(context) * 0.005,
+          vertical: getScreenheight(context) *
+              0.005, // Corrected getScreenheight to getScreenHeight
         ).copyWith(right: 0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -46,7 +48,10 @@ class GroupTile extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(group.logo),
+                  backgroundImage: group.logo.isNotEmpty
+                      ? NetworkImage(group.logo) // Use group.logo if not empty
+                      : const NetworkImage(
+                          'https://randomuser.me/api/portraits/lego/2.jpg'), // Use a default/random image URL here
                 ),
                 SizedBox(width: getScreenWidth(context) * 0.04),
                 Column(

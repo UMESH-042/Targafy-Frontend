@@ -121,7 +121,7 @@ class _BusinessRequestsPageState extends ConsumerState<BusinessRequestsPage> {
                                             context: context,
                                             builder: (context) =>
                                                 UserSelectionDialog(
-                                              userId: user.userId!,
+                                              userId: user.userId,
                                               userRequestCallback: (success) {
                                                 if (success) {
                                                   requestController.clear();

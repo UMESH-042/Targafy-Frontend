@@ -7,8 +7,8 @@ class UserBusinessProfilePage extends ConsumerWidget {
 
   const UserBusinessProfilePage({
     required this.userId,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -16,25 +16,25 @@ class UserBusinessProfilePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Profile'),
+        title: const Text('User Profile'),
       ),
       body: userAsyncValue.when(
         data: (user) => SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
                 title: Text(
                   'Name: ${user.name}',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text('User ID: ${user.userId}'),
-                trailing: CircleAvatar(
+                trailing: const CircleAvatar(
                     // Add avatar here if needed
                     ),
               ),
-              Divider(),
+              const Divider(),
               _buildKeyValuePair("Rating", user.totalRating.toString()),
               _buildKeyValuePair("Contact Number", user.contactNumber),
               _buildKeyValuePair("User Type", user.userType),
@@ -44,7 +44,7 @@ class UserBusinessProfilePage extends ConsumerWidget {
             ],
           ),
         ),
-        loading: () => Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) => Center(child: Text('Error: $error')),
       ),
     );

@@ -8,7 +8,7 @@ import 'package:targafy/utils/colors.dart';
 class ActivityTile extends StatelessWidget {
   final ActivityModel activity;
 
-  const ActivityTile({Key? key, required this.activity}) : super(key: key);
+  const ActivityTile({super.key, required this.activity});
 
   String formatDate(DateTime dateTimeFromServer) {
     DateTime localDateTime = dateTimeFromServer.toLocal();

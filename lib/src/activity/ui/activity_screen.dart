@@ -19,7 +19,7 @@ class ActivityScreen extends ConsumerWidget {
     final businessId = selectedBusinessData?['business']?.id;
 
     if (businessId == null) {
-      return Scaffold(
+      return const Scaffold(
         body: Center(
           child: Text(
             "Business not selected",
@@ -95,7 +95,7 @@ class ActivityScreen extends ConsumerWidget {
                       },
                       child: ActivityTile(activity: activity),
                     );
-                  }).toList(),
+                  }),
                 ],
               );
             },

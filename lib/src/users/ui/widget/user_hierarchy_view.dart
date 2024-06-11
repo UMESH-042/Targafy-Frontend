@@ -15,9 +15,9 @@ class UserHierarchy extends ConsumerStatefulWidget {
   final String businessId;
 
   const UserHierarchy({
-    Key? key,
+    super.key,
     required this.businessId,
-  }) : super(key: key);
+  });
 
   @override
   _UserHierarchyState createState() => _UserHierarchyState();

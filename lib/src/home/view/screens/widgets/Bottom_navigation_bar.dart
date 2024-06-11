@@ -481,7 +481,7 @@ class _BottomNavigationAndAppBarState
                 ),
                 Text(
                   selectedBusiness != null && selectedUserType != null
-                      ? '${selectedBusiness.name}'
+                      ? selectedBusiness.name
                       : 'Hi User',
                   style: TextStyle(
                     fontSize: getScreenWidth(context) *
@@ -624,11 +624,21 @@ class _BottomNavigationAndAppBarState
                                   child: Center(
                                     child: CircleAvatar(
                                       radius: getScreenWidth(context) * 0.09,
-                                      backgroundImage:
-                                          NetworkImage(businesses.first.logo),
-                                      onBackgroundImageError: (_, __) {
+                                      backgroundImage: businesses.first.logo !=
+                                              null
+                                          ? NetworkImage(businesses.first.logo)
+                                          : null,
+                                      onBackgroundImageError:
+                                          (exception, stackTrace) {
                                         // Fallback image if loading fails
                                       },
+                                      child: businesses.first.logo == null
+                                          ? Icon(
+                                              Icons.business,
+                                              size: getScreenWidth(context) *
+                                                  0.09,
+                                            )
+                                          : null,
                                     ),
                                   ),
                                 ),
@@ -642,7 +652,7 @@ class _BottomNavigationAndAppBarState
                                   if (user != null)
                                     Center(
                                       child: CustomText(
-                                        text: user.name,
+                                        text: user.name ?? 'No Name',
                                         fontSize:
                                             getScreenWidth(context) * 0.045,
                                         color: primaryColor,
@@ -665,7 +675,7 @@ class _BottomNavigationAndAppBarState
                           ],
                         ),
                       ),
-                      if (businesses != null)
+                      if (businesses != null && businesses.isNotEmpty)
                         ExpansionTile(
                           leading: const Icon(Icons.business),
                           title: const Text('Businesses'),
@@ -677,26 +687,29 @@ class _BottomNavigationAndAppBarState
                             );
 
                             return ListTile(
-                              leading: Image.network(
-                                business.logo,
-                                width: 30,
-                                height: 30,
-                                errorBuilder: (BuildContext context,
-                                    Object exception, StackTrace? stackTrace) {
-                                  return Image.network(
-                                    'https://via.placeholder.com/30',
-                                    width: 30,
-                                    height: 30,
-                                  );
-                                },
-                              ),
-                              title: Text(business.name),
+                              leading: business.logo != null
+                                  ? Image.network(
+                                      business.logo,
+                                      width: 30,
+                                      height: 30,
+                                      errorBuilder: (BuildContext context,
+                                          Object exception,
+                                          StackTrace? stackTrace) {
+                                        return Image.network(
+                                          'https://via.placeholder.com/30',
+                                          width: 30,
+                                          height: 30,
+                                        );
+                                      },
+                                    )
+                                  : const Icon(Icons.business),
+                              title: Text(business.name ?? 'No Name'),
                               onTap: () {
                                 if (businessUser != null) {
                                   selectBusiness(
                                       business,
-                                      businessUser.userType,
-                                      business.businessCode,
+                                      businessUser.userType ?? 'No User Type',
+                                      business.businessCode ?? 'No Code',
                                       ref);
                                   Navigator.pop(context); // Close the drawer
                                 }
@@ -744,8 +757,55 @@ class _BottomNavigationAndAppBarState
                   );
                 },
                 loading: () => const CircularProgressIndicator(),
-                error: (error, stack) => ListTile(
-                  title: Text('Error: $error'),
+                error: (error, stack) => Column(
+                  children: [
+                    DrawerHeader(
+                      child: Center(
+                        child: CustomText(
+                          text: 'Error: $error',
+                          fontSize: getScreenWidth(context) * 0.045,
+                          color: Colors.red,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.add),
+                      title: const Text('Create Business'),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const CreateBusinessPage()));
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.group_add),
+                      title: const Text('Join Business'),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const JoinBusinessScreen()));
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.person),
+                      title: const Text('Profile'),
+                      onTap: () {
+                        // Action for Profile
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.logout),
+                      title: const Text('Log out'),
+                      onTap: () {
+                        // Action for Log out
+                      },
+                    ),
+                  ],
                 ),
               );
             },

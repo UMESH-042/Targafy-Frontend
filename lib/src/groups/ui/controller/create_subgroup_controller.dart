@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
-import 'package:targafy/src/groups/ui/model/create_group_model.dart';
 import 'package:targafy/src/groups/ui/model/create_sub_group_model.dart';
 
 final SubgroupControllerProvider = Provider<SubGroupController>((ref) {

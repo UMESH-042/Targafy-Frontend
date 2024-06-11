@@ -1,6 +1,5 @@
 import 'package:targafy/core/constants/colors.dart';
 
-import '../utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class SubmitButton extends StatelessWidget {

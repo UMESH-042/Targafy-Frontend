@@ -428,7 +428,7 @@ import 'package:targafy/src/users/ui/widget/user_hierarchy_view.dart';
 import 'package:targafy/utils/colors.dart';
 
 class UsersScreen extends ConsumerStatefulWidget {
-  const UsersScreen({Key? key}) : super(key: key);
+  const UsersScreen({super.key});
 
   @override
   _UsersScreenState createState() => _UsersScreenState();
@@ -464,7 +464,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   ElevatedButton(
@@ -480,7 +480,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                          const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                       backgroundColor: lightblue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
@@ -492,7 +492,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                       style: TextStyle(color: primaryColor),
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
@@ -514,7 +514,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
@@ -527,7 +527,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                          const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                       backgroundColor: lightblue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
@@ -539,7 +539,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                       style: TextStyle(color: primaryColor),
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
@@ -551,7 +551,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                          const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                       backgroundColor: lightblue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
@@ -669,7 +669,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                                                 print(
                                                     'user Id:- ${user.userId}');
                                                 print(
-                                                    'business Id :-${businessId}');
+                                                    'business Id :-$businessId');
                                                 break;
                                               case 2:
                                                 // Call the promote user to MiniAdmin function
