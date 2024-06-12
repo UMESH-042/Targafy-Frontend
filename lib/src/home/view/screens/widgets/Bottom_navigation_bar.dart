@@ -609,9 +609,11 @@ class _BottomNavigationAndAppBarState
               return asyncValue.when(
                 data: (data) {
                   print('this is the :-$data');
+
                   // final businesses = data['businesses'] as List<Business>?;
                   final businesses =
                       (data['businesses'] as List<Business>?) ?? [];
+
                   final user = data['user'] as User?;
 
                   // Fetch user avatar
@@ -623,6 +625,39 @@ class _BottomNavigationAndAppBarState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // userAvatar.when(
+                            //   data: (avatarUrl) => Container(
+                            //     alignment: Alignment.centerLeft,
+                            //     width: double.infinity,
+                            //     child: Container(
+                            //       decoration: BoxDecoration(
+                            //         color: primaryColor,
+                            //         shape: BoxShape.circle,
+                            //       ),
+                            //       padding: const EdgeInsets.all(1.5),
+                            //       child: Center(
+                            //         child: CircleAvatar(
+                            //           radius: getScreenWidth(context) * 0.09,
+                            //           // backgroundImage:
+                            //           //     NetworkImage(avatarUrl),
+                            //           backgroundImage:
+                            //               CachedNetworkImageProvider(avatarUrl),
+                            //           onBackgroundImageError:
+                            //               (exception, stackTrace) {
+                            //             // Fallback image if loading fails
+
+                            //           },
+                            //           child: null,
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ),
+                            //   loading: () => const CircularProgressIndicator(),
+                            //   error: (error, stack) => Icon(
+                            //     Icons.error,
+                            //     size: getScreenWidth(context) * 0.09,
+                            //   ),
+                            // ),
                             userAvatar.when(
                               data: (avatarUrl) => Container(
                                 alignment: Alignment.centerLeft,
@@ -636,13 +671,13 @@ class _BottomNavigationAndAppBarState
                                   child: Center(
                                     child: CircleAvatar(
                                       radius: getScreenWidth(context) * 0.09,
-                                      // backgroundImage:
-                                      //     NetworkImage(avatarUrl),
                                       backgroundImage:
                                           CachedNetworkImageProvider(avatarUrl),
                                       onBackgroundImageError:
                                           (exception, stackTrace) {
                                         // Fallback image if loading fails
+                                        const NetworkImage(
+                                            'https://codeskulptor-demos.commondatastorage.googleapis.com/pang/LdTCEUo.png');
                                       },
                                       child: null,
                                     ),
@@ -650,10 +685,57 @@ class _BottomNavigationAndAppBarState
                                 ),
                               ),
                               loading: () => const CircularProgressIndicator(),
-                              error: (error, stack) => Icon(
-                                Icons.error,
-                                size: getScreenWidth(context) * 0.09,
-                              ),
+                              error: (error, stack) {
+                                // Check for specific error message and display fallback image
+                                // if (error
+                                //     .toString()
+                                //     .contains("User avatar does not exist")) {
+                                //   return Container(
+                                //     alignment: Alignment.centerLeft,
+                                //     width: double.infinity,
+                                //     child: Container(
+                                //       decoration: BoxDecoration(
+                                //         color: primaryColor,
+                                //         shape: BoxShape.circle,
+                                //       ),
+                                //       padding: const EdgeInsets.all(1.5),
+                                //       child: Center(
+                                //         child: CircleAvatar(
+                                //           radius:
+                                //               getScreenWidth(context) * 0.09,
+                                //           backgroundImage: NetworkImage(
+                                //               'https://codeskulptor-demos.commondatastorage.googleapis.com/pang/LdTCEUo.png'),
+                                //           child: null,
+                                //         ),
+                                //       ),
+                                //     ),
+                                //   );
+                                // } else {
+                                // return Icon(
+                                //   Icons.error,
+                                //   size: getScreenWidth(context) * 0.09,
+                                // );
+                                return Container(
+                                  alignment: Alignment.centerLeft,
+                                  width: double.infinity,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: primaryColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    padding: const EdgeInsets.all(1.5),
+                                    child: Center(
+                                      child: CircleAvatar(
+                                        radius: getScreenWidth(context) * 0.09,
+                                        backgroundImage: NetworkImage(
+                                            'https://codeskulptor-demos.commondatastorage.googleapis.com/pang/LdTCEUo.png'),
+                                        child: null,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                                // }
+                              },
                             ),
                             Padding(
                               padding: EdgeInsets.only(

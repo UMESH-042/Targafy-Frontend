@@ -6,10 +6,9 @@ import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart'
 
 // Provider to fetch auth token from shared preferences
 
-
-
 // Provider to fetch business and user details
-final businessAndUserProvider = StreamProvider<Map<String, dynamic>>((ref) async* {
+final businessAndUserProvider =
+    StreamProvider<Map<String, dynamic>>((ref) async* {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('authToken');
   if (token == null) {
@@ -18,7 +17,8 @@ final businessAndUserProvider = StreamProvider<Map<String, dynamic>>((ref) async
 
   while (true) {
     final response = await http.get(
-      Uri.parse('http://13.234.163.59:5000/api/v1/business/get-business-details'),
+      Uri.parse(
+          'http://13.234.163.59:5000/api/v1/business/get-business-details'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -31,7 +31,19 @@ final businessAndUserProvider = StreamProvider<Map<String, dynamic>>((ref) async
 
       // print('Fetched User: $user');
       // print('Fetched Businesses: $businesses');
-      
+
+      yield {
+        'businesses': businesses.map((e) => Business.fromJson(e)).toList(),
+        'user': User.fromJson(user),
+      };
+    } else if (response.statusCode == 400) {
+      final data = json.decode(response.body);
+      final List businesses = data['data']['businesses'];
+      final user = data['data']['user'];
+
+      // print('Fetched User: $user');
+      // print('Fetched Businesses: $businesses');
+
       yield {
         'businesses': businesses.map((e) => Business.fromJson(e)).toList(),
         'user': User.fromJson(user),
@@ -41,10 +53,10 @@ final businessAndUserProvider = StreamProvider<Map<String, dynamic>>((ref) async
     }
 
     // Wait for a short duration before fetching data again
-    await Future.delayed(const Duration(seconds: 3)); // Adjust the duration as needed
+    await Future.delayed(
+        const Duration(seconds: 3)); // Adjust the duration as needed
   }
 });
-
 
 // Provider to track the currently selected business and userType
 final currentBusinessProvider =
@@ -80,6 +92,3 @@ Future<void> loadSelectedBusiness(WidgetRef ref) async {
     };
   }
 }
-
-
-
