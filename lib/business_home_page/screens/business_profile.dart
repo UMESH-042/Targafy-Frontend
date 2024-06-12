@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -71,11 +72,18 @@ class _BusinessProfileState extends ConsumerState<BusinessProfile> {
                             ? const CircularProgressIndicator()
                             : CircleAvatar(
                                 radius: 60,
-                                backgroundImage: selectedBusiness.logo.isEmpty
-                                    ? const AssetImage(
-                                            "assets/images/placeholder.png")
-                                        as ImageProvider
-                                    : NetworkImage(_imageUrl),
+                                // backgroundImage: selectedBusiness.logo.isEmpty
+                                //     ? const AssetImage(
+                                //             "assets/images/placeholder.png")
+                                //         as ImageProvider
+                                //     : NetworkImage(_imageUrl),
+                                backgroundImage: profileImage != null
+                                    ? FileImage(File(profileImage!.path))
+                                    : (_imageUrl.isEmpty
+                                        ? const AssetImage(
+                                            "assets/img/targafy.png")
+                                        : CachedNetworkImageProvider(
+                                            _imageUrl)) as ImageProvider,
                               ),
                       ),
                       const SizedBox(height: 20),

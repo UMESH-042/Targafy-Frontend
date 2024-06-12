@@ -545,7 +545,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => GroupScreen(),
+                          builder: (context) => const GroupScreen(),
                         ),
                       );
                     },

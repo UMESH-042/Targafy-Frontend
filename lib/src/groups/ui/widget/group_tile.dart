@@ -10,10 +10,10 @@ class GroupTile extends StatelessWidget {
   final VoidCallback onDataAdded;
 
   const GroupTile({
-    Key? key, // Corrected super.key to Key? key
+    super.key, // Corrected super.key to Key? key
     required this.group,
     required this.onDataAdded,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

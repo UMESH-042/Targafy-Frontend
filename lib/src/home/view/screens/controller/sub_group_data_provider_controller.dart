@@ -23,7 +23,7 @@ class SubGroupDataController {
         },
         body: json.encode({'groupName': groupName}),
       );
-      print('This is groupId:-${groupId}');
+      print('This is groupId:-$groupId');
       if (response.statusCode == 200) {
         print('success');
         final Map<String, dynamic> responseData = json.decode(response.body);

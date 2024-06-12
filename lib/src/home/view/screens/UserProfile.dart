@@ -6,7 +6,7 @@ import 'package:targafy/src/home/view/screens/controller/user_profile_data_contr
 import 'model/user_business_model_drawer.dart';
 
 class UserProfile extends ConsumerStatefulWidget {
-  const UserProfile({Key? key}) : super(key: key);
+  const UserProfile({super.key});
 
   @override
   ConsumerState<UserProfile> createState() => _UserProfileState();
@@ -99,7 +99,7 @@ class _UserProfileState extends ConsumerState<UserProfile> {
               ? FileImage(File(_profileImage!.path))
               : (_profileImageUrl != null
                       ? NetworkImage(_profileImageUrl!)
-                      : AssetImage("assets/images/placeholder.png"))
+                      : const AssetImage("assets/images/placeholder.png"))
                   as ImageProvider,
         ),
         if (_uploading)

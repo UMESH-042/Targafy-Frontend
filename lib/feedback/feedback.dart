@@ -11,7 +11,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Text('Feedback Screen'),
+      child: Text('Feedback Screen\n   Coming Soon'),
     );
   }
 }

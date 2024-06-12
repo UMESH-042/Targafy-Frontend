@@ -103,7 +103,7 @@ class _GroupDetailsPageState extends ConsumerState<GroupDetailsPage> {
             .updateGroupLogo(widget.group.id, businessId!, logoUrl);
 
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Logo updated successfully!')));
+            const SnackBar(content: Text('Logo updated successfully!')));
       } catch (e) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Failed to update logo: $e')));
@@ -131,7 +131,7 @@ class _GroupDetailsPageState extends ConsumerState<GroupDetailsPage> {
                       ? FileImage(_logoImage!)
                       : NetworkImage(widget.group.logo) as ImageProvider,
                   child: _logoImage == null
-                      ? Icon(
+                      ? const Icon(
                           Icons.camera_alt,
                           color: Colors.white,
                         )

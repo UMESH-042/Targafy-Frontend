@@ -70,10 +70,10 @@ class CustomChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SfCartesianChart(
-      primaryXAxis: CategoryAxis(
+      primaryXAxis: const CategoryAxis(
         title: AxisTitle(
           text: 'Months',
-          textStyle: const TextStyle(fontWeight: FontWeight.bold),
+          textStyle: TextStyle(fontWeight: FontWeight.bold),
         ),
         minimum: 0, // Ensure the X-axis starts at 0
       ),

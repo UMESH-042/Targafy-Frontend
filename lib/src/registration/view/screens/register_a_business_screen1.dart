@@ -562,7 +562,7 @@ class _RegisterABusinessScreen1State
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  BottomNavigationAndAppBar()));
+                                  const BottomNavigationAndAppBar()));
                     } else {
                       // Show an error message if the code is invalid
                       ScaffoldMessenger.of(context).showSnackBar(

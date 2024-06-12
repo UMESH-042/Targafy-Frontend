@@ -399,6 +399,7 @@
 // }
 
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -608,7 +609,9 @@ class _BottomNavigationAndAppBarState
               return asyncValue.when(
                 data: (data) {
                   print('this is the :-$data');
-                  final businesses = data['businesses'] as List<Business>?;
+                  // final businesses = data['businesses'] as List<Business>?;
+                  final businesses =
+                      (data['businesses'] as List<Business>?) ?? [];
                   final user = data['user'] as User?;
 
                   // Fetch user avatar
@@ -620,38 +623,38 @@ class _BottomNavigationAndAppBarState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (userAvatar != null)
-                              userAvatar.when(
-                                data: (avatarUrl) => Container(
-                                  alignment: Alignment.centerLeft,
-                                  width: double.infinity,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: primaryColor,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    padding: const EdgeInsets.all(1.5),
-                                    child: Center(
-                                      child: CircleAvatar(
-                                        radius: getScreenWidth(context) * 0.09,
-                                        backgroundImage:
-                                            NetworkImage(avatarUrl),
-                                        onBackgroundImageError:
-                                            (exception, stackTrace) {
-                                          // Fallback image if loading fails
-                                        },
-                                        child: null,
-                                      ),
+                            userAvatar.when(
+                              data: (avatarUrl) => Container(
+                                alignment: Alignment.centerLeft,
+                                width: double.infinity,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: primaryColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  padding: const EdgeInsets.all(1.5),
+                                  child: Center(
+                                    child: CircleAvatar(
+                                      radius: getScreenWidth(context) * 0.09,
+                                      // backgroundImage:
+                                      //     NetworkImage(avatarUrl),
+                                      backgroundImage:
+                                          CachedNetworkImageProvider(avatarUrl),
+                                      onBackgroundImageError:
+                                          (exception, stackTrace) {
+                                        // Fallback image if loading fails
+                                      },
+                                      child: null,
                                     ),
                                   ),
                                 ),
-                                loading: () =>
-                                    const CircularProgressIndicator(),
-                                error: (error, stack) => Icon(
-                                  Icons.error,
-                                  size: getScreenWidth(context) * 0.09,
-                                ),
                               ),
+                              loading: () => const CircularProgressIndicator(),
+                              error: (error, stack) => Icon(
+                                Icons.error,
+                                size: getScreenWidth(context) * 0.09,
+                              ),
+                            ),
                             Padding(
                               padding: EdgeInsets.only(
                                   left: getScreenWidth(context) * 0.02),
@@ -697,19 +700,16 @@ class _BottomNavigationAndAppBarState
 
                             return ListTile(
                               leading: business.logo != null
-                                  ? Image.network(
-                                      business.logo,
+                                  ? CachedNetworkImage(
+                                      imageUrl: business.logo,
                                       width: 30,
                                       height: 30,
-                                      errorBuilder: (BuildContext context,
-                                          Object exception,
-                                          StackTrace? stackTrace) {
-                                        return Image.network(
-                                          'https://via.placeholder.com/30',
-                                          width: 30,
-                                          height: 30,
-                                        );
-                                      },
+                                      errorWidget: (context, url, error) =>
+                                          Image.network(
+                                        'https://via.placeholder.com/30',
+                                        width: 30,
+                                        height: 30,
+                                      ),
                                     )
                                   : const Icon(Icons.business),
                               title: Text(business.name ?? 'No Name'),
@@ -755,7 +755,7 @@ class _BottomNavigationAndAppBarState
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => UserProfile()));
+                                  builder: (context) => const UserProfile()));
                         },
                       ),
                       // ListTile(
@@ -839,7 +839,12 @@ class _BottomNavigationAndAppBarState
           Icon(Icons.home, size: 30, color: Colors.white),
           Icon(Icons.supervised_user_circle, size: 30, color: Colors.white),
           Icon(Icons.add, size: 40, color: Colors.white),
-          Icon(Icons.local_activity, size: 30, color: Colors.white),
+          // Icon(Icons.local_activity, size: 30, color: Colors.white),
+          ImageIcon(
+            AssetImage("assets/img/activity-icon-without-bg.png"),
+            size: 30,
+            color: Colors.white,
+          ),
           Icon(Icons.feedback, size: 30, color: Colors.white),
         ],
         onTap: _onItemTapped,

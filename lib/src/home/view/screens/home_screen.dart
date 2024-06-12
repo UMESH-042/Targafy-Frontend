@@ -10,7 +10,6 @@ import 'package:targafy/src/home/view/screens/controller/fetching_id_controller.
 import 'package:targafy/src/home/view/screens/controller/parameter_group_list_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/sub_group_data_provider_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/subgroup_user_controller.dart';
-import 'package:targafy/src/home/view/screens/model/subgroup_user_model.dart';
 import 'package:targafy/src/home/view/widgets/selectable_chart.dart';
 import 'package:targafy/src/home/view/widgets/selectable_parameter.dart';
 import 'package:targafy/src/home/view/widgets/selectable_sub_group.dart';
