@@ -73,15 +73,17 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:targafy/utils/remote_routes.dart';
 
 final groupControllerProvider = Provider((ref) => GroupController());
 
+String domain = AppRemoteRoutes.baseUrl;
+
 class GroupController {
   Future<String> uploadLogo(File image) async {
-
-    final url = Uri.parse('http://13.234.163.59:5000/api/v1/upload/file');
+    final url = Uri.parse('${domain}upload/file');
     final mimeType = lookupMimeType(image.path);
-       final prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
     final request = http.MultipartRequest('POST', url)
@@ -102,9 +104,10 @@ class GroupController {
     }
   }
 
-  Future<void> updateGroupLogo(String groupId, String businessId, String logoUrl) async {
-    final url = Uri.parse('http://13.234.163.59:5000/api/v1/group/update-logo/$groupId/$businessId');
-       final prefs = await SharedPreferences.getInstance();
+  Future<void> updateGroupLogo(
+      String groupId, String businessId, String logoUrl) async {
+    final url = Uri.parse('${domain}group/update-logo/$groupId/$businessId');
+    final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
     final response = await http.post(
       url,

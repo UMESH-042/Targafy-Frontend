@@ -3,10 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
+import 'package:targafy/utils/remote_routes.dart';
 
 // Provider to fetch auth token from shared preferences
 
 // Provider to fetch business and user details
+
+String domain = AppRemoteRoutes.baseUrl;
+
 final businessAndUserProvider =
     StreamProvider<Map<String, dynamic>>((ref) async* {
   final prefs = await SharedPreferences.getInstance();
@@ -17,8 +21,7 @@ final businessAndUserProvider =
 
   while (true) {
     final response = await http.get(
-      Uri.parse(
-          'http://13.234.163.59:5000/api/v1/business/get-business-details'),
+      Uri.parse('${domain}business/get-business-details'),
       headers: {
         'Authorization': 'Bearer $token',
       },

@@ -65,6 +65,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/src/parameters/view/model/parameter_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 final parameterNotifierProvider =
     StateNotifierProvider<ParameterNotifier, List<Parameter>>((ref) {
@@ -79,8 +82,7 @@ class ParameterNotifier extends StateNotifier<List<Parameter>> {
     final token = prefs.getString('authToken');
 
     final response = await http.get(
-      Uri.parse(
-          'http://13.234.163.59:5000/api/v1/params/get/assigned-parameter/$businessId'),
+      Uri.parse('${domain}params/get/assigned-parameter/$businessId'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -99,8 +101,7 @@ class ParameterNotifier extends StateNotifier<List<Parameter>> {
     final token = prefs.getString('authToken');
 
     final response = await http.get(
-      Uri.parse(
-          'http://13.234.163.59:5000/api/v1/params/get/assigned-parameter/$businessId'),
+      Uri.parse('${domain}params/get/assigned-parameter/$businessId'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -128,7 +129,7 @@ class ParameterNotifier extends StateNotifier<List<Parameter>> {
     final token = prefs.getString('authToken');
 
     final response = await http.post(
-      Uri.parse('http://13.234.163.59:5000/api/v1/params/add/$businessId'),
+      Uri.parse('${domain}params/add/$businessId'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',

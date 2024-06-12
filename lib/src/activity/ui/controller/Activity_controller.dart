@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/src/activity/ui/model/activity_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 class ActivityService {
-  final String baseUrl =
-      'http://13.234.163.59:5000/api/v1/activity/get-activity';
+  final String baseUrl = '${domain}activity/get-activity';
 
   Future<List<ActivityModel>> fetchActivities(
       String businessId, String token) async {

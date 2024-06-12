@@ -48,7 +48,7 @@
 //   } else {
 //     return [];
 //   }
-// }); 
+// });
 
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,11 +56,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/src/home/view/screens/model/parameter_group_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 class ApiService {
-  Future<SubGroupResponse> fetchSubGroups(String businessId, String parameterName, String token) async {
+  Future<SubGroupResponse> fetchSubGroups(
+      String businessId, String parameterName, String token) async {
     final url = Uri.parse(
-      'http://13.234.163.59:5000/api/v1/group/get-sublevel-group-name/$businessId/$parameterName',
+      '${domain}group/get-sublevel-group-name/$businessId/$parameterName',
     );
 
     final response = await http.get(
@@ -82,7 +86,8 @@ class ApiService {
 
 final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
 
-final subGroupProvider = FutureProvider.family<List<SubGroup>, String>((ref, parameter) async {
+final subGroupProvider =
+    FutureProvider.family<List<SubGroup>, String>((ref, parameter) async {
   final apiService = ref.read(apiServiceProvider);
   final selectedBusinessData = ref.watch(currentBusinessProvider);
   final businessId = selectedBusinessData?['business']?.id;
@@ -90,11 +95,10 @@ final subGroupProvider = FutureProvider.family<List<SubGroup>, String>((ref, par
   final token = prefs.getString('authToken');
 
   if (businessId != null && token != null) {
-    final subGroupResponse = await apiService.fetchSubGroups(businessId, parameter, token);
+    final subGroupResponse =
+        await apiService.fetchSubGroups(businessId, parameter, token);
     return subGroupResponse.groups;
   } else {
     return [];
   }
 });
-
-

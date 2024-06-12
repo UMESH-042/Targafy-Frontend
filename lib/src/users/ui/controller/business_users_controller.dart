@@ -5,6 +5,9 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:targafy/src/users/ui/model/business_user_list_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 final businessUsersProvider = StateNotifierProvider<BusinessUsersNotifier,
     AsyncValue<List<BusinessUserModel>>>((ref) {
@@ -26,8 +29,7 @@ class BusinessUsersNotifier
       }
 
       final response = await http.get(
-        Uri.parse(
-            'http://13.234.163.59:5000/api/v1/business/get/all/users/$businessId'),
+        Uri.parse('${domain}business/get/all/users/$businessId'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -60,8 +62,7 @@ final businessUsersStreamProvider = StreamProvider.autoDispose
 
   // Initial fetch
   final response = await http.get(
-    Uri.parse(
-        'http://13.234.163.59:5000/api/v1/business/get/all/users/$businessId'),
+    Uri.parse('${domain}business/get/all/users/$businessId'),
     headers: {
       'Authorization': 'Bearer $token',
     },
@@ -80,8 +81,7 @@ final businessUsersStreamProvider = StreamProvider.autoDispose
   // Simulate real-time updates
   await for (final _ in Stream.periodic(const Duration(seconds: 1))) {
     final response = await http.get(
-      Uri.parse(
-          'http://13.234.163.59:5000/api/v1/business/get/all/users/$businessId'),
+      Uri.parse('${domain}business/get/all/users/$businessId'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -116,8 +116,7 @@ class UserRequestNotifier extends StateNotifier<AsyncValue<void>> {
       final token = prefs.getString('authToken');
 
       final response = await http.post(
-        Uri.parse(
-            'http://13.234.163.59:5000/api/v1/business/accept/request/$businessId'),
+        Uri.parse('${domain}business/accept/request/$businessId'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

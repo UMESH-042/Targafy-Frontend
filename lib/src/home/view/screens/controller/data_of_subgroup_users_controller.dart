@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 // Provider for UserDataController
 final userDataControllerProvider =
@@ -10,8 +13,7 @@ final userDataControllerProvider =
 class UserDataController {
   Future<Map<String, List<List<dynamic>>>> fetchUserData(
       String businessId, String parameter, String userId) async {
-    final String url =
-        'http://13.234.163.59:5000/api/v1/data/get-user-data/$businessId/$parameter/$userId';
+    final String url = '${domain}data/get-user-data/$businessId/$parameter/$userId';
     final authToken = await _getAuthToken(); // Get the auth token
 
     try {

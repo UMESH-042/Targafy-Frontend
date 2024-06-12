@@ -5,19 +5,24 @@ import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
 import 'dart:convert';
 import 'package:targafy/src/users/ui/model/user_Business_Profile_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
 
-final userProvider = FutureProvider.autoDispose.family<UserProfileBusinessModel, String>((ref, userId) async {
+String domain = AppRemoteRoutes.baseUrl;
+
+final userProvider = FutureProvider.autoDispose
+    .family<UserProfileBusinessModel, String>((ref, userId) async {
   final selectedBusinessData = ref.watch(currentBusinessProvider);
   final selectedBusiness = selectedBusinessData?['business'] as Business?;
   final businessId = selectedBusiness?.id;
-   final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('authToken');
-  final url = 'http://13.234.163.59:5000/api/v1/business/user/$businessId/$userId';
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('authToken');
+  final url = '${domain}business/user/$businessId/$userId';
 
   final response = await http.get(
     Uri.parse(url),
     headers: {
-      'Authorization': 'Bearer $token', // Replace YOUR_TOKEN_HERE with your actual token
+      'Authorization':
+          'Bearer $token', // Replace YOUR_TOKEN_HERE with your actual token
       'Content-Type': 'application/json',
     },
   );

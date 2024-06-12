@@ -16,9 +16,12 @@ import 'package:targafy/src/home/view/widgets/selectable_sub_group.dart';
 import 'package:targafy/src/home/view/widgets/selectable_username.dart';
 import 'package:targafy/src/parameters/view/controller/add_parameter_controller.dart';
 import 'package:targafy/src/parameters/view/model/parameter_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
 import 'widgets/CustomCharts.dart';
 import 'widgets/DataTable.dart';
 import 'widgets/PieChart.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 // Providers
 final selectedBusinessData = Provider<Map<String, dynamic>?>((ref) {
@@ -87,8 +90,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _sendTokenToServer(String fcmToken, String bearerToken) async {
     try {
-      final url = Uri.parse(
-          'http://13.234.163.59:5000/api/v1/user/update/fcmToken?fcmToken=$fcmToken');
+      final url = Uri.parse('${domain}user/update/fcmToken?fcmToken=$fcmToken');
 
       final response = await http.patch(
         url,

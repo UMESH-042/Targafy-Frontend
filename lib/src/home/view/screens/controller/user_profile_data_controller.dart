@@ -6,6 +6,9 @@ import 'package:targafy/src/home/view/screens/model/user_business_model_drawer.d
 import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 final userProvider = FutureProvider<User>((ref) async {
   final prefs = await SharedPreferences.getInstance();
@@ -15,7 +18,7 @@ final userProvider = FutureProvider<User>((ref) async {
   }
 
   final response = await http.get(
-    Uri.parse('http://13.234.163.59:5000/api/v1/user/'),
+    Uri.parse('${domain}user/'),
     headers: {
       'Authorization': 'Bearer $token',
     },
@@ -36,7 +39,7 @@ final userProfileLogoControllerProvider =
 
 class UserProfileLogoController {
   Future<String> uploadLogo(File image) async {
-    final url = Uri.parse('http://13.234.163.59:5000/api/v1/upload/file');
+    final url = Uri.parse('${domain}upload/file');
     final mimeType = lookupMimeType(image.path);
 
     final request = http.MultipartRequest('POST', url)
@@ -58,8 +61,7 @@ class UserProfileLogoController {
   }
 
   Future<void> updateUserProfileLogo(String avatarUrl) async {
-    final updateUrl =
-        Uri.parse('http://13.234.163.59:5000/api/v1/user/update/user-avatar');
+    final updateUrl = Uri.parse('${domain}user/update/user-avatar');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
     final headers = {
@@ -77,8 +79,7 @@ class UserProfileLogoController {
   }
 
   Future<String> fetchUserAvatar() async {
-    final fetchUrl =
-        Uri.parse('http://13.234.163.59:5000/api/v1/user/request/user-avatar');
+    final fetchUrl = Uri.parse('${domain}user/request/user-avatar');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
     final headers = {

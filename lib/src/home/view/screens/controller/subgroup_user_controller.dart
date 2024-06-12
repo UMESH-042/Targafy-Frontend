@@ -4,12 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/src/home/view/screens/model/subgroup_user_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 class ApiService {
   Future<UserGroupResponse> fetchUserGroup(
       String subgroupId, String businessId, String token) async {
     final url = Uri.parse(
-      'http://13.234.163.59:5000/api/v1/group/get-user-group/$subgroupId/$businessId',
+      '${domain}group/get-user-group/$subgroupId/$businessId',
     );
 
     final response = await http.get(

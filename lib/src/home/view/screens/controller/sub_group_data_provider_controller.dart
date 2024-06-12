@@ -2,15 +2,17 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:targafy/utils/remote_routes.dart';
 
 final SubGroupDataControllerProvider =
     Provider<SubGroupDataController>((ref) => SubGroupDataController());
 
+String domain = AppRemoteRoutes.baseUrl;
+
 class SubGroupDataController {
   Future<Map<String, List<List<dynamic>>>> fetchDataAdded(
       String businessId, String groupId, String groupName) async {
-    final String url =
-        'http://13.234.163.59:5000/api/v1/group/get-level-data/$businessId/$groupId';
+    final String url = '${domain}group/get-level-data/$businessId/$groupId';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 

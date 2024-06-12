@@ -4,18 +4,18 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
+import 'package:targafy/utils/remote_routes.dart';
 
+String domain = AppRemoteRoutes.baseUrl;
 
 class CreateBusinessController {
-  final String domain = 'http://13.234.163.59:5000'; // Your API domain
-
   Future<String?> _getAuthToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('authToken');
   }
 
-Future<String> uploadLogo(File image) async {
-    final url = Uri.parse('http://13.234.163.59:5000/api/v1/upload/file');
+  Future<String> uploadLogo(File image) async {
+    final url = Uri.parse('${domain}upload/file');
     final mimeType = lookupMimeType(image.path);
 
     final request = http.MultipartRequest('POST', url)
@@ -36,14 +36,13 @@ Future<String> uploadLogo(File image) async {
     }
   }
 
-
   Future<void> createBusiness({
     required String buisnessName,
     required String logo,
     required String industryType,
     required String city,
     required String country,
-      required Function(bool isSuccess) onCompletion,
+    required Function(bool isSuccess) onCompletion,
   }) async {
     final token = await _getAuthToken();
     if (token == null) {
@@ -51,7 +50,7 @@ Future<String> uploadLogo(File image) async {
       return;
     }
 
-    final url = '$domain/api/v1/business/create';
+    final url = '${domain}business/create';
     final headers = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',

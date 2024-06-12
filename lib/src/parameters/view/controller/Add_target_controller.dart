@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:targafy/src/parameters/view/model/user_target_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 // User Notifier
 class UserNotifier extends StateNotifier<AsyncValue<List<User>>> {
@@ -13,8 +16,7 @@ class UserNotifier extends StateNotifier<AsyncValue<List<User>>> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('authToken');
       final response = await http.get(
-        Uri.parse(
-            'http://13.234.163.59:5000/api/v1/params/get-assign-user/$paramName/$businessId'),
+        Uri.parse('${domain}params/get-assign-user/$paramName/$businessId'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -42,8 +44,7 @@ class TargetNotifier extends StateNotifier<AsyncValue<void>> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('authToken');
       final response = await http.post(
-        Uri.parse(
-            'http://13.234.163.59:5000/api/v1/target/add-target/$businessId'),
+        Uri.parse('${domain}target/add-target/$businessId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

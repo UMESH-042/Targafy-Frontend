@@ -5,6 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/models/business_request.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 // Provider to fetch auth token from shared preferences
 final authTokenProvider = FutureProvider<String?>((ref) async {
@@ -19,7 +22,7 @@ final joinBusinessProvider =
   if (token == null) throw Exception('No token found');
 
   final response = await http.post(
-    Uri.parse('http://13.234.163.59:5000/api/v1/business/send/request/${request.businessCode}'),
+    Uri.parse('${domain}business/send/request/${request.businessCode}'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',

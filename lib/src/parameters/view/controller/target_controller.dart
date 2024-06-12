@@ -4,8 +4,9 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/src/parameters/view/controller/add_parameter_controller.dart';
 import 'package:targafy/src/parameters/view/model/parameter_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
 
-
+String domain = AppRemoteRoutes.baseUrl;
 
 class TargetNotifier extends StateNotifier<AsyncValue<Map<String, int>>> {
   TargetNotifier() : super(const AsyncValue.loading());
@@ -15,7 +16,7 @@ class TargetNotifier extends StateNotifier<AsyncValue<Map<String, int>>> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('authToken');
       final response = await http.get(
-        Uri.parse('http://13.234.163.59:5000/api/v1/target/get-target-values/$businessId'),
+        Uri.parse('${domain}target/get-target-values/$businessId'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -35,23 +36,22 @@ class TargetNotifier extends StateNotifier<AsyncValue<Map<String, int>>> {
 
         state = AsyncValue.data(targetValues);
       } else {
-        state = AsyncValue.error('Failed to load target values', StackTrace.current);
+        state = AsyncValue.error(
+            'Failed to load target values', StackTrace.current);
       }
     } catch (e) {
       print('Error fetching target values: $e');
       state = AsyncValue.error(e, StackTrace.current);
     }
   }
-
 }
 
-
-final parameterProvider = StateNotifierProvider<ParameterNotifier, List<Parameter>>((ref) {
+final parameterProvider =
+    StateNotifierProvider<ParameterNotifier, List<Parameter>>((ref) {
   return ParameterNotifier();
 });
 
-final targetProvider = StateNotifierProvider.family<TargetNotifier, AsyncValue<Map<String, int>>, String>((ref, businessId) {
+final targetProvider = StateNotifierProvider.family<TargetNotifier,
+    AsyncValue<Map<String, int>>, String>((ref, businessId) {
   return TargetNotifier()..fetchTargets(businessId);
 });
-
-

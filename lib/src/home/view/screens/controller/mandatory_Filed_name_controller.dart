@@ -1,11 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:targafy/utils/remote_routes.dart';
 
 final nameControllerProvider =
     StateNotifierProvider<NameController, NameState>((ref) {
   return NameController();
 });
+
+String domain = AppRemoteRoutes.baseUrl;
 
 class NameState {
   final bool isFirstTime;
@@ -26,7 +29,7 @@ class NameController extends StateNotifier<NameState> {
   Future<void> updateName(String name) async {
     final token = await SharedPreferenceService().getAuthToken();
     final response = await http.patch(
-      Uri.parse('http://13.234.163.59:5000/api/v1/user/update/name/$name'),
+      Uri.parse('${domain}user/update/name/$name'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',

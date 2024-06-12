@@ -44,26 +44,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/src/users/ui/model/user_hierarchy_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
 
 final businessControllerProvider = StateNotifierProvider<BusinessController,
     AsyncValue<BusinessUserHierarchy>>((ref) {
   return BusinessController();
 });
 
+String domain = AppRemoteRoutes.baseUrl;
+
 class BusinessController
     extends StateNotifier<AsyncValue<BusinessUserHierarchy>> {
   BusinessController() : super(const AsyncLoading());
 
-  Future<void> fetchBusinessUserHierarchy(
-      String businessId) async {
-
-         final prefs = await SharedPreferences.getInstance();
+  Future<void> fetchBusinessUserHierarchy(String businessId) async {
+    final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
     try {
       final response = await http.get(
-        Uri.parse(
-            'http://13.234.163.59:5000/api/v1/business/get-user-hierarchy/$businessId'),
+        Uri.parse('${domain}business/get-user-hierarchy/$businessId'),
         headers: {'Authorization': 'Bearer $token'},
       );
 

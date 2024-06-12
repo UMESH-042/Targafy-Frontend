@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 final dataAddedControllerProvider =
     Provider<DataAddedController>((ref) => DataAddedController());
@@ -9,8 +12,7 @@ final dataAddedControllerProvider =
 class DataAddedController {
   Future<Map<String, List<List<dynamic>>>> fetchDataAdded(
       String businessId, String parameter) async {
-    final String url =
-        'http://13.234.163.59:5000/api/v1/data/get-param-data/$businessId/$parameter';
+    final String url = '${domain}data/get-param-data/$businessId/$parameter';
     final authToken = await _getAuthToken(); // Get the auth token
 
     try {

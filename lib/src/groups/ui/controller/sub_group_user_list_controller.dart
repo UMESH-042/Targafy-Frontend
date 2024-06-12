@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/src/groups/ui/model/create_sub_group_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 final subgroupUsersControllerProvider =
     Provider<SubgroupUsersController>((ref) {
@@ -16,11 +19,10 @@ class SubgroupUsersController {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('authToken');
-      final url = Uri.parse(
-          'http://13.234.163.59:5000/api/v1/group/get-above-group-users/$businessId/$groupId');
+      final url =
+          Uri.parse('${domain}group/get-above-group-users/$businessId/$groupId');
       final headers = {
         'Authorization': 'Bearer $token',
-
       };
 
       final response = await http.get(url, headers: headers);

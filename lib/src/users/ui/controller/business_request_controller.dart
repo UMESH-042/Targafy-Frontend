@@ -4,11 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/src/users/ui/model/request_user_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
 
 final businessRequestsProvider =
     ChangeNotifierProvider.autoDispose<BusinessRequestsProvider>((ref) {
   return BusinessRequestsProvider();
 });
+
+String domain = AppRemoteRoutes.baseUrl;
 
 class BusinessRequestsProvider extends ChangeNotifier {
   List<RequestUserModel>? userRequestList;
@@ -24,8 +27,7 @@ class BusinessRequestsProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('authToken');
       final response = await http.get(
-        Uri.parse(
-            'http://13.234.163.59:5000/api/v1/business/get/request/$businessId'),
+        Uri.parse('${domain}business/get/request/$businessId'),
         headers: {
           'Authorization': 'Bearer $token',
         },

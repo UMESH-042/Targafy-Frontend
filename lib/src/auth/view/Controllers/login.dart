@@ -9,7 +9,10 @@ import 'package:targafy/src/auth/view/screens/verify_login_otp.dart';
 import 'package:targafy/src/services/shared_preference_service.dart';
 import 'package:targafy/utils/colors.dart';
 import 'package:http/http.dart' as http;
+import 'package:targafy/utils/remote_routes.dart';
 import 'package:targafy/utils/utils.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 class LoginState {
   final String countryCode;
@@ -188,66 +191,64 @@ class LoginNotifier extends StateNotifier<LoginState> {
       showSnackBar(
           context, "Session expired. Please log in again.", Colors.red);
       // Navigate to login screen or handle re-login logic
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()));
     }
   }
 
-  
-    Future<String?> _getAuthToken() async {
+  Future<String?> _getAuthToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('authToken');
   }
 
   Future<bool> checkBusinessExists() async {
-  final token = await _getAuthToken();
-  if (token == null) {
-    debugPrint('Authentication token not found');
-    return false;
-  }
-
-  const url = 'http://13.234.163.59:5000/api/v1/business/checkBusiness';
-  
-  final response = await http.get(
-    Uri.parse(url),
-    headers: {
-      'Authorization': 'Bearer $token',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    return data['exists'];
-  } else {
-    debugPrint('Failed to check business existence: ${response.body}');
-    return false;
-  }
-}
-
-
- Future<void> createBusiness(Map<String, dynamic> businessData) async {
     final token = await _getAuthToken();
     if (token == null) {
-      // Handle token not found
-      return;
+      debugPrint('Authentication token not found');
+      return false;
     }
 
-    final url = '$domain/api/v1/business/create';
-    final headers = {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    };
+    final url = '${domain}business/checkBusiness';
 
-    final response = await http.post(Uri.parse(url), headers: headers, body: jsonEncode({'business': businessData}));
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      // Handle successful response
+      return data['exists'];
     } else {
-      // Handle error
+      debugPrint('Failed to check business existence: ${response.body}');
+      return false;
     }
   }
 
+  // Future<void> createBusiness(Map<String, dynamic> businessData) async {
+  //   final token = await _getAuthToken();
+  //   if (token == null) {
+  //     // Handle token not found
+  //     return;
+  //   }
+
+  //   final url = '$domain/api/v1/business/create';
+  //   final headers = {
+  //     'Authorization': 'Bearer $token',
+  //     'Content-Type': 'application/json',
+  //   };
+
+  //   final response = await http.post(Uri.parse(url),
+  //       headers: headers, body: jsonEncode({'business': businessData}));
+
+  //   if (response.statusCode == 200) {
+  //     final data = jsonDecode(response.body);
+  //     // Handle successful response
+  //   } else {
+  //     // Handle error
+  //   }
+  // }
 
   bool isEligibleToLogin(bool tnc) {
     return state.number.isNotEmpty && state.number.length == 10 && tnc;

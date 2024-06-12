@@ -4,7 +4,8 @@ import 'package:targafy/core/constants/url.dart';
 import 'package:targafy/core/utils/print_log.dart';
 
 class AuthRepo {
-  static Future<Map<String, dynamic>> login({required String countryCode, required String phone}) async {
+  static Future<Map<String, dynamic>> login(
+      {required String countryCode, required String phone}) async {
     final response = await http.post(
       Uri.parse('$baseUrl/login'),
       body: jsonEncode({
@@ -27,7 +28,10 @@ class AuthRepo {
     }
   }
 
-  static Future<Map<String, dynamic>> verifyOtp({required String countryCode, required String phone, required String otp}) async {
+  static Future<Map<String, dynamic>> verifyOtp(
+      {required String countryCode,
+      required String phone,
+      required String otp}) async {
     final response = await http.post(
       Uri.parse('$baseUrl/verifyotp'),
       body: jsonEncode({

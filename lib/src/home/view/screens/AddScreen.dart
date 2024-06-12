@@ -5,6 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/mandatory_Filed_name_controller.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 // Provider for fetching parameters
 final parametersProvider = FutureProvider<List<String>>((ref) async {
@@ -13,8 +16,7 @@ final parametersProvider = FutureProvider<List<String>>((ref) async {
   final businessId = selectedBusinessData?['business']?.id;
 
   final response = await http.get(
-    Uri.parse(
-        'http://13.234.163.59:5000/api/v1/data/get-target-users/$businessId'),
+    Uri.parse('${domain}data/get-target-users/$businessId'),
     headers: {
       'Authorization': 'Bearer $authToken',
     },
@@ -38,8 +40,7 @@ final addDataForParameterProvider =
     final comment = requestData['comment'] as String;
 
     final response = await http.post(
-      Uri.parse(
-          'http://13.234.163.59:5000/api/v1/data/add-data/$businessId/$parameterName'),
+      Uri.parse('${domain}data/add-data/$businessId/$parameterName'),
       headers: {
         'Authorization': 'Bearer $authToken',
         'Content-Type': 'application/json',
@@ -96,7 +97,8 @@ class _AddscreenState extends ConsumerState<Addscreen> {
                 ),
                 const SizedBox(height: 20),
                 DropdownButtonFormField<String>(
-                  value: selectedParameter ?? (parameters.isNotEmpty ? parameters[0] : null),
+                  value: selectedParameter ??
+                      (parameters.isNotEmpty ? parameters[0] : null),
                   onChanged: (value) {
                     setState(() {
                       selectedParameter = value;
@@ -153,7 +155,8 @@ class _AddscreenState extends ConsumerState<Addscreen> {
                           .then((_) {
                         // Data added successfully
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Data added successfully')),
+                          const SnackBar(
+                              content: Text('Data added successfully')),
                         );
                         // Clear the input fields
                         todayDataController.clear();

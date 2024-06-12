@@ -285,6 +285,9 @@ import 'package:targafy/src/auth/view/Controllers/login.dart';
 import 'package:targafy/src/home/view/screens/widgets/Bottom_navigation_bar.dart';
 import 'package:http/http.dart' as http;
 import 'package:targafy/src/registration/view/screens/register_a_business_screen2.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 class RegisterABusinessScreen1 extends ConsumerStatefulWidget {
   const RegisterABusinessScreen1({super.key});
@@ -330,8 +333,7 @@ class _RegisterABusinessScreen1State
   Future<void> _sendTokenToServer(String fcmToken, String bearerToken) async {
     try {
       // Define the URL of your server endpoint
-      final url = Uri.parse(
-          'http://13.234.163.59:5000/api/v1/user/update/fcmToken?fcmToken=$fcmToken');
+      final url = Uri.parse('${domain}user/update/fcmToken?fcmToken=$fcmToken');
 
       // Make the POST request
       final response = await http.patch(

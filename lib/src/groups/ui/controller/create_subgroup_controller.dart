@@ -7,6 +7,9 @@ import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/src/groups/ui/model/create_sub_group_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 final SubgroupControllerProvider = Provider<SubGroupController>((ref) {
   return SubGroupController();
@@ -15,8 +18,7 @@ final SubgroupControllerProvider = Provider<SubGroupController>((ref) {
 class SubGroupController {
   Future<void> createSubGroup(
       SubGroupModel subgroup, String parentGroupId, String token) async {
-    final url = Uri.parse(
-        'http://13.234.163.59:5000/api/v1/group/create-subgroups/$parentGroupId');
+    final url = Uri.parse('${domain}group/create-subgroups/$parentGroupId');
     final headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
@@ -44,7 +46,7 @@ class SubGroupController {
   }
 
   Future<String> uploadLogo(File image, String? token) async {
-    final url = Uri.parse('http://13.234.163.59:5000/api/v1/upload/file');
+    final url = Uri.parse('${domain}upload/file');
     final mimeType = lookupMimeType(image.path);
 
     final request = http.MultipartRequest('POST', url)
@@ -72,7 +74,7 @@ final BusinessLogoControllerProvider = Provider<BusinessLogoController>((ref) {
 
 class BusinessLogoController {
   Future<String> uploadLogo(File image) async {
-    final url = Uri.parse('http://13.234.163.59:5000/api/v1/upload/file');
+    final url = Uri.parse('${domain}upload/file');
     final mimeType = lookupMimeType(image.path);
 
     final request = http.MultipartRequest('POST', url)
@@ -94,8 +96,7 @@ class BusinessLogoController {
   }
 
   Future<void> updateBusinessLogo(String businessId, String logoUrl) async {
-    final updateUrl = Uri.parse(
-        'http://13.234.163.59:5000/api/v1/business/update/logo/$businessId');
+    final updateUrl = Uri.parse('${domain}business/update/logo/$businessId');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
     final headers = {
@@ -112,9 +113,9 @@ class BusinessLogoController {
     }
   }
 
-   Future<String> fetchBusinessLogo(String businessId) async {
-    final fetchUrl = Uri.parse(
-        'http://13.234.163.59:5000/api/v1/business/requests/user-business-logo/$businessId');
+  Future<String> fetchBusinessLogo(String businessId) async {
+    final fetchUrl =
+        Uri.parse('${domain}business/requests/user-business-logo/$businessId');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
     final headers = {
@@ -130,5 +131,4 @@ class BusinessLogoController {
       throw Exception('Failed to fetch business logo: ${response.statusCode}');
     }
   }
-
 }
