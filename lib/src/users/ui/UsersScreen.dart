@@ -425,7 +425,6 @@ import 'package:targafy/src/users/ui/controller/demote_user.dart';
 import 'package:targafy/src/users/ui/controller/promote_to_MiniAdmin.dart';
 import 'package:targafy/src/users/ui/controller/promote_to_admin.dart';
 import 'package:targafy/src/users/ui/widget/user_hierarchy_view.dart';
-import 'package:targafy/utils/colors.dart';
 
 class UsersScreen extends ConsumerStatefulWidget {
   const UsersScreen({super.key});

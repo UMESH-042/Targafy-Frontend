@@ -727,7 +727,7 @@ class _BottomNavigationAndAppBarState
                                     child: Center(
                                       child: CircleAvatar(
                                         radius: getScreenWidth(context) * 0.09,
-                                        backgroundImage: NetworkImage(
+                                        backgroundImage: const NetworkImage(
                                             'https://codeskulptor-demos.commondatastorage.googleapis.com/pang/LdTCEUo.png'),
                                         child: null,
                                       ),
@@ -769,7 +769,7 @@ class _BottomNavigationAndAppBarState
                           ],
                         ),
                       ),
-                      if (businesses != null && businesses.isNotEmpty)
+                      if (businesses.isNotEmpty)
                         ExpansionTile(
                           leading: const Icon(Icons.business),
                           title: const Text('Businesses'),

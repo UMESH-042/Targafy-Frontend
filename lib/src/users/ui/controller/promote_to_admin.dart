@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:targafy/api%20repository/product_repository.dart';
 import 'package:targafy/utils/remote_routes.dart';
 
 // Define a provider for promoting a user to admin
