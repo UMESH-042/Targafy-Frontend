@@ -45,8 +45,6 @@
 
 // }
 
-
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferenceService {
@@ -67,4 +65,3 @@ class SharedPreferenceService {
     await prefs.remove(_authTokenKey);
   }
 }
-
