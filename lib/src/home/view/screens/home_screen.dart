@@ -380,6 +380,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (selectedStates.isNotEmpty &&
                 selectedStates[3] &&
                 selectedParameter.isNotEmpty &&
+                selectedGroup.isEmpty && selectedSubOffice.isEmpty&&
                 selectedUser.isEmpty)
               FutureBuilder(
                 future: dataAddedController.fetchDataAdded(
@@ -405,6 +406,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (selectedStates.isNotEmpty &&
                 selectedStates[1] &&
                 selectedParameter.isNotEmpty &&
+                selectedGroup.isEmpty &&
+                selectedSubOffice.isEmpty &&
                 selectedUser.isEmpty)
               FutureBuilder(
                 future: dataAddedController.fetchDataAdded(
@@ -481,6 +484,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         parameter: selectedParameter,
                         actualData: data['userEntries'] ?? [],
                         predictedData: data['dailyTarget'] ?? [],
+                      ),
+                    );
+                  }
+                },
+              ),
+            if (selectedStates.isNotEmpty &&
+                selectedStates[1] &&
+                selectedParameter.isNotEmpty &&
+                selectedGroup.isNotEmpty &&
+                selectedSubOffice.isNotEmpty &&
+                selectedUser.isEmpty)
+              FutureBuilder(
+                future: SubGroupDataController.fetchDataAdded(
+                    selectedSubgroupId, selectedParameter),
+                builder: (context,
+                    AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    final data = snapshot.data!;
+                    print(data);
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: DataTableWidget(
+                        parameter: selectedParameter,
+                        actualData: data['userEntries'] ?? [],
+                        predictedData: data['dailyTarget'] ?? [],
+                      ),
+                    );
+                  }
+                },
+              ),
+            if (selectedStates.isNotEmpty &&
+                selectedStates[3] &&
+                selectedParameter.isNotEmpty &&
+                selectedGroup.isNotEmpty &&
+                selectedSubOffice.isNotEmpty &&
+                selectedUser.isEmpty)
+              FutureBuilder(
+                future: SubGroupDataController.fetchDataAdded(
+                    selectedSubgroupId, selectedParameter),
+                builder: (context,
+                    AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    final data = snapshot.data!;
+                    print(data);
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: PiechartGraph(
+                        parameter: selectedParameter,
+                        actualData: data['userEntries'] ?? [],
+                        // predictedData: data['dailyTarget'] ?? [],
                       ),
                     );
                   }
