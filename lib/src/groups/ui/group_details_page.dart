@@ -115,7 +115,7 @@ class _GroupDetailsPageState extends ConsumerState<GroupDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.group.groupName),
+        title: Text(widget.group.headOffice),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

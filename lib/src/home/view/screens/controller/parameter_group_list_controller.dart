@@ -61,10 +61,9 @@ import 'package:targafy/utils/remote_routes.dart';
 String domain = AppRemoteRoutes.baseUrl;
 
 class ApiService {
-  Future<SubGroupResponse> fetchSubGroups(
-      String businessId, String parameterName, String token) async {
+  Future<GroupResponse> fetchGroups(String businessId, String token) async {
     final url = Uri.parse(
-      '${domain}group/get-sublevel-group-name/$businessId/$parameterName',
+      '${domain}group/get-all-groups/$businessId',
     );
 
     final response = await http.get(
@@ -75,9 +74,10 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return SubGroupResponse.fromJson(json.decode(response.body));
+      print(response.body);
+      return GroupResponse.fromJson(json.decode(response.body));
     } else {
-      throw Exception('Failed to load subgroups');
+      throw Exception('Failed to load groups');
     }
   }
 }
@@ -86,8 +86,7 @@ class ApiService {
 
 final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
 
-final subGroupProvider =
-    FutureProvider.family<List<SubGroup>, String>((ref, parameter) async {
+final GroupProvider = FutureProvider<List<Group>>((ref) async {
   final apiService = ref.read(apiServiceProvider);
   final selectedBusinessData = ref.watch(currentBusinessProvider);
   final businessId = selectedBusinessData?['business']?.id;
@@ -95,10 +94,13 @@ final subGroupProvider =
   final token = prefs.getString('authToken');
 
   if (businessId != null && token != null) {
-    final subGroupResponse =
-        await apiService.fetchSubGroups(businessId, parameter, token);
-    return subGroupResponse.groups;
+    final GroupResponse = await apiService.fetchGroups(businessId, token);
+    print(GroupResponse);
+    print('Success');
+    return GroupResponse.groups;
   } else {
+    print('not Success');
+
     return [];
   }
 });

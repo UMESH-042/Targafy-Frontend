@@ -19,6 +19,7 @@ class SubGroupController {
   Future<void> createSubGroup(
       SubGroupModel subgroup, String parentGroupId, String token) async {
     final url = Uri.parse('${domain}group/create-subgroups/$parentGroupId');
+    print('This is ParentGroupId :- $parentGroupId');
     final headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
@@ -29,13 +30,13 @@ class SubGroupController {
       url,
       headers: headers,
       body: json.encode({
-        'subgroupName': subgroup.subgroupName,
-        'logo': subgroup.logo,
+        'subOfficeName': subgroup.subOfficeName,
+        // 'logo': subgroup.logo,
         'usersIds': subgroup.usersIds
       }),
     );
-    print(subgroup.subgroupName);
-    print(subgroup.logo);
+    print(subgroup.subOfficeName);
+    // print(subgroup.logo);
     print(subgroup.usersIds);
 
     if (response.statusCode == 201) {

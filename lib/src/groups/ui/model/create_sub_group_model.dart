@@ -1,25 +1,20 @@
 // lib/models/group_model.dart
 class SubGroupModel {
-  final String subgroupName;
-  final String logo;
+  final String subOfficeName;
   final List<String> usersIds;
 
   SubGroupModel({
-    required this.subgroupName,
-    required this.logo,
+    required this.subOfficeName,
     required this.usersIds,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'subgroupName': subgroupName,
-      'logo': logo,
+      'subOfficeName': subOfficeName,
       'usersIds': usersIds,
     };
   }
 }
-
-
 
 class SubgroupUserModel {
   final String id;

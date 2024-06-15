@@ -58,7 +58,7 @@ class GroupTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CustomText(
-                      text: group.groupName,
+                      text: group.headOffice,
                       fontSize: getScreenWidth(context) * 0.04,
                       fontWeight: FontWeight.w700,
                       color: Colors.black,

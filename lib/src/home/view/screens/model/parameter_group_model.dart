@@ -1,27 +1,27 @@
 // models/subgroup_model.dart
-class SubGroup {
+class Group {
   final String id;
-  final String groupName;
+  final String headOfficeName;
 
-  SubGroup({required this.id, required this.groupName});
+  Group({required this.id, required this.headOfficeName});
 
-  factory SubGroup.fromJson(Map<String, dynamic> json) {
-    return SubGroup(
+  factory Group.fromJson(Map<String, dynamic> json) {
+    return Group(
       id: json['_id'],
-      groupName: json['groupName'],
+      headOfficeName: json['headOfficeName'],
     );
   }
 }
 
-class SubGroupResponse {
-  final List<SubGroup> groups;
+class GroupResponse {
+  final List<Group> groups;
 
-  SubGroupResponse({required this.groups});
+  GroupResponse({required this.groups});
 
-  factory SubGroupResponse.fromJson(Map<String, dynamic> json) {
-    return SubGroupResponse(
-      groups: (json['data']['groups'] as List)
-          .map((group) => SubGroup.fromJson(group))
+  factory GroupResponse.fromJson(Map<String, dynamic> json) {
+    return GroupResponse(
+      groups: (json['data']['headOffice'] as List)
+          .map((group) => Group.fromJson(group))
           .toList(),
     );
   }

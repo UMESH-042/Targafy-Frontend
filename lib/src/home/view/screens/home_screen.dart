@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/actual_predicted_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/data_of_subgroup_users_controller.dart';
+import 'package:targafy/src/home/view/screens/controller/fetchSubGroup_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/fetching_id_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/parameter_group_list_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/sub_group_data_provider_controller.dart';
@@ -52,21 +53,26 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   late List<bool> selectedStates;
   late String selectedParameter;
-  late String selectedSubGroup;
+  late String selectedGroup;
   late String groupId;
-  late String subgroupId;
+  late String IdForSubGroup;
   late String selectedUser;
   late String selectedUserId;
+  late String selectedSubOffice;
+  late String selectedSubgroupId;
 
   @override
   void initState() {
     super.initState();
     selectedStates = List<bool>.filled(images.length, false);
     selectedParameter = '';
-    selectedSubGroup = '';
-    subgroupId = '';
+    selectedGroup = '';
+    IdForSubGroup = '';
     selectedUser = '';
     selectedUserId = '';
+    selectedSubOffice = '';
+    selectedSubgroupId = '';
+    groupId = '';
     _getToken();
   }
 
@@ -133,47 +139,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     setState(() {
       selectedParameter =
           selectedParameter == parameterName ? '' : parameterName;
-      selectedSubGroup = '';
+      selectedSubOffice = '';
     });
-    final selectedBusinessData = ref.read(currentBusinessProvider);
-    final businessId = selectedBusinessData?['business']?.id;
-    if (businessId != null && selectedParameter.isNotEmpty) {
-      final groupController = ref.read(groupControllerProvider);
-      final fetchedGroupId =
-          await groupController.getGroupId(businessId, selectedParameter);
-      if (fetchedGroupId != null) {
-        groupId = fetchedGroupId;
-        print(groupId);
-      } else {
-        print('Failed to fetch Group ID');
-      }
-    }
 
     if (selectedParameter.isNotEmpty) {
-      ref.invalidate(subGroupProvider(selectedParameter));
+      ref.invalidate(GroupProvider);
     }
   }
 
-  Future<void> _handleTapForSubGroups(String subGroupName) async {
+  Future<void> _handleTapForGroups(
+      String GroupName, String parentGroupId) async {
     setState(() {
-      selectedSubGroup = selectedSubGroup == subGroupName ? '' : subGroupName;
+      selectedGroup = selectedGroup == GroupName ? '' : GroupName;
     });
 
-    final selectedBusinessData = ref.read(currentBusinessProvider);
-    final businessId = selectedBusinessData?['business']?.id;
-    if (businessId != null && selectedSubGroup.isNotEmpty) {
-      final groupController = ref.read(groupControllerProvider);
-      final fetchedGroupId =
-          await groupController.getGroupId(businessId, selectedSubGroup);
-      if (fetchedGroupId != null) {
-        subgroupId = fetchedGroupId;
-        print('this is subgroupId :- $subgroupId');
-
-        // Invalidate the userGroupProvider to fetch new data for the selected subgroup
-        ref.invalidate(userGroupProvider(subgroupId));
-      } else {
-        print('Failed to fetch Group ID');
-      }
+    if (selectedGroup.isNotEmpty) {
+      IdForSubGroup = parentGroupId;
+      groupId = parentGroupId;
+      print('this is the parent Group Id :- ${IdForSubGroup}');
     }
   }
 
@@ -190,6 +173,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           .read(userDataControllerProvider)
           .fetchUserData(businessId, selectedParameter, userId);
     }
+  }
+
+  void _handleSubGroupTap(String SubOfficeName, String subgroupId) {
+    setState(() {
+      selectedSubOffice =
+          selectedSubOffice == SubOfficeName ? '' : SubOfficeName;
+    });
+    if (selectedSubOffice.isNotEmpty) {
+      selectedSubgroupId = subgroupId;
+    }
+    print('This is the selected Subgroup Id :- $selectedSubgroupId');
   }
 
   @override
@@ -251,8 +245,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Center(child: Text('Error: $error')),
             ),
             if (selectedParameter.isNotEmpty)
-              ref.watch(subGroupProvider(selectedParameter)).when(
-                    data: (subGroups) {
+              ref.watch(GroupProvider).when(
+                    data: (Groups) {
                       return Container(
                         height: MediaQuery.of(context).size.height * 0.04,
                         margin: EdgeInsets.symmetric(
@@ -262,13 +256,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
-                          itemCount: subGroups.length,
+                          itemCount: Groups.length,
                           itemBuilder: (context, index) {
-                            final subGroupName = subGroups[index].groupName;
+                            final GroupName = Groups[index].headOfficeName;
+                            final parentGroupId = Groups[index].id;
                             return SelectableSubGroupWidget(
-                              text: subGroupName,
-                              isSelected: subGroupName == selectedSubGroup,
-                              onTap: () => _handleTapForSubGroups(subGroupName),
+                              text: GroupName,
+                              isSelected: GroupName == selectedGroup,
+                              onTap: () =>
+                                  _handleTapForGroups(GroupName, parentGroupId),
                             );
                           },
                         ),
@@ -279,8 +275,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     error: (error, stackTrace) =>
                         Center(child: Text('Error: $error')),
                   ),
-            if (selectedSubGroup.isNotEmpty)
-              ref.watch(userGroupProvider(subgroupId)).when(
+            if (selectedGroup.isNotEmpty)
+              ref.watch(subGroupDetailsProvider(IdForSubGroup)).when(
+                    data: (SubGroup) {
+                      return Container(
+                        height: MediaQuery.of(context).size.height * 0.04,
+                        margin: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.035,
+                        ).copyWith(
+                          top: MediaQuery.of(context).size.height * 0.01,
+                        ),
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: SubGroup.length,
+                          itemBuilder: (context, index) {
+                            final subofficeName = SubGroup[index].subOfficeName;
+                            final subgroupId = SubGroup[index].groupId;
+                            return SelectableUsername(
+                              text: subofficeName,
+                              isSelected: subofficeName == selectedSubOffice,
+                              onTap: () =>
+                                  _handleSubGroupTap(subofficeName, subgroupId),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (error, stackTrace) =>
+                        Center(child: Text('Error: $error')),
+                  ),
+            if (selectedSubOffice.isNotEmpty)
+              ref.watch(userGroupProvider(IdForSubGroup)).when(
                     data: (userGroup) {
                       return Container(
                         height: MediaQuery.of(context).size.height * 0.04,
@@ -324,7 +351,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (selectedStates.isNotEmpty &&
                 selectedStates[0] &&
                 selectedParameter.isNotEmpty &&
-                selectedSubGroup.isEmpty &&
+                selectedGroup.isEmpty &&
+                selectedSubOffice.isEmpty &&
                 selectedUser.isEmpty)
               FutureBuilder(
                 future: dataAddedController.fetchDataAdded(
@@ -403,11 +431,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (selectedStates.isNotEmpty &&
                 selectedStates[0] &&
                 selectedParameter.isNotEmpty &&
-                selectedSubGroup.isNotEmpty &&
+                selectedGroup.isNotEmpty &&
+                selectedSubOffice.isEmpty &&
                 selectedUser.isEmpty)
               FutureBuilder(
                 future: SubGroupDataController.fetchDataAdded(
-                    businessId, groupId, selectedSubGroup),
+                    groupId, selectedParameter),
                 builder: (context,
                     AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -431,6 +460,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (selectedStates.isNotEmpty &&
                 selectedStates[0] &&
                 selectedParameter.isNotEmpty &&
+                selectedGroup.isNotEmpty &&
+                selectedSubOffice.isNotEmpty &&
+                selectedUser.isEmpty)
+              FutureBuilder(
+                future: SubGroupDataController.fetchDataAdded(
+                    selectedSubgroupId, selectedParameter),
+                builder: (context,
+                    AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    final data = snapshot.data!;
+                    print(data);
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CustomChart(
+                        parameter: selectedParameter,
+                        actualData: data['userEntries'] ?? [],
+                        predictedData: data['dailyTarget'] ?? [],
+                      ),
+                    );
+                  }
+                },
+              ),
+            if (selectedStates.isNotEmpty &&
+                selectedStates[0] &&
+                selectedParameter.isNotEmpty &&
+                selectedGroup.isNotEmpty &&
+                selectedSubOffice.isNotEmpty &&
                 selectedUser.isNotEmpty)
               FutureBuilder<Map<String, List<List<dynamic>>>>(
                 future: ref.read(userDataControllerProvider).fetchUserData(

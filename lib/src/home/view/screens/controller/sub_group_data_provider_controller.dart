@@ -11,21 +11,22 @@ String domain = AppRemoteRoutes.baseUrl;
 
 class SubGroupDataController {
   Future<Map<String, List<List<dynamic>>>> fetchDataAdded(
-      String businessId, String groupId, String groupName) async {
-    final String url = '${domain}group/get-level-data/$businessId/$groupId';
+ String groupId, String selectedParameter) async {
+    final String url =
+        '${domain}group/get-level-data/$groupId/$selectedParameter';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
-
+    print('This is group Id :- $groupId');
+    print('This is SelectedParameter :- $selectedParameter');
     try {
-      final response = await http.post(
+      final response = await http.get(
         Uri.parse(url),
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: json.encode({'groupName': groupName}),
       );
       print('This is groupId:-$groupId');
+      print(response.body);
       if (response.statusCode == 200) {
         print('success');
         final Map<String, dynamic> responseData = json.decode(response.body);

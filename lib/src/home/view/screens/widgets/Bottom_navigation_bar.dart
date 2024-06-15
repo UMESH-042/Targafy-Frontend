@@ -398,7 +398,6 @@
 //   ref.read(currentBusinessProvider.notifier).state = selectedBusinessData;
 // }
 
-import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
@@ -414,15 +413,12 @@ import 'package:targafy/core/utils/texts.dart';
 import 'package:targafy/feedback/feedback.dart';
 import 'package:targafy/src/activity/ui/activity_screen.dart';
 import 'package:targafy/src/auth/view/Controllers/login.dart';
-import 'package:targafy/src/auth/view/screens/login_screen.dart';
-import 'package:targafy/src/groups/ui/groups_screen.dart';
 import 'package:targafy/src/home/view/screens/AddScreen.dart';
 import 'package:targafy/src/home/view/screens/UserProfile.dart';
 import 'package:targafy/src/home/view/screens/controller/user_profile_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
 import 'package:targafy/src/home/view/screens/home_screen.dart';
 import 'package:targafy/src/parameters/view/screens/add_parameter_target_screen.dart';
-import 'package:targafy/src/services/shared_preference_service.dart';
 import 'package:targafy/src/users/ui/UsersScreen.dart';
 
 final userAvatarProvider = FutureProvider<String>((ref) async {

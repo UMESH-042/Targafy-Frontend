@@ -335,8 +335,7 @@ class _CreateSubGroupPageState extends ConsumerState<CreateSubGroupPage> {
           .read(SubgroupControllerProvider)
           .uploadLogo(_logoImage!, token);
       final group = SubGroupModel(
-        subgroupName: subgroupName,
-        logo: logoUrl,
+        subOfficeName: subgroupName,
         usersIds: _selectedUsers,
       );
       print(group);

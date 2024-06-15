@@ -75,7 +75,7 @@ class GroupDataController extends StateNotifier<List<GroupDataModel>> {
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       final List<GroupDataModel> groups =
-          (responseData['data']['groups'] as List)
+          (responseData['data']['headOffice'] as List)
               .map((data) => GroupDataModel.fromJson(data))
               .toList();
       state = groups;
@@ -86,7 +86,7 @@ class GroupDataController extends StateNotifier<List<GroupDataModel>> {
 
   String? getGroupIdByName(String groupName) {
     try {
-      return state.firstWhere((group) => group.groupName == groupName).id;
+      return state.firstWhere((group) => group.headOffice == groupName).id;
     } catch (e) {
       return null; // or handle the error as needed
     }

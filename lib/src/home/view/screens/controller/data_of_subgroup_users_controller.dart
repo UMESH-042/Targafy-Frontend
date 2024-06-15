@@ -13,7 +13,8 @@ final userDataControllerProvider =
 class UserDataController {
   Future<Map<String, List<List<dynamic>>>> fetchUserData(
       String businessId, String parameter, String userId) async {
-    final String url = '${domain}data/get-user-data/$businessId/$parameter/$userId';
+    final String url =
+        '${domain}data/get-user-data/$businessId/$userId/$parameter';
     final authToken = await _getAuthToken(); // Get the auth token
 
     try {

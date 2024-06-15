@@ -11,11 +11,15 @@ String domain = AppRemoteRoutes.baseUrl;
 class GroupController {
   Future<String?> getGroupId(String businessId, String groupName) async {
     try {
-      final url = Uri.parse('${domain}group/get-groupId/$businessId/$groupName');
+      final url =
+          Uri.parse('${domain}group/get-groupId/$businessId/$groupName');
 
       // Replace 'YOUR_AUTH_TOKEN' with your actual authorization token
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('authToken');
+
+      print(businessId);
+      print(groupName);
 
       final response = await http.get(
         url,
@@ -29,6 +33,7 @@ class GroupController {
         final groupId = responseData['data']['groupId'] as String?;
         return groupId;
       } else {
+        print(response.body);
         throw Exception('Failed to get groupId: ${response.statusCode}');
       }
     } catch (e) {

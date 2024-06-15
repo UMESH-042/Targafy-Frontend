@@ -254,14 +254,27 @@ class LoginNotifier extends StateNotifier<LoginState> {
     return state.number.isNotEmpty && state.number.length == 10 && tnc;
   }
 
+  // Future<void> logout(BuildContext context) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   await prefs.remove('authToken');
+  //   await prefs.remove('expiryTime');
+  //   state = LoginState();
+  //   print('Successful');
+  //   Navigator.pushReplacement(
+  //       context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+  // }
   Future<void> logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('authToken');
     await prefs.remove('expiryTime');
     state = LoginState();
     print('Successful');
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (Route<dynamic> route) => false,
+    );
   }
 }
 
