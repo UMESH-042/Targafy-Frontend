@@ -226,55 +226,38 @@ class LoginNotifier extends StateNotifier<LoginState> {
     }
   }
 
-  // Future<void> createBusiness(Map<String, dynamic> businessData) async {
-  //   final token = await _getAuthToken();
-  //   if (token == null) {
-  //     // Handle token not found
-  //     return;
-  //   }
-
-  //   final url = '$domain/api/v1/business/create';
-  //   final headers = {
-  //     'Authorization': 'Bearer $token',
-  //     'Content-Type': 'application/json',
-  //   };
-
-  //   final response = await http.post(Uri.parse(url),
-  //       headers: headers, body: jsonEncode({'business': businessData}));
-
-  //   if (response.statusCode == 200) {
-  //     final data = jsonDecode(response.body);
-  //     // Handle successful response
-  //   } else {
-  //     // Handle error
-  //   }
-  // }
-
   bool isEligibleToLogin(bool tnc) {
     return state.number.isNotEmpty && state.number.length == 10 && tnc;
   }
 
-  // Future<void> logout(BuildContext context) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   await prefs.remove('authToken');
-  //   await prefs.remove('expiryTime');
-  //   state = LoginState();
-  //   print('Successful');
-  //   Navigator.pushReplacement(
-  //       context, MaterialPageRoute(builder: (context) => const LoginScreen()));
-  // }
   Future<void> logout(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('authToken');
-    await prefs.remove('expiryTime');
-    state = LoginState();
-    print('Successful');
+    try {
+      // Clear shared preferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('authToken');
+      await prefs.remove('expiryTime');
 
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-      (Route<dynamic> route) => false,
-    );
+      // Verify removal
+      String? authToken = prefs.getString('authToken');
+      int? expiryTime = prefs.getInt('expiryTime');
+
+      if (authToken == null && expiryTime == null) {
+        debugPrint("AuthToken and ExpiryTime successfully removed.");
+      } else {
+        debugPrint("Failed to remove AuthToken or ExpiryTime.");
+      }
+
+      // Reset state to initial state
+      state = LoginState();
+
+      // Navigate to login screen
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()));
+    } catch (e) {
+      debugPrint("Error during logout: $e");
+      // Optionally show a snack bar with the error
+      showSnackBar(context, "Failed to log out. Please try again.", Colors.red);
+    }
   }
 }
 
