@@ -380,7 +380,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (selectedStates.isNotEmpty &&
                 selectedStates[3] &&
                 selectedParameter.isNotEmpty &&
-                selectedGroup.isEmpty && selectedSubOffice.isEmpty&&
+                selectedGroup.isEmpty &&
+                selectedSubOffice.isEmpty &&
                 selectedUser.isEmpty)
               FutureBuilder(
                 future: dataAddedController.fetchDataAdded(
