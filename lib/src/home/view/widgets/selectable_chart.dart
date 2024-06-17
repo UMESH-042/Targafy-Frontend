@@ -6,7 +6,8 @@ class SelectableChartWidget extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const SelectableChartWidget({super.key, 
+  const SelectableChartWidget({
+    super.key,
     required this.imagePath,
     required this.isSelected,
     required this.onTap,
@@ -17,10 +18,13 @@ class SelectableChartWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4.0), // Space between items
+        margin:
+            const EdgeInsets.symmetric(horizontal: 4.0), // Space between items
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color: isSelected ? primaryColor: const Color.fromARGB(255, 145, 173, 216),
+          color: isSelected
+              ? primaryColor
+              : const Color.fromARGB(255, 145, 173, 216),
           borderRadius: BorderRadius.circular(20), // Circular rectangle
         ),
         child: Image.asset(

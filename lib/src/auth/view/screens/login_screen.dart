@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -8,6 +9,7 @@ import 'package:targafy/src/auth/view/Controllers/login.dart';
 import 'package:targafy/src/auth/view/screens/verify_login_otp.dart';
 // import 'package:targafy/utils/routes/app_route_constants.dart';
 import 'package:targafy/utils/utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 // import 'package:go_router/go_router.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -97,16 +99,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         },
                       ),
                       SizedBox(width: getScreenWidth(context) * 0.02),
-                      Flexible(
-                        child: Text(
-                          'I agree to the Terms and Conditions and Privacy Policy',
+                      // Flexible(
+                      //   child: Text(
+                      //     'I agree to the Terms and Conditions and Privacy Policy',
+                      //     style: TextStyle(
+                      //       fontFamily: 'Sofia Pro',
+                      //       fontWeight: FontWeight.w500,
+                      //       fontSize: getScreenWidth(context) * 0.03,
+                      //     ),
+                      //   ),
+                      // )
+                      RichText(
+                        text: TextSpan(
+                          text: 'I agree to the ',
                           style: TextStyle(
                             fontFamily: 'Sofia Pro',
                             fontWeight: FontWeight.w500,
                             fontSize: getScreenWidth(context) * 0.03,
+                            color: Colors.black, // Adjust color as needed
                           ),
+                          children: [
+                            TextSpan(
+                              text: 'Terms and Conditions \nand Privacy Policy',
+                              style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue, // Adjust color as needed
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  // Navigate to your URL
+                                  launch('https://ophiz.com/targafy');
+                                },
+                            ),
+                          ],
                         ),
-                      )
+                      ),
                     ],
                   ),
                   SizedBox(height: getScreenheight(context) * 0.05),
