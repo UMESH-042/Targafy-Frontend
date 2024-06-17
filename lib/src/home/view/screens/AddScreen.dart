@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/mandatory_Filed_name_controller.dart';
@@ -76,13 +77,32 @@ class _AddscreenState extends ConsumerState<Addscreen> {
     final businessId = selectedBusinessData?['business']?.id;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Data'),
-      ),
+      // appBar: AppBar(
+      //   title: const Text('Add Data'),
+      // ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: parametersAsyncValue.when(
           data: (parameters) {
+            if (parameters.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Lottie.asset('assets/animations/empty_list.json',
+                        height: 200, width: 200),
+                    const Text(
+                      "Nothing to Add",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -187,7 +207,23 @@ class _AddscreenState extends ConsumerState<Addscreen> {
             return const Center(child: CircularProgressIndicator());
           },
           error: (error, stack) {
-            return Center(child: Text('Error: $error'));
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Lottie.asset('assets/animations/empty_list.json',
+                      height: 200, width: 200),
+                  const Text(
+                    "Nothing to Add",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            );
           },
         ),
       ),

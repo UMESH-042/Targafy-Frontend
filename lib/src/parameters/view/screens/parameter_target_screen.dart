@@ -331,6 +331,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:targafy/core/shared/components/back_button.dart';
 import 'package:targafy/src/parameters/view/model/user_target_model.dart';
+import 'package:targafy/widgets/submit_button.dart';
 import '../controller/Add_target_controller.dart';
 
 class ParameterTargetScreen extends ConsumerStatefulWidget {
@@ -460,7 +461,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                   const SizedBox(height: 16),
                   isLoading
                       ? const CircularProgressIndicator()
-                      : ElevatedButton(
+                      : SubmitButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               setState(() {
@@ -497,7 +498,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                               }
                             }
                           },
-                          child: const Text('Add Target'),
+                          // child: const Text('Add Target'),
                         ),
                 ],
               ),

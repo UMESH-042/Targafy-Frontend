@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +12,7 @@ import 'package:targafy/src/home/view/screens/controller/fetching_id_controller.
 import 'package:targafy/src/home/view/screens/controller/parameter_group_list_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/sub_group_data_provider_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/subgroup_user_controller.dart';
+import 'package:targafy/src/home/view/screens/widgets/GraphicalStatistics.dart';
 import 'package:targafy/src/home/view/widgets/selectable_chart.dart';
 import 'package:targafy/src/home/view/widgets/selectable_parameter.dart';
 import 'package:targafy/src/home/view/widgets/selectable_sub_group.dart';
@@ -117,11 +119,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   static const List<String> images = [
-    'assets/img/line_chart.png',
-    'assets/img/table.png',
-    'assets/img/chat.png',
-    'assets/img/pie.png',
-    'assets/img/lines.png'
+    'assets/img/line_chart_invert.png',
+    'assets/img/table_invert.png',
+    'assets/img/chat_invert.png',
+    'assets/img/pie_invert.png',
+    'assets/img/line_invert.png'
   ];
 
   void handleTapForCharts(int index) {
@@ -234,6 +236,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               data: (parameterList) {
                 if (selectedParameter.isEmpty && parameterList.isNotEmpty) {
                   selectedParameter = parameterList[0].name;
+
                   ref.invalidate(GroupProvider);
                 }
                 return Container(
@@ -599,13 +602,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData) {
                     final data = snapshot.data!;
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: CustomChart(
-                        parameter: selectedParameter,
-                        actualData: data['userEntries'] ?? [],
-                        predictedData: data['dailyTarget'] ?? [],
-                      ),
+                    //       return Padding(
+                    //         padding: const EdgeInsets.all(8.0),
+                    //         child: CustomChart(
+                    //           parameter: selectedParameter,
+                    //           actualData: data['userEntries'] ?? [],
+                    //           predictedData: data['dailyTarget'] ?? [],
+                    //         ),
+                    //       );
+                    //     } else {
+                    //       return const Center(child: Text('No data available'));
+                    //     }
+                    //   },
+                    // ),
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CustomChart(
+                            parameter: selectedParameter,
+                            actualData: data['userEntries'] ?? [],
+                            predictedData: data['dailyTarget'] ?? [],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Graphicalstatistics(
+                            parameter: selectedParameter,
+                            actualData: data['userEntries'] ?? [],
+                            predictedData: data['dailyTarget'] ?? [],
+                          ),
+                        ),
+                      ],
                     );
                   } else {
                     return const Center(child: Text('No data available'));
@@ -666,6 +694,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   }
                 },
               ),
+            if (selectedStates[2])
+              Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Lottie.asset('assets/animations/empty_list.json',
+                        height: 200, width: 200),
+                    const Text(
+                      "Nothing to display",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            if (selectedStates[4])
+              Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Lottie.asset('assets/animations/empty_list.json',
+                        height: 200, width: 200),
+                    const Text(
+                      "Nothing to display",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              )
           ],
         ),
       ),
