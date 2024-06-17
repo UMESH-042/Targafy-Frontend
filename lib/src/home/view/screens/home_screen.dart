@@ -158,6 +158,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       groupId = parentGroupId;
       print('this is the parent Group Id :- ${IdForSubGroup}');
     }
+
+    if (selectedGroup.isNotEmpty) {
+      ref.invalidate(subGroupDetailsProvider(IdForSubGroup));
+    }
   }
 
   void _handleUserTap(String username, String userId) {
@@ -173,6 +177,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           .read(userDataControllerProvider)
           .fetchUserData(businessId, selectedParameter, userId);
     }
+
+    ref.invalidate(userDataControllerProvider);
   }
 
   void _handleSubGroupTap(String SubOfficeName, String subgroupId) {
@@ -184,6 +190,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       selectedSubgroupId = subgroupId;
     }
     print('This is the selected Subgroup Id :- $selectedSubgroupId');
+    if (selectedSubOffice.isNotEmpty) {
+      ref.invalidate(userGroupProvider(IdForSubGroup));
+    }
   }
 
   @override
@@ -209,6 +218,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 scrollDirection: Axis.horizontal,
                 itemCount: images.length,
                 itemBuilder: (context, index) {
+                  if (!selectedStates.contains(true) && images.isNotEmpty) {
+                    selectedStates[0] = true;
+                  }
+
                   return SelectableChartWidget(
                     imagePath: images[index],
                     isSelected: selectedStates[index],
@@ -219,6 +232,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             parameterListAsync.when(
               data: (parameterList) {
+                if (selectedParameter.isEmpty && parameterList.isNotEmpty) {
+                  selectedParameter = parameterList[0].name;
+                  ref.invalidate(GroupProvider);
+                }
                 return Container(
                   height: MediaQuery.of(context).size.height * 0.04,
                   margin: EdgeInsets.symmetric(
@@ -247,6 +264,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (selectedParameter.isNotEmpty)
               ref.watch(GroupProvider).when(
                     data: (Groups) {
+                      if (selectedGroup.isEmpty && Groups.isNotEmpty) {
+                        selectedGroup = Groups[0].headOfficeName;
+                        IdForSubGroup = Groups[0].id;
+                        groupId = Groups[0].id;
+                        ref.invalidate(subGroupDetailsProvider(IdForSubGroup));
+                      }
                       return Container(
                         height: MediaQuery.of(context).size.height * 0.04,
                         margin: EdgeInsets.symmetric(
@@ -275,9 +298,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     error: (error, stackTrace) =>
                         Center(child: Text('Error: $error')),
                   ),
-            if (selectedGroup.isNotEmpty)
+            if (selectedGroup.isNotEmpty && selectedParameter.isNotEmpty)
               ref.watch(subGroupDetailsProvider(IdForSubGroup)).when(
                     data: (SubGroup) {
+                      if (selectedSubOffice.isEmpty && SubGroup.isNotEmpty) {
+                        selectedSubOffice = SubGroup[0].subOfficeName;
+                        selectedSubgroupId = SubGroup[0].groupId;
+                        ref.invalidate(userGroupProvider(IdForSubGroup));
+                      }
                       return Container(
                         height: MediaQuery.of(context).size.height * 0.04,
                         margin: EdgeInsets.symmetric(
@@ -306,9 +334,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     error: (error, stackTrace) =>
                         Center(child: Text('Error: $error')),
                   ),
-            if (selectedSubOffice.isNotEmpty)
+            if (selectedSubOffice.isNotEmpty &&
+                selectedParameter.isNotEmpty &&
+                selectedGroup.isNotEmpty)
               ref.watch(userGroupProvider(IdForSubGroup)).when(
                     data: (userGroup) {
+                      if (selectedUser.isEmpty &&
+                          userGroup.businessUsers.isNotEmpty) {
+                        selectedUser = userGroup.businessUsers[0].name;
+                        selectedUserId = userGroup.users[0].id;
+                      }
                       return Container(
                         height: MediaQuery.of(context).size.height * 0.04,
                         margin: EdgeInsets.symmetric(

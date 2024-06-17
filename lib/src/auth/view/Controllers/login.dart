@@ -127,6 +127,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
       if (res == "Login request for verification sent successfully") {
         await _storeAuthToken(state.accessToken);
         SharedPreferenceService().setLogin(state.accessToken);
+        print('this is new access Token :- ${state.accessToken}');
         debugPrint("Done");
         return true;
       } else {
@@ -178,6 +179,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
         DateTime.now().add(const Duration(days: 1)).millisecondsSinceEpoch;
     await prefs.setString('authToken', token);
     await prefs.setInt('expiryTime', expiryTime);
+    print('new auth token has been set- $token');
   }
 
   Future<bool> _isAuthTokenValid() async {
@@ -203,6 +205,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
   Future<bool> checkBusinessExists() async {
     final token = await _getAuthToken();
+    print('This is the token for checking business:- $token');
     if (token == null) {
       debugPrint('Authentication token not found');
       return false;
@@ -230,35 +233,20 @@ class LoginNotifier extends StateNotifier<LoginState> {
     return state.number.isNotEmpty && state.number.length == 10 && tnc;
   }
 
-  Future<void> logout(BuildContext context) async {
-    try {
-      // Clear shared preferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('authToken');
-      await prefs.remove('expiryTime');
-
-      // Verify removal
-      String? authToken = prefs.getString('authToken');
-      int? expiryTime = prefs.getInt('expiryTime');
-
-      if (authToken == null && expiryTime == null) {
-        debugPrint("AuthToken and ExpiryTime successfully removed.");
-      } else {
-        debugPrint("Failed to remove AuthToken or ExpiryTime.");
-      }
-
-      // Reset state to initial state
-      state = LoginState();
-
-      // Navigate to login screen
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()));
-    } catch (e) {
-      debugPrint("Error during logout: $e");
-      // Optionally show a snack bar with the error
-      showSnackBar(context, "Failed to log out. Please try again.", Colors.red);
-    }
-  }
+  // Future<void> logout(BuildContext context) async {
+  //   try {
+  //     final sharedPrefs = SharedPreferenceService();
+  //     await sharedPrefs.logout();
+  //     state = LoginState(); // Reset login state to initial values
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => const LoginScreen()),
+  //     );
+  //   } catch (e) {
+  //     debugPrint("Error during logout: $e");
+  //     showSnackBar(context, "Failed to logout. Please try again.", Colors.red);
+  //   }
+  // }
 }
 
 final loginProvider =

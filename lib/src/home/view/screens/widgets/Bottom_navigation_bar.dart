@@ -402,6 +402,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
 import 'package:targafy/business_home_page/screens/business_profile.dart';
@@ -446,6 +447,11 @@ class _BottomNavigationAndAppBarState
     const FeedbackScreen()
   ];
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -456,6 +462,30 @@ class _BottomNavigationAndAppBarState
   Widget build(BuildContext context) {
     final asyncValue = ref.watch(businessAndUserProvider);
     final selectedBusinessData = ref.watch(currentBusinessProvider);
+    // Check if a business is selected, if not, try to select the first one
+    if (selectedBusinessData == null) {
+      asyncValue.whenData((data) {
+        final businesses = (data['businesses'] as List<Business>?) ?? [];
+        final user = data['user'] as User?;
+
+        if (businesses.isNotEmpty && user != null) {
+          final firstBusiness = businesses.first;
+          final businessUser = user.businesses.firstWhere(
+            (b) => b.businessId == firstBusiness.id,
+            orElse: () => BusinessUser(name: '', userType: '', businessId: ''),
+          );
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            selectBusiness(
+              firstBusiness,
+              businessUser.userType ?? 'No User Type',
+              firstBusiness.businessCode ?? 'No Code',
+              ref,
+            );
+          });
+        }
+      });
+    }
     final selectedBusiness = selectedBusinessData?['business'] as Business?;
     final selectedUserType = selectedBusinessData?['userType'] as String?;
     final selectedbusinessCode =
@@ -542,6 +572,7 @@ class _BottomNavigationAndAppBarState
                               // Handle action for "Add Charts"
                             } else if (value == 3) {
                               // Handle action for "Refresh"
+                              Restart.restartApp();
                             } else if (value == 4) {
                               Navigator.push(
                                 context,
@@ -614,8 +645,9 @@ class _BottomNavigationAndAppBarState
                     // final businesses = data['businesses'] as List<Business>?;
                     final businesses =
                         (data['businesses'] as List<Business>?) ?? [];
-
+                    print(businesses);
                     final user = data['user'] as User?;
+                    print(user);
 
                     // Fetch user avatar
                     final userAvatar = ref.watch(userAvatarProvider);
@@ -844,14 +876,14 @@ class _BottomNavigationAndAppBarState
                                     builder: (context) => const UserProfile()));
                           },
                         ),
-                        ListTile(
-                          leading: const Icon(Icons.logout),
-                          title: const Text('Log out'),
-                          onTap: () {
-                            // Action for Log out
-                            // ref.read(loginProvider.notifier).logout(context);
-                          },
-                        ),
+                        // ListTile(
+                        //   leading: const Icon(Icons.logout),
+                        //   title: const Text('Log out'),
+                        //   onTap: () {
+
+                        //     // ref.read(loginProvider.notifier).logout(context);
+                        //   },
+                        // ),
                       ],
                     );
                   },

@@ -15,6 +15,7 @@ final businessAndUserProvider =
     StreamProvider<Map<String, dynamic>>((ref) async* {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('authToken');
+  print('this is the token for drawer:- $token');
   if (token == null) {
     throw Exception('No token found');
   }
@@ -75,23 +76,7 @@ Future<void> selectBusiness(Business business, String userType,
     'businessCode': businessCode,
   };
 
-  await prefs.setString(
-      'selectedBusinessData', json.encode(selectedBusinessData));
   ref.read(currentBusinessProvider.state).state = selectedBusinessData;
 }
 
-// Function to load the selected business from shared preferences
-Future<void> loadSelectedBusiness(WidgetRef ref) async {
-  final prefs = await SharedPreferences.getInstance();
-  final selectedBusinessDataString = prefs.getString('selectedBusinessData');
 
-  if (selectedBusinessDataString != null) {
-    final Map<String, dynamic> data = json.decode(selectedBusinessDataString);
-    final business = Business.fromJson(data['business']);
-    ref.read(currentBusinessProvider.state).state = {
-      'business': business,
-      'userType': data['userType'] as String,
-      'businessCode': data['businessCode'] as String,
-    };
-  }
-}
