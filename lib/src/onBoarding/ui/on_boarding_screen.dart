@@ -26,7 +26,11 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   void _completeOnboarding() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('hasSeenOnboarding', true);
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (route) => false,
+    );
   }
 
   @override

@@ -39,10 +39,12 @@ class _MandatoryFieldPageState extends ConsumerState<MandatoryFieldPage> {
       // Navigate to the next screen if not first time
       WidgetsBinding.instance.addPostFrameCallback((_) {
         // Navigator.pushReplacementNamed(context, '/nextScreen');
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const RegisterABusinessScreen1()));
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const RegisterABusinessScreen1()),
+          (route) => false,
+        );
       });
     }
 
@@ -82,7 +84,7 @@ class _MandatoryFieldPageState extends ConsumerState<MandatoryFieldPage> {
                     showSnackBar(context, "Enter Correct Name!!", invalidColor);
                     return;
                   }
-                  
+
                   try {
                     await ref
                         .read(nameControllerProvider.notifier)

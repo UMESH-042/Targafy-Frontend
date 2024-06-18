@@ -18,21 +18,18 @@ class VerifyOTPScreen extends ConsumerStatefulWidget {
 }
 
 class _VerifyOTPScreenState extends ConsumerState<VerifyOTPScreen> {
-
-
-    @override
+  @override
   void initState() {
     super.initState();
     ref.read(nameControllerProvider.notifier).checkFirstTime();
   }
-  
+
   String otp = "";
 
   @override
   Widget build(BuildContext context) {
     final loginNotifier = ref.read(loginProvider.notifier);
-     final state = ref.watch(nameControllerProvider);
-
+    final state = ref.watch(nameControllerProvider);
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -106,29 +103,30 @@ class _VerifyOTPScreenState extends ConsumerState<VerifyOTPScreen> {
                       final success =
                           await loginNotifier.verifyLoginOtp(context);
                       if (success) {
-
                         // // Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterABusinessScreen1()));
                         // Navigator.pushReplacement(
                         //     context,
                         //     MaterialPageRoute(
                         //         builder: (context) => MandatoryFieldPage()));
-                        
-                      if (state.isFirstTime) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MandatoryFieldPage(),
-                          ),
-                        );
-                      } else {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const RegisterABusinessScreen1(),
-                          ),
-                        );
-                      }
+
+                        if (state.isFirstTime) {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MandatoryFieldPage(),
+                            ),
+                            (route) => false,
+                          );
+                        } else {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const RegisterABusinessScreen1(),
+                            ),
+                            (route) => false,
+                          );
+                        }
                       } else {
                         showSnackBar(context, 'Invalid OTP. Please try again.',
                             Colors.red);

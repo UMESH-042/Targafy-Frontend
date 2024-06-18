@@ -39,7 +39,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/src/auth/view/screens/login_screen.dart';
 import 'package:targafy/src/home/view/screens/widgets/Bottom_navigation_bar.dart';
-// import 'package:targafy/src/home/view/screens/home_screen.dart';
 import 'package:targafy/src/onBoarding/ui/on_boarding_screen.dart';
 import 'package:targafy/src/services/shared_preference_service.dart';
 
@@ -57,6 +56,12 @@ void main() async {
     hasSeenOnboarding: hasSeenOnboarding,
     isTokenValid: isTokenValid,
   )));
+
+  // runApp(ResettableProviderScope(
+  //     child: MyApp(
+  //   hasSeenOnboarding: hasSeenOnboarding,
+  //   isTokenValid: isTokenValid,
+  // )));
 }
 
 class MyApp extends StatelessWidget {
@@ -77,12 +82,60 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      // home: !hasSeenOnboarding
-      //     ? const OnBoardingScreen()
-      //     : isTokenValid
-      //         ? const BottomNavigationAndAppBar()
-      //         : const LoginScreen(),
-      home: !hasSeenOnboarding ? const OnBoardingScreen() : const LoginScreen(),
+      home: !hasSeenOnboarding
+          ? const OnBoardingScreen()
+          : isTokenValid
+              ? const BottomNavigationAndAppBar()
+              : const LoginScreen(),
+      // home: !hasSeenOnboarding ? const OnBoardingScreen() : const LoginScreen(),
     );
   }
 }
+
+// class ResettableProviderScope extends StatefulWidget {
+//   const ResettableProviderScope({
+//     required this.child,
+//     Key? key,
+//   }) : super(key: key);
+
+//   final Widget child;
+
+//   static void reset(BuildContext context) {
+//     context.findAncestorStateOfType<_ResettableProviderScopeState>()?.reset();
+//   }
+
+//   @override
+//   _ResettableProviderScopeState createState() =>
+//       _ResettableProviderScopeState();
+// }
+
+// class _ResettableProviderScopeState extends State<ResettableProviderScope> {
+//   ProviderContainer? _container;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _container = ProviderContainer(overrides: []);
+//   }
+
+//   @override
+//   void dispose() {
+//     _container!.dispose();
+//     super.dispose();
+//   }
+
+//   void reset() {
+//     setState(() {
+//       _container!.dispose();
+//       _container = ProviderContainer(overrides: []);
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return UncontrolledProviderScope(
+//       container: _container!,
+//       child: widget.child,
+//     );
+//   }
+// }

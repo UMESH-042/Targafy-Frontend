@@ -85,7 +85,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:targafy/business_home_page/controller/join_business_controller.dart';
 import 'package:targafy/business_home_page/models/business_request.dart';
-import 'package:targafy/src/home/view/screens/widgets/Bottom_navigation_bar.dart';
 import 'package:targafy/widgets/submit_button.dart';
 
 class JoinBusinessScreen extends ConsumerStatefulWidget {

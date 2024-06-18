@@ -86,276 +86,272 @@ class _RegisterABusinessScreen1State
     final loginState = ref.watch(loginProvider);
     final loginNotifier = ref.read(loginProvider.notifier);
 
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: getScreenheight(context) * 0.2,
-              ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isRegisterSelected = true;
-                  });
-                },
-                child: Container(
-                  margin: EdgeInsets.all(getScreenWidth(context) * 0.05),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    color: Colors.white,
-                    border: Border.all(
-                        color: isRegisterSelected ? primaryColor : Colors.grey,
-                        width: 2),
-                  ),
-                  width: getScreenWidth(context),
-                  height: getScreenheight(context) * 0.23,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Checkbox(
-                            value: isRegisterSelected,
-                            onChanged: (value) {
-                              setState(() {
-                                isRegisterSelected = value!;
-                              });
-                            },
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            checkColor: Colors.white,
-                            activeColor: primaryColor,
-                          ),
-                          Text(
-                            'Register a Business',
-                            style: TextStyle(
-                              fontFamily: 'Sofia Pro',
-                              fontWeight: FontWeight.w400,
-                              fontSize: getScreenWidth(context) * 0.04,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: getScreenWidth(context) * 0.04),
-                        child: Container(
-                          alignment: Alignment.centerLeft,
-                          width: getScreenWidth(context) * 0.72,
-                          child: Text(
-                            'This option is for the business owners who wants to register their business. Registering will generate a special code which can be shared with employees.',
-                            style: TextStyle(
-                              fontFamily: 'Sofia Pro',
-                              fontWeight: FontWeight.w400,
-                              fontSize: getScreenWidth(context) * 0.038,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              height: getScreenheight(context) * 0.2,
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  isRegisterSelected = true;
+                });
+              },
+              child: Container(
+                margin: EdgeInsets.all(getScreenWidth(context) * 0.05),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  color: Colors.white,
+                  border: Border.all(
+                      color: isRegisterSelected ? primaryColor : Colors.grey,
+                      width: 2),
                 ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isRegisterSelected = false;
-                  });
-                },
-                child: Container(
-                  margin: EdgeInsets.all(getScreenWidth(context) * 0.05),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    color: Colors.white,
-                    border: Border.all(
-                        color: !isRegisterSelected ? primaryColor : Colors.grey,
-                        width: 2),
-                  ),
-                  width: getScreenWidth(context),
-                  height: getScreenheight(context) * 0.28,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Checkbox(
-                            value: !isRegisterSelected,
-                            onChanged: (value) {
-                              setState(() {
-                                isRegisterSelected = !value!;
-                              });
-                            },
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            checkColor: Colors.white,
-                            activeColor: primaryColor,
+                width: getScreenWidth(context),
+                height: getScreenheight(context) * 0.23,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          value: isRegisterSelected,
+                          onChanged: (value) {
+                            setState(() {
+                              isRegisterSelected = value!;
+                            });
+                          },
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          Text(
-                            'Join a Business',
-                            style: TextStyle(
-                              fontFamily: 'Sofia Pro',
-                              fontWeight: FontWeight.w400,
-                              fontSize: getScreenWidth(context) * 0.04,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 5),
-                      CustomTextInputField(
-                        numberOfFields: 6,
-                        onCodeChanged: (String code) {
-                          // Handle validation or checks here if necessary
-                        },
-                        onSubmit: (String verificationCode) {
-                          codeController.text = verificationCode;
-                        },
-                      ),
-                      const SizedBox(height: 5),
-                      Container(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Enter the business code',
+                          checkColor: Colors.white,
+                          activeColor: primaryColor,
+                        ),
+                        Text(
+                          'Register a Business',
                           style: TextStyle(
-                              fontFamily: 'Sofia Pro',
-                              fontWeight: FontWeight.w300,
-                              fontSize: getScreenWidth(context) * 0.028,
-                              color: tertiaryColor),
+                            fontFamily: 'Sofia Pro',
+                            fontWeight: FontWeight.w400,
+                            fontSize: getScreenWidth(context) * 0.04,
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: getScreenWidth(context) * 0.04),
-                        child: Container(
-                          alignment: Alignment.centerLeft,
-                          width: getScreenWidth(context) * 0.75,
-                          child: Text(
-                            'This option is for the employees who want to join a particular business. For joining a business you should have a special code.',
-                            style: TextStyle(
-                              fontFamily: 'Sofia Pro',
-                              fontWeight: FontWeight.w400,
-                              fontSize: getScreenWidth(context) * 0.038,
-                            ),
+                      ],
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: getScreenWidth(context) * 0.04),
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        width: getScreenWidth(context) * 0.72,
+                        child: Text(
+                          'This option is for the business owners who wants to register their business. Registering will generate a special code which can be shared with employees.',
+                          style: TextStyle(
+                            fontFamily: 'Sofia Pro',
+                            fontWeight: FontWeight.w400,
+                            fontSize: getScreenWidth(context) * 0.038,
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              Container(
-                margin: EdgeInsets.symmetric(
-                  horizontal: getScreenWidth(context) * 0.05,
-                ).copyWith(
-                  top: getScreenheight(context) * 0.05,
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  isRegisterSelected = false;
+                });
+              },
+              child: Container(
+                margin: EdgeInsets.all(getScreenWidth(context) * 0.05),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  color: Colors.white,
+                  border: Border.all(
+                      color: !isRegisterSelected ? primaryColor : Colors.grey,
+                      width: 2),
                 ),
-                child: PrimaryButton(
-                  function: () async {
-                    if (isRegisterSelected) {
-                      // Call the function to check business existence
-                      final exists = await loginNotifier.checkBusinessExists();
+                width: getScreenWidth(context),
+                height: getScreenheight(context) * 0.28,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          value: !isRegisterSelected,
+                          onChanged: (value) {
+                            setState(() {
+                              isRegisterSelected = !value!;
+                            });
+                          },
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          checkColor: Colors.white,
+                          activeColor: primaryColor,
+                        ),
+                        Text(
+                          'Join a Business',
+                          style: TextStyle(
+                            fontFamily: 'Sofia Pro',
+                            fontWeight: FontWeight.w400,
+                            fontSize: getScreenWidth(context) * 0.04,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    CustomTextInputField(
+                      numberOfFields: 6,
+                      onCodeChanged: (String code) {
+                        // Handle validation or checks here if necessary
+                      },
+                      onSubmit: (String verificationCode) {
+                        codeController.text = verificationCode;
+                      },
+                    ),
+                    const SizedBox(height: 5),
+                    Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Enter the business code',
+                        style: TextStyle(
+                            fontFamily: 'Sofia Pro',
+                            fontWeight: FontWeight.w300,
+                            fontSize: getScreenWidth(context) * 0.028,
+                            color: tertiaryColor),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: getScreenWidth(context) * 0.04),
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        width: getScreenWidth(context) * 0.75,
+                        child: Text(
+                          'This option is for the employees who want to join a particular business. For joining a business you should have a special code.',
+                          style: TextStyle(
+                            fontFamily: 'Sofia Pro',
+                            fontWeight: FontWeight.w400,
+                            fontSize: getScreenWidth(context) * 0.038,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: getScreenWidth(context) * 0.05,
+              ).copyWith(
+                top: getScreenheight(context) * 0.05,
+              ),
+              child: PrimaryButton(
+                function: () async {
+                  if (isRegisterSelected) {
+                    // Call the function to check business existence
+                    final exists = await loginNotifier.checkBusinessExists();
 
-                      if (exists) {
-                        // Business already exists
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Business already exists')),
-                        );
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const BottomNavigationAndAppBar()),
-                        );
-                      } else {
-                        // Navigate to the next screen if business does not exist
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const RegisterABusinessScreen2()),
-                        );
-                      }
-                    } else if (!isRegisterSelected) {
-                      // Handle joining a business with the entered code
-                      final code = codeController.text;
-                      if (code.length == 6) {
-                        final joinBusinessRequest = JoinBusinessRequest(
-                          businessCode: code,
-                        );
-                        try {
-                          final success = await ref.read(
-                              joinBusinessProvider(joinBusinessRequest).future);
+                    if (exists) {
+                      // Business already exists
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Business already exists')),
+                      );
+                      // Navigator.pushReplacement(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //       builder: (context) =>
+                      //           const BottomNavigationAndAppBar()),
+                      // );
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const BottomNavigationAndAppBar(),
+                        ),
+                        (route) => false,
+                      );
+                    } else {
+                      // Navigate to the next screen if business does not exist
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const RegisterABusinessScreen2()),
+                      );
+                    }
+                  } else if (!isRegisterSelected) {
+                    // Handle joining a business with the entered code
+                    final code = codeController.text;
+                    if (code.length == 6) {
+                      final joinBusinessRequest = JoinBusinessRequest(
+                        businessCode: code,
+                      );
+                      try {
+                        final success = await ref.read(
+                            joinBusinessProvider(joinBusinessRequest).future);
 
-                          //         if (success) {
-                          //           ScaffoldMessenger.of(context).showSnackBar(
-                          //             const SnackBar(
-                          //                 content: Text(
-                          //                     'Your request has been sent successfully. You will be notified soon.')),
-                          //           );
-                          //           Navigator.pushReplacement(
-                          //               context,
-                          //               MaterialPageRoute(
-                          //                   builder: (context) =>
-                          //                       const BottomNavigationAndAppBar()));
-                          //         }
-                          //       } catch (e) {
-                          //         ScaffoldMessenger.of(context).showSnackBar(
-                          //           const SnackBar(
-                          //               content: Text('Pls enter correct code')),
-                          //         );
-                          //       }
-                          //     } else {
-                          //       // Show an error message if the code is invalid
-                          //       ScaffoldMessenger.of(context).showSnackBar(
-                          //         const SnackBar(
-                          //             content:
-                          //                 Text('Please enter a valid 6-digit code')),
-                          //       );
-                          //     }
-                          //   }
-                          // },
-                          if (success) {
-                            // Show success message in AlertDialog
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text('Request Sent Successfully'),
-                                content: Text(
-                                    'Your request has been sent successfully. You will be notified soon.'),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const BottomNavigationAndAppBar()));
-                                    },
-                                    child: Text('OK'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          // Show error message in AlertDialog
+                        //         if (success) {
+                        //           ScaffoldMessenger.of(context).showSnackBar(
+                        //             const SnackBar(
+                        //                 content: Text(
+                        //                     'Your request has been sent successfully. You will be notified soon.')),
+                        //           );
+                        //           Navigator.pushReplacement(
+                        //               context,
+                        //               MaterialPageRoute(
+                        //                   builder: (context) =>
+                        //                       const BottomNavigationAndAppBar()));
+                        //         }
+                        //       } catch (e) {
+                        //         ScaffoldMessenger.of(context).showSnackBar(
+                        //           const SnackBar(
+                        //               content: Text('Pls enter correct code')),
+                        //         );
+                        //       }
+                        //     } else {
+                        //       // Show an error message if the code is invalid
+                        //       ScaffoldMessenger.of(context).showSnackBar(
+                        //         const SnackBar(
+                        //             content:
+                        //                 Text('Please enter a valid 6-digit code')),
+                        //       );
+                        //     }
+                        //   }
+                        // },
+                        if (success) {
+                          // Show success message in AlertDialog
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: Text('Error'),
-                              content: Text('Please enter correct code'),
+                              title: Text('Request Sent Successfully'),
+                              content: Text(
+                                  'Your request has been sent successfully. You will be notified soon.'),
                               actions: <Widget>[
                                 TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop();
+                                    // Navigator.pushReplacement(
+                                    //     context,
+                                    //     MaterialPageRoute(
+                                    //         builder: (context) =>
+                                    //             const BottomNavigationAndAppBar()));
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const BottomNavigationAndAppBar(),
+                                      ),
+                                      (route) => false,
+                                    );
                                   },
                                   child: Text('OK'),
                                 ),
@@ -363,13 +359,13 @@ class _RegisterABusinessScreen1State
                             ),
                           );
                         }
-                      } else {
-                        // Show an error message if the code is invalid
+                      } catch (e) {
+                        // Show error message in AlertDialog
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: Text('Invalid Code'),
-                            content: Text('Please enter a valid 6-digit code'),
+                            title: Text('Error'),
+                            content: Text('Please enter correct code'),
                             actions: <Widget>[
                               TextButton(
                                 onPressed: () {
@@ -381,13 +377,30 @@ class _RegisterABusinessScreen1State
                           ),
                         );
                       }
+                    } else {
+                      // Show an error message if the code is invalid
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text('Invalid Code'),
+                          content: Text('Please enter a valid 6-digit code'),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('OK'),
+                            ),
+                          ],
+                        ),
+                      );
                     }
-                  },
-                  text: 'Proceed',
-                ),
+                  }
+                },
+                text: 'Proceed',
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -71,7 +71,7 @@ class CreateBusinessController {
     );
 
     if (response.statusCode == 201) {
-      final data = jsonDecode(response.body);
+      // final data = jsonDecode(response.body);
       print("Success");
       // Handle successful response
       onCompletion(true); // Invoke callback with failure status

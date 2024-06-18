@@ -69,7 +69,6 @@ final currentBusinessProvider =
 // Function to update the currently selected business and userType
 Future<void> selectBusiness(Business business, String userType,
     String businessCode, WidgetRef ref) async {
-  final prefs = await SharedPreferences.getInstance();
   final selectedBusinessData = {
     'business': business.toJson(),
     'userType': userType,
@@ -78,5 +77,3 @@ Future<void> selectBusiness(Business business, String userType,
 
   ref.read(currentBusinessProvider.state).state = selectedBusinessData;
 }
-
-

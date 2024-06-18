@@ -1,4 +1,4 @@
-package com.example.targafy
+package com.terabiz.targafy
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -238,9 +238,10 @@ class LoginNotifier extends StateNotifier<LoginState> {
   //     final sharedPrefs = SharedPreferenceService();
   //     await sharedPrefs.logout();
   //     state = LoginState(); // Reset login state to initial values
-  //     Navigator.pushReplacement(
+  //     Navigator.pushAndRemoveUntil(
   //       context,
   //       MaterialPageRoute(builder: (context) => const LoginScreen()),
+  //       (Route<dynamic> route) => false,
   //     );
   //   } catch (e) {
   //     debugPrint("Error during logout: $e");
