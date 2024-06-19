@@ -7,7 +7,7 @@ class UserProfileBusinessModel {
   final String userType;
   final String role;
   final String lastSeen;
-  final int totalRating;
+  final double totalRating;
 
   UserProfileBusinessModel({
     required this.id,

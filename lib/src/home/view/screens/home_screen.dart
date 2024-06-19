@@ -233,11 +233,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             parameterListAsync.when(
               data: (parameterList) {
-                if (selectedParameter.isEmpty && parameterList.isNotEmpty) {
-                  selectedParameter = parameterList[0].name;
+                // if (selectedParameter.isEmpty && parameterList.isNotEmpty) {
+                //   selectedParameter = parameterList[0].name;
 
-                  ref.invalidate(GroupProvider);
-                }
+                //   ref.invalidate(GroupProvider);
+                // }
                 return Container(
                   height: MediaQuery.of(context).size.height * 0.04,
                   margin: EdgeInsets.symmetric(
@@ -260,18 +260,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stackTrace) =>
-                  Center(child: Text('Error: $error')),
+              error: (error, stackTrace) => Center(child: Text('')),
+              // Center(child: Text('Error: $error')),
             ),
             if (selectedParameter.isNotEmpty)
               ref.watch(GroupProvider).when(
                     data: (Groups) {
-                      if (selectedGroup.isEmpty && Groups.isNotEmpty) {
-                        selectedGroup = Groups[0].headOfficeName;
-                        IdForSubGroup = Groups[0].id;
-                        groupId = Groups[0].id;
-                        ref.invalidate(subGroupDetailsProvider(IdForSubGroup));
-                      }
+                      // if (selectedGroup.isEmpty && Groups.isNotEmpty) {
+                      //   selectedGroup = Groups[0].headOfficeName;
+                      //   IdForSubGroup = Groups[0].id;
+                      //   groupId = Groups[0].id;
+                      //   ref.invalidate(subGroupDetailsProvider(IdForSubGroup));
+                      // }
                       return Container(
                         height: MediaQuery.of(context).size.height * 0.04,
                         margin: EdgeInsets.symmetric(
@@ -297,17 +297,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     },
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
-                    error: (error, stackTrace) =>
-                        Center(child: Text('Error: $error')),
+                    error: (error, stackTrace) => Center(child: Text('')),
+                    // Center(child: Text('Error: $error')),
                   ),
             if (selectedGroup.isNotEmpty && selectedParameter.isNotEmpty)
               ref.watch(subGroupDetailsProvider(IdForSubGroup)).when(
                     data: (SubGroup) {
-                      if (selectedSubOffice.isEmpty && SubGroup.isNotEmpty) {
-                        selectedSubOffice = SubGroup[0].subOfficeName;
-                        selectedSubgroupId = SubGroup[0].groupId;
-                        ref.invalidate(userGroupProvider(IdForSubGroup));
-                      }
+                      // if (selectedSubOffice.isEmpty && SubGroup.isNotEmpty) {
+                      //   selectedSubOffice = SubGroup[0].subOfficeName;
+                      //   selectedSubgroupId = SubGroup[0].groupId;
+                      //   ref.invalidate(userGroupProvider(IdForSubGroup));
+                      // }
                       return Container(
                         height: MediaQuery.of(context).size.height * 0.04,
                         margin: EdgeInsets.symmetric(
@@ -341,11 +341,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 selectedGroup.isNotEmpty)
               ref.watch(userGroupProvider(IdForSubGroup)).when(
                     data: (userGroup) {
-                      if (selectedUser.isEmpty &&
-                          userGroup.businessUsers.isNotEmpty) {
-                        selectedUser = userGroup.businessUsers[0].name;
-                        selectedUserId = userGroup.users[0].id;
-                      }
+                      // if (selectedUser.isEmpty &&
+                      //     userGroup.businessUsers.isNotEmpty) {
+                      //   selectedUser = userGroup.businessUsers[0].name;
+                      //   selectedUserId = userGroup.users[0].id;
+                      // }
                       return Container(
                         height: MediaQuery.of(context).size.height * 0.04,
                         margin: EdgeInsets.symmetric(
@@ -371,8 +371,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     },
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
-                    error: (error, stackTrace) =>
-                        Center(child: Text('Error: $error')),
+                    error: (error, stackTrace) => Center(child: Text('')),
+                    // Center(child: Text('Error: $error')),
                   ),
             if (selectedStates.isNotEmpty &&
                 selectedStates[0] &&

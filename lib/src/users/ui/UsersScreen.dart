@@ -470,7 +470,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                     onPressed: () {
                       String shareText = 'Dear User,\n\n'
                           'We invite you to download our app via the following link: '
-                          'Please download the app from: https://play.google.com/store/apps/details?id=com.issuecop.app\n\n'
+                          'Please download the app from: https://play.google.com/store/apps/details?id=com.terabiz.targafy\n\n'
                           'And then join our business using code: $selectedbusinessCode\n\n'
                           'Best regards,\n'
                           '$businessName Team';
