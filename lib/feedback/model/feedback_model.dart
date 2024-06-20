@@ -7,7 +7,7 @@ class FeedbackModel {
   final String userId;
   final String businessId;
   final String givenTo;
-  final double rating;
+  final num rating;
   final String message;
   final GivenBy givenBy;
   final DateTime createdDate;

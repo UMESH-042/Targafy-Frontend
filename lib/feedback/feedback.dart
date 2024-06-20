@@ -25,6 +25,12 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
   String? selectedUserName;
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final selectedBusinessData = ref.watch(currentBusinessProvider);
