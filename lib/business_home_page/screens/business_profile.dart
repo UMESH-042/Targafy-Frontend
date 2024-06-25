@@ -1,15 +1,21 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
 import 'package:targafy/src/groups/ui/controller/create_subgroup_controller.dart';
 import 'package:targafy/utils/utils.dart';
 
 class BusinessProfile extends ConsumerStatefulWidget {
-  const BusinessProfile({super.key});
+  final String? token;
+  const BusinessProfile({
+    this.token,
+  });
 
   @override
   ConsumerState<BusinessProfile> createState() => _BusinessProfileState();
@@ -34,7 +40,7 @@ class _BusinessProfileState extends ConsumerState<BusinessProfile> {
 
   @override
   Widget build(BuildContext context) {
-    final asyncValue = ref.watch(businessAndUserProvider);
+    final asyncValue = ref.watch(businessAndUserProvider(widget.token!));
     final selectedBusinessData = ref.watch(currentBusinessProvider);
     final selectedBusiness = selectedBusinessData?['business'] as Business?;
     // final selectedUserType = selectedBusinessData?['userType'] as String?;

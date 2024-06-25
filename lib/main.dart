@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 // import 'package:flutter/material.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
@@ -34,9 +35,12 @@
 // }
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:targafy/src/auth/view/screens/login_screen.dart';
 import 'package:targafy/src/home/view/screens/widgets/Bottom_navigation_bar.dart';
 import 'package:targafy/src/onBoarding/ui/on_boarding_screen.dart';
@@ -53,6 +57,7 @@ void main() async {
   print(token);
   runApp(ProviderScope(
       child: MyApp(
+    token: token,
     hasSeenOnboarding: hasSeenOnboarding,
     isTokenValid: isTokenValid,
   )));
@@ -67,12 +72,14 @@ void main() async {
 class MyApp extends StatelessWidget {
   final bool hasSeenOnboarding;
   final bool isTokenValid;
+  final String? token;
 
   const MyApp({
+    Key? key,
     required this.hasSeenOnboarding,
     required this.isTokenValid,
-    super.key,
-  });
+    this.token,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -85,57 +92,48 @@ class MyApp extends StatelessWidget {
       home: !hasSeenOnboarding
           ? const OnBoardingScreen()
           : isTokenValid
-              ? const BottomNavigationAndAppBar()
+              ? BottomNavigationAndAppBar(
+                  token: token,
+                )
               : const LoginScreen(),
       // home: !hasSeenOnboarding ? const OnBoardingScreen() : const LoginScreen(),
     );
   }
 }
 
-// class ResettableProviderScope extends StatefulWidget {
-//   const ResettableProviderScope({
-//     required this.child,
-//     Key? key,
-//   }) : super(key: key);
+class LocalNotificationService {
+  static final FlutterLocalNotificationsPlugin
+      _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  static void initialize() {
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+            android: AndroidInitializationSettings("@mipmap/ic_launcher"));
+    _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
 
-//   final Widget child;
-
-//   static void reset(BuildContext context) {
-//     context.findAncestorStateOfType<_ResettableProviderScopeState>()?.reset();
-//   }
-
-//   @override
-//   _ResettableProviderScopeState createState() =>
-//       _ResettableProviderScopeState();
-// }
-
-// class _ResettableProviderScopeState extends State<ResettableProviderScope> {
-//   ProviderContainer? _container;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _container = ProviderContainer(overrides: []);
-//   }
-
-//   @override
-//   void dispose() {
-//     _container!.dispose();
-//     super.dispose();
-//   }
-
-//   void reset() {
-//     setState(() {
-//       _container!.dispose();
-//       _container = ProviderContainer(overrides: []);
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return UncontrolledProviderScope(
-//       container: _container!,
-//       child: widget.child,
-//     );
-//   }
-// }
+  static void display(RemoteMessage message) async {
+    try {
+      print("In Notification method");
+      // int id = DateTime.now().microsecondsSinceEpoch ~/1000000;
+      // Random random = new Random();
+      // int id = random.nextInt(1000);
+      int id = 1;
+      final NotificationDetails notificationDetails = NotificationDetails(
+          android: AndroidNotificationDetails(
+        "channelId",
+        "my chanel",
+        importance: Importance.max,
+        priority: Priority.high,
+      ));
+      print("my id is ${id.toString()}");
+      await _flutterLocalNotificationsPlugin.show(
+        id,
+        message.notification!.title,
+        message.notification!.body,
+        notificationDetails,
+      );
+    } on Exception catch (e) {
+      print('Error>>>$e');
+    }
+  }
+}

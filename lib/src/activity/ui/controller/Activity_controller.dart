@@ -9,7 +9,7 @@ import 'package:targafy/utils/remote_routes.dart';
 String domain = AppRemoteRoutes.baseUrl;
 
 class ActivityService {
-  final String baseUrl = '${domain}activity/get-activity';
+  final String baseUrl = '${domain}activity/get-all-subordinatesUserActivity';
 
   Future<List<ActivityModel>> fetchActivities(
       String businessId, String token) async {

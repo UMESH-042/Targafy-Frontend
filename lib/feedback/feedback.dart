@@ -14,8 +14,8 @@ import 'package:targafy/widgets/rating_list_display.dart';
 import 'package:targafy/widgets/sort_dropdown_list.dart'; // Adjust imports as per your project structure
 
 class FeedbackScreen extends ConsumerStatefulWidget {
-  const FeedbackScreen({Key? key}) : super(key: key);
-
+  final String? token;
+  const FeedbackScreen({this.token});
   @override
   ConsumerState<FeedbackScreen> createState() => _FeedbackScreenState();
 }
@@ -37,7 +37,7 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
     final selectedBusiness = selectedBusinessData?['business'] as Business?;
     final businessId = selectedBusiness?.id;
 
-    final asyncValue = ref.watch(businessAndUserProvider);
+    final asyncValue = ref.watch(businessAndUserProvider(widget.token!));
 
     // Extracting userName from asyncValue
     final User user = asyncValue.asData!.value['user'] as User;

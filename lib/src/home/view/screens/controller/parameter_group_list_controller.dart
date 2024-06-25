@@ -63,7 +63,7 @@ String domain = AppRemoteRoutes.baseUrl;
 class ApiService {
   Future<GroupResponse> fetchGroups(String businessId, String token) async {
     final url = Uri.parse(
-      '${domain}group/get-all-groups/$businessId',
+      '${domain}office/get-all-office/$businessId',
     );
 
     final response = await http.get(

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:http/http.dart' as http;
 import 'package:targafy/business_home_page/controller/business_controller.dart';
+import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/src/home/view/screens/controller/actual_predicted_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/data_of_subgroup_users_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/fetchSubGroup_controller.dart';
@@ -62,6 +60,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   late String selectedSubOffice;
   late String selectedSubgroupId;
 
+  bool _isRefreshing = false;
   @override
   void initState() {
     super.initState();
@@ -74,48 +73,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     selectedSubOffice = '';
     selectedSubgroupId = '';
     groupId = '';
-    _getToken();
+    // _getToken();
   }
 
-  Future<void> _getToken() async {
-    try {
-      String? fcmToken = await FirebaseMessaging.instance.getToken();
-      print('FCM Token: $fcmToken');
+  // Future<void> _refreshData() async {
+  //   // Here, you can invalidate any providers you need to refresh the data.
+  //   ref.invalidate(parameterListProvider);
+  //   ref.invalidate(GroupProvider);
+  //   ref.invalidate(subGroupDetailsProvider(IdForSubGroup));
+  //   ref.invalidate(userGroupProvider(IdForSubGroup));
+  //   ref.invalidate(userDataControllerProvider);
+  //   ref.invalidate(dataAddedControllerProvider);
+  //   ref.invalidate(SubGroupDataControllerProvider);
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? bearerToken = prefs.getString('authToken');
-
-      if (fcmToken != null && bearerToken != null) {
-        await _sendTokenToServer(fcmToken, bearerToken);
-      } else {
-        print('Failed to retrieve FCM token or bearer token.');
-      }
-    } catch (e) {
-      print('Error fetching token: $e');
-    }
-  }
-
-  Future<void> _sendTokenToServer(String fcmToken, String bearerToken) async {
-    try {
-      final url = Uri.parse('${domain}user/update/fcmToken?fcmToken=$fcmToken');
-
-      final response = await http.patch(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $bearerToken',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        print('Token sent successfully.');
-      } else {
-        print('Failed to send token: ${response.statusCode} ${response.body}');
-      }
-    } catch (e) {
-      print('Error sending token to server: $e');
-    }
-  }
+  //   // You can also add any additional logic you need for refreshing data.
+  // }
 
   static const List<String> images = [
     'assets/img/line_chart_invert.png',
@@ -196,6 +168,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  Future<void> _handleRefresh() async {
+    setState(() {
+      _isRefreshing = true;
+    });
+
+    // Perform your refresh logic here
+    await Future.delayed(Duration(seconds: 2)); // Simulating delay
+
+    setState(() {
+      _isRefreshing = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final parameterListAsync = ref.watch(parameterListProvider);
@@ -205,532 +190,714 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final businessId = selectedBusinessData?['business']?.id;
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: MediaQuery.of(context).size.height * 0.04,
-              margin: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.035,
-              ).copyWith(
-                top: MediaQuery.of(context).size.height * 0.03,
-              ),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: images.length,
-                itemBuilder: (context, index) {
-                  if (!selectedStates.contains(true) && images.isNotEmpty) {
-                    selectedStates[0] = true;
-                  }
-
-                  return SelectableChartWidget(
-                    imagePath: images[index],
-                    isSelected: selectedStates[index],
-                    onTap: () => handleTapForCharts(index),
-                  );
-                },
-              ),
-            ),
-            parameterListAsync.when(
-              data: (parameterList) {
-                // if (selectedParameter.isEmpty && parameterList.isNotEmpty) {
-                //   selectedParameter = parameterList[0].name;
-
-                //   ref.invalidate(GroupProvider);
-                // }
-                return Container(
-                  height: MediaQuery.of(context).size.height * 0.04,
-                  margin: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.035,
-                  ).copyWith(
-                    top: MediaQuery.of(context).size.height * 0.01,
-                  ),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: parameterList.length,
-                    itemBuilder: (context, index) {
-                      final parameterName = parameterList[index].name;
-                      return SelectableParameterWidget(
-                        text: parameterName,
-                        isSelected: parameterName == selectedParameter,
-                        onTap: () => _handleTapForParameters(parameterName),
-                      );
-                    },
-                  ),
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stackTrace) => Center(child: Text('')),
-              // Center(child: Text('Error: $error')),
-            ),
-            if (selectedParameter.isNotEmpty)
-              ref.watch(GroupProvider).when(
-                    data: (Groups) {
-                      // if (selectedGroup.isEmpty && Groups.isNotEmpty) {
-                      //   selectedGroup = Groups[0].headOfficeName;
-                      //   IdForSubGroup = Groups[0].id;
-                      //   groupId = Groups[0].id;
-                      //   ref.invalidate(subGroupDetailsProvider(IdForSubGroup));
-                      // }
-                      return Container(
-                        height: MediaQuery.of(context).size.height * 0.04,
-                        margin: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width * 0.035,
-                        ).copyWith(
-                          top: MediaQuery.of(context).size.height * 0.01,
-                        ),
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: Groups.length,
-                          itemBuilder: (context, index) {
-                            final GroupName = Groups[index].headOfficeName;
-                            final parentGroupId = Groups[index].id;
-                            return SelectableSubGroupWidget(
-                              text: GroupName,
-                              isSelected: GroupName == selectedGroup,
-                              onTap: () =>
-                                  _handleTapForGroups(GroupName, parentGroupId),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (error, stackTrace) => Center(child: Text('')),
-                    // Center(child: Text('Error: $error')),
-                  ),
-            if (selectedGroup.isNotEmpty && selectedParameter.isNotEmpty)
-              ref.watch(subGroupDetailsProvider(IdForSubGroup)).when(
-                    data: (SubGroup) {
-                      // if (selectedSubOffice.isEmpty && SubGroup.isNotEmpty) {
-                      //   selectedSubOffice = SubGroup[0].subOfficeName;
-                      //   selectedSubgroupId = SubGroup[0].groupId;
-                      //   ref.invalidate(userGroupProvider(IdForSubGroup));
-                      // }
-                      return Container(
-                        height: MediaQuery.of(context).size.height * 0.04,
-                        margin: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width * 0.035,
-                        ).copyWith(
-                          top: MediaQuery.of(context).size.height * 0.01,
-                        ),
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: SubGroup.length,
-                          itemBuilder: (context, index) {
-                            final subofficeName = SubGroup[index].subOfficeName;
-                            final subgroupId = SubGroup[index].groupId;
-                            return SelectableUsername(
-                              text: subofficeName,
-                              isSelected: subofficeName == selectedSubOffice,
-                              onTap: () =>
-                                  _handleSubGroupTap(subofficeName, subgroupId),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (error, stackTrace) =>
-                        Center(child: Text('Error: $error')),
-                  ),
-            if (selectedSubOffice.isNotEmpty &&
-                selectedParameter.isNotEmpty &&
-                selectedGroup.isNotEmpty)
-              ref.watch(userGroupProvider(IdForSubGroup)).when(
-                    data: (userGroup) {
-                      // if (selectedUser.isEmpty &&
-                      //     userGroup.businessUsers.isNotEmpty) {
-                      //   selectedUser = userGroup.businessUsers[0].name;
-                      //   selectedUserId = userGroup.users[0].id;
-                      // }
-                      return Container(
-                        height: MediaQuery.of(context).size.height * 0.04,
-                        margin: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width * 0.035,
-                        ).copyWith(
-                          top: MediaQuery.of(context).size.height * 0.01,
-                        ),
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: userGroup.businessUsers.length,
-                          itemBuilder: (context, index) {
-                            final businessUser = userGroup.businessUsers[index];
-                            final userid = userGroup.users[index].id;
-                            final username = businessUser.name;
-                            return SelectableUsername(
-                              text: username,
-                              isSelected: username == selectedUser,
-                              onTap: () => _handleUserTap(username, userid),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (error, stackTrace) => Center(child: Text('')),
-                    // Center(child: Text('Error: $error')),
-                  ),
-            if (selectedStates.isNotEmpty &&
-                selectedStates[0] &&
-                selectedParameter.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: CustomChart(
-                  parameter: '',
-                  actualData: [],
-                  predictedData: [],
-                ),
-              ),
-            if (selectedStates.isNotEmpty &&
-                selectedStates[0] &&
-                selectedParameter.isNotEmpty &&
-                selectedGroup.isEmpty &&
-                selectedSubOffice.isEmpty &&
-                selectedUser.isEmpty)
-              FutureBuilder(
-                future: dataAddedController.fetchDataAdded(
-                    businessId, selectedParameter),
-                builder: (context,
-                    AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
-                    final data = snapshot.data!;
-                    print(data);
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: CustomChart(
-                        parameter: selectedParameter,
-                        actualData: data['userEntries'] ?? [],
-                        predictedData: data['dailyTarget'] ?? [],
-                      ),
-                    );
-                  }
-                },
-              ),
-            if (selectedStates.isNotEmpty &&
-                selectedStates[3] &&
-                selectedParameter.isNotEmpty &&
-                selectedGroup.isEmpty &&
-                selectedSubOffice.isEmpty &&
-                selectedUser.isEmpty)
-              FutureBuilder(
-                future: dataAddedController.fetchDataAdded(
-                    businessId, selectedParameter),
-                builder: (context,
-                    AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
-                    final data = snapshot.data!;
-                    print(data);
-                    return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: PiechartGraph(
-                          parameter: selectedParameter,
-                          actualData: data['userEntries'] ?? [],
-                        ));
-                  }
-                },
-              ),
-            if (selectedStates.isNotEmpty &&
-                selectedStates[1] &&
-                selectedParameter.isNotEmpty &&
-                selectedGroup.isEmpty &&
-                selectedSubOffice.isEmpty &&
-                selectedUser.isEmpty)
-              FutureBuilder(
-                future: dataAddedController.fetchDataAdded(
-                    businessId, selectedParameter),
-                builder: (context,
-                    AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
-                    final data = snapshot.data!;
-                    print(data);
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: DataTableWidget(
-                          parameter: selectedParameter,
-                          actualData: data['userEntries'] ?? [],
-                          predictedData: data['dailyTarget'] ?? []),
-                    );
-                  }
-                },
-              ),
-            if (selectedStates.isNotEmpty &&
-                selectedStates[0] &&
-                selectedParameter.isNotEmpty &&
-                selectedGroup.isNotEmpty &&
-                selectedSubOffice.isEmpty &&
-                selectedUser.isEmpty)
-              FutureBuilder(
-                future: SubGroupDataController.fetchDataAdded(
-                    groupId, selectedParameter),
-                builder: (context,
-                    AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
-                    final data = snapshot.data!;
-                    print(data);
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: CustomChart(
-                        parameter: selectedParameter,
-                        actualData: data['userEntries'] ?? [],
-                        predictedData: data['dailyTarget'] ?? [],
-                      ),
-                    );
-                  }
-                },
-              ),
-            if (selectedStates.isNotEmpty &&
-                selectedStates[0] &&
-                selectedParameter.isNotEmpty &&
-                selectedGroup.isNotEmpty &&
-                selectedSubOffice.isNotEmpty &&
-                selectedUser.isEmpty)
-              FutureBuilder(
-                future: SubGroupDataController.fetchDataAdded(
-                    selectedSubgroupId, selectedParameter),
-                builder: (context,
-                    AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
-                    final data = snapshot.data!;
-                    print(data);
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: CustomChart(
-                        parameter: selectedParameter,
-                        actualData: data['userEntries'] ?? [],
-                        predictedData: data['dailyTarget'] ?? [],
-                      ),
-                    );
-                  }
-                },
-              ),
-            if (selectedStates.isNotEmpty &&
-                selectedStates[1] &&
-                selectedParameter.isNotEmpty &&
-                selectedGroup.isNotEmpty &&
-                selectedSubOffice.isNotEmpty &&
-                selectedUser.isEmpty)
-              FutureBuilder(
-                future: SubGroupDataController.fetchDataAdded(
-                    selectedSubgroupId, selectedParameter),
-                builder: (context,
-                    AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
-                    final data = snapshot.data!;
-                    print(data);
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: DataTableWidget(
-                        parameter: selectedParameter,
-                        actualData: data['userEntries'] ?? [],
-                        predictedData: data['dailyTarget'] ?? [],
-                      ),
-                    );
-                  }
-                },
-              ),
-            if (selectedStates.isNotEmpty &&
-                selectedStates[3] &&
-                selectedParameter.isNotEmpty &&
-                selectedGroup.isNotEmpty &&
-                selectedSubOffice.isNotEmpty &&
-                selectedUser.isEmpty)
-              FutureBuilder(
-                future: SubGroupDataController.fetchDataAdded(
-                    selectedSubgroupId, selectedParameter),
-                builder: (context,
-                    AsyncSnapshot<Map<String, List<List<dynamic>>>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
-                    final data = snapshot.data!;
-                    print(data);
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: PiechartGraph(
-                        parameter: selectedParameter,
-                        actualData: data['userEntries'] ?? [],
-                        // predictedData: data['dailyTarget'] ?? [],
-                      ),
-                    );
-                  }
-                },
-              ),
-            if (selectedStates.isNotEmpty &&
-                selectedStates[0] &&
-                selectedParameter.isNotEmpty &&
-                selectedGroup.isNotEmpty &&
-                selectedSubOffice.isNotEmpty &&
-                selectedUser.isNotEmpty)
-              FutureBuilder<Map<String, List<List<dynamic>>>>(
-                future: ref.read(userDataControllerProvider).fetchUserData(
-                    businessId!, selectedParameter, selectedUserId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (snapshot.hasData) {
-                    final data = snapshot.data!;
-                    //       return Padding(
-                    //         padding: const EdgeInsets.all(8.0),
-                    //         child: CustomChart(
-                    //           parameter: selectedParameter,
-                    //           actualData: data['userEntries'] ?? [],
-                    //           predictedData: data['dailyTarget'] ?? [],
-                    //         ),
-                    //       );
-                    //     } else {
-                    //       return const Center(child: Text('No data available'));
-                    //     }
-                    //   },
-                    // ),
-                    return Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: CustomChart(
-                            parameter: selectedParameter,
-                            actualData: data['userEntries'] ?? [],
-                            predictedData: data['dailyTarget'] ?? [],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Graphicalstatistics(
-                            parameter: selectedParameter,
-                            actualData: data['userEntries'] ?? [],
-                            predictedData: data['dailyTarget'] ?? [],
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return const Center(child: Text('No data available'));
-                  }
-                },
-              ),
-            if (selectedStates.isNotEmpty &&
-                selectedStates[1] &&
-                selectedParameter.isNotEmpty &&
-                selectedUser.isNotEmpty)
-              FutureBuilder<Map<String, List<List<dynamic>>>>(
-                future: ref.read(userDataControllerProvider).fetchUserData(
-                    businessId!, selectedParameter, selectedUserId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (snapshot.hasData) {
-                    final data = snapshot.data!;
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: DataTableWidget(
-                        parameter: selectedParameter,
-                        actualData: data['userEntries'] ?? [],
-                        predictedData: data['dailyTarget'] ?? [],
-                      ),
-                    );
-                  } else {
-                    return const Center(child: Text('No data available'));
-                  }
-                },
-              ),
-            if (selectedStates.isNotEmpty &&
-                selectedStates[3] &&
-                selectedParameter.isNotEmpty &&
-                selectedUser.isNotEmpty)
-              FutureBuilder<Map<String, List<List<dynamic>>>>(
-                future: ref.read(userDataControllerProvider).fetchUserData(
-                    businessId!, selectedParameter, selectedUserId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (snapshot.hasData) {
-                    final data = snapshot.data!;
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: PiechartGraph(
-                        parameter: selectedParameter,
-                        actualData: data['userEntries'] ?? [],
-                        // predictedData: data['dailyTarget'] ?? [],
-                      ),
-                    );
-                  } else {
-                    return const Center(child: Text('No data available'));
-                  }
-                },
-              ),
-            if (selectedStates[2])
-              Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Lottie.asset('assets/animations/empty_list.json',
-                        height: 200, width: 200),
-                    const Text(
-                      "Nothing to display",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            if (selectedStates[4])
-              Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Lottie.asset('assets/animations/empty_list.json',
-                        height: 200, width: 200),
-                    const Text(
-                      "Nothing to display",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+      body: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        child: _isRefreshing
+            ? Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
                 ),
               )
-          ],
-        ),
+            : SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                      margin: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.035,
+                      ).copyWith(
+                        top: MediaQuery.of(context).size.height * 0.03,
+                      ),
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: images.length,
+                        itemBuilder: (context, index) {
+                          if (!selectedStates.contains(true) &&
+                              images.isNotEmpty) {
+                            selectedStates[0] = true;
+                          }
+
+                          return SelectableChartWidget(
+                            imagePath: images[index],
+                            isSelected: selectedStates[index],
+                            onTap: () => handleTapForCharts(index),
+                          );
+                        },
+                      ),
+                    ),
+                    parameterListAsync.when(
+                      data: (parameterList) {
+                        // if (selectedParameter.isEmpty && parameterList.isNotEmpty) {
+                        //   selectedParameter = parameterList[0].name;
+
+                        //   ref.invalidate(GroupProvider);
+                        // }
+                        return Container(
+                          height: MediaQuery.of(context).size.height * 0.04,
+                          margin: EdgeInsets.symmetric(
+                            horizontal:
+                                MediaQuery.of(context).size.width * 0.035,
+                          ).copyWith(
+                            top: MediaQuery.of(context).size.height * 0.01,
+                          ),
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: parameterList.length,
+                            itemBuilder: (context, index) {
+                              final parameterName = parameterList[index].name;
+                              return SelectableParameterWidget(
+                                text: parameterName,
+                                isSelected: parameterName == selectedParameter,
+                                onTap: () =>
+                                    _handleTapForParameters(parameterName),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (error, stackTrace) => Center(child: Text('')),
+                      // Center(child: Text('Error: $error')),
+                    ),
+                    if (selectedParameter.isNotEmpty)
+                      ref.watch(GroupProvider).when(
+                            data: (Groups) {
+                              // if (selectedGroup.isEmpty && Groups.isNotEmpty) {
+                              //   selectedGroup = Groups[0].headOfficeName;
+                              //   IdForSubGroup = Groups[0].id;
+                              //   groupId = Groups[0].id;
+                              //   ref.invalidate(subGroupDetailsProvider(IdForSubGroup));
+                              // }
+                              return Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.04,
+                                margin: EdgeInsets.symmetric(
+                                  horizontal:
+                                      MediaQuery.of(context).size.width * 0.035,
+                                ).copyWith(
+                                  top:
+                                      MediaQuery.of(context).size.height * 0.01,
+                                ),
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: Groups.length,
+                                  itemBuilder: (context, index) {
+                                    final GroupName =
+                                        Groups[index].headOfficeName;
+                                    final parentGroupId = Groups[index].id;
+                                    return SelectableSubGroupWidget(
+                                      text: GroupName,
+                                      isSelected: GroupName == selectedGroup,
+                                      onTap: () => _handleTapForGroups(
+                                          GroupName, parentGroupId),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            loading: () => const Center(
+                                child: CircularProgressIndicator()),
+                            error: (error, stackTrace) =>
+                                Center(child: Text('')),
+                            // Center(child: Text('Error: $error')),
+                          ),
+                    if (selectedGroup.isNotEmpty &&
+                        selectedParameter.isNotEmpty)
+                      ref.watch(subGroupDetailsProvider(IdForSubGroup)).when(
+                            data: (SubGroup) {
+                              // if (selectedSubOffice.isEmpty && SubGroup.isNotEmpty) {
+                              //   selectedSubOffice = SubGroup[0].subOfficeName;
+                              //   selectedSubgroupId = SubGroup[0].groupId;
+                              //   ref.invalidate(userGroupProvider(IdForSubGroup));
+                              // }
+                              return Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.04,
+                                margin: EdgeInsets.symmetric(
+                                  horizontal:
+                                      MediaQuery.of(context).size.width * 0.035,
+                                ).copyWith(
+                                  top:
+                                      MediaQuery.of(context).size.height * 0.01,
+                                ),
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: SubGroup.length,
+                                  itemBuilder: (context, index) {
+                                    final subofficeName =
+                                        SubGroup[index].subOfficeName;
+                                    final subgroupId = SubGroup[index].groupId;
+                                    return SelectableUsername(
+                                      text: subofficeName,
+                                      isSelected:
+                                          subofficeName == selectedSubOffice,
+                                      onTap: () => _handleSubGroupTap(
+                                          subofficeName, subgroupId),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            loading: () => const Center(
+                                child: CircularProgressIndicator()),
+                            error: (error, stackTrace) =>
+                                Center(child: Text('')),
+                          ),
+         
+
+                    if (selectedSubOffice.isNotEmpty &&
+                        selectedParameter.isNotEmpty &&
+                        selectedGroup.isNotEmpty)
+                      ref.watch(userGroupProvider(groupId)).when(
+                            data: (userGroup) {
+                              // if (selectedUser.isEmpty &&
+                              //     userGroup.businessUsers.isNotEmpty) {
+                              //   selectedUser = userGroup.businessUsers[0].name;
+                              //   selectedUserId = userGroup.users[0].id;
+                              // }
+                              return Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.04,
+                                margin: EdgeInsets.symmetric(
+                                  horizontal:
+                                      MediaQuery.of(context).size.width * 0.035,
+                                ).copyWith(
+                                  top:
+                                      MediaQuery.of(context).size.height * 0.01,
+                                ),
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: userGroup.businessUsers.length,
+                                  itemBuilder: (context, index) {
+                                    final businessUser =
+                                        userGroup.businessUsers[index];
+                                    final userid = userGroup.users[index].id;
+                                    final username = businessUser.name;
+                                    return SelectableUsername(
+                                      text: username,
+                                      isSelected: username == selectedUser,
+                                      onTap: () =>
+                                          _handleUserTap(username, userid),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            loading: () => const Center(
+                                child: CircularProgressIndicator()),
+                            error: (error, stackTrace) =>
+                                Center(child: Text('')),
+                            // Center(child: Text('Error: $error')),
+                          ),
+                    if (selectedSubOffice.isEmpty &&
+                        selectedParameter.isNotEmpty &&
+                        selectedGroup.isNotEmpty)
+                      ref.watch(userGroupProvider(IdForSubGroup)).when(
+                            data: (userGroup) {
+                              // if (selectedUser.isEmpty &&
+                              //     userGroup.businessUsers.isNotEmpty) {
+                              //   selectedUser = userGroup.businessUsers[0].name;
+                              //   selectedUserId = userGroup.users[0].id;
+                              // }
+                              return Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.04,
+                                margin: EdgeInsets.symmetric(
+                                  horizontal:
+                                      MediaQuery.of(context).size.width * 0.035,
+                                ).copyWith(
+                                  top:
+                                      MediaQuery.of(context).size.height * 0.01,
+                                ),
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: userGroup.businessUsers.length,
+                                  itemBuilder: (context, index) {
+                                    final businessUser =
+                                        userGroup.businessUsers[index];
+                                    final userid = userGroup.users[index].id;
+                                    final username = businessUser.name;
+                                    return SelectableUsername(
+                                      text: username,
+                                      isSelected: username == selectedUser,
+                                      onTap: () =>
+                                          _handleUserTap(username, userid),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            loading: () => const Center(
+                                child: CircularProgressIndicator()),
+                            error: (error, stackTrace) =>
+                                Center(child: Text('')),
+                            // Center(child: Text('Error: $error')),
+                          ),
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[0] &&
+                        selectedParameter.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CustomChart(
+                          parameter: '',
+                          actualData: [],
+                          predictedData: [],
+                        ),
+                      ),
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[0] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedGroup.isEmpty &&
+                        selectedSubOffice.isEmpty &&
+                        selectedUser.isEmpty)
+                      FutureBuilder(
+                        future: dataAddedController.fetchDataAdded(
+                            businessId, selectedParameter),
+                        builder: (context,
+                            AsyncSnapshot<Map<String, List<List<dynamic>>>>
+                                snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else {
+                            final data = snapshot.data!;
+                            print(data);
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: CustomChart(
+                                parameter: selectedParameter,
+                                actualData: data['userEntries'] ?? [],
+                                predictedData: data['dailyTarget'] ?? [],
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[3] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedGroup.isEmpty &&
+                        selectedSubOffice.isEmpty &&
+                        selectedUser.isEmpty)
+                      FutureBuilder(
+                        future: dataAddedController.fetchDataAdded(
+                            businessId, selectedParameter),
+                        builder: (context,
+                            AsyncSnapshot<Map<String, List<List<dynamic>>>>
+                                snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else {
+                            final data = snapshot.data!;
+                            print(data);
+                            return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: PiechartGraph(
+                                  parameter: selectedParameter,
+                                  actualData: data['userEntries'] ?? [],
+                                ));
+                          }
+                        },
+                      ),
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[1] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedGroup.isEmpty &&
+                        selectedSubOffice.isEmpty &&
+                        selectedUser.isEmpty)
+                      FutureBuilder(
+                        future: dataAddedController.fetchDataAdded(
+                            businessId, selectedParameter),
+                        builder: (context,
+                            AsyncSnapshot<Map<String, List<List<dynamic>>>>
+                                snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else {
+                            final data = snapshot.data!;
+                            print(data);
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DataTableWidget(
+                                  parameter: selectedParameter,
+                                  actualData: data['userEntries'] ?? [],
+                                  predictedData: data['dailyTarget'] ?? []),
+                            );
+                          }
+                        },
+                      ),
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[0] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedGroup.isNotEmpty &&
+                        selectedSubOffice.isEmpty &&
+                        selectedUser.isEmpty)
+                      FutureBuilder(
+                        future: SubGroupDataController.fetchDataAdded(
+                            groupId, selectedParameter),
+                        builder: (context,
+                            AsyncSnapshot<Map<String, List<List<dynamic>>>>
+                                snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else {
+                            final data = snapshot.data!;
+                            print(data);
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: CustomChart(
+                                parameter: selectedParameter,
+                                actualData: data['userEntries'] ?? [],
+                                predictedData: data['dailyTarget'] ?? [],
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[0] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedGroup.isNotEmpty &&
+                        selectedSubOffice.isNotEmpty &&
+                        selectedUser.isEmpty)
+                      FutureBuilder(
+                        future: SubGroupDataController.fetchDataAdded(
+                            selectedSubgroupId, selectedParameter),
+                        builder: (context,
+                            AsyncSnapshot<Map<String, List<List<dynamic>>>>
+                                snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else {
+                            final data = snapshot.data!;
+                            print(data);
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: CustomChart(
+                                parameter: selectedParameter,
+                                actualData: data['userEntries'] ?? [],
+                                predictedData: data['dailyTarget'] ?? [],
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[1] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedGroup.isNotEmpty &&
+                        selectedSubOffice.isNotEmpty &&
+                        selectedUser.isEmpty)
+                      FutureBuilder(
+                        future: SubGroupDataController.fetchDataAdded(
+                            selectedSubgroupId, selectedParameter),
+                        builder: (context,
+                            AsyncSnapshot<Map<String, List<List<dynamic>>>>
+                                snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else {
+                            final data = snapshot.data!;
+                            print(data);
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DataTableWidget(
+                                parameter: selectedParameter,
+                                actualData: data['userEntries'] ?? [],
+                                predictedData: data['dailyTarget'] ?? [],
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[3] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedGroup.isNotEmpty &&
+                        selectedSubOffice.isNotEmpty &&
+                        selectedUser.isEmpty)
+                      FutureBuilder(
+                        future: SubGroupDataController.fetchDataAdded(
+                            selectedSubgroupId, selectedParameter),
+                        builder: (context,
+                            AsyncSnapshot<Map<String, List<List<dynamic>>>>
+                                snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else {
+                            final data = snapshot.data!;
+                            print(data);
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: PiechartGraph(
+                                parameter: selectedParameter,
+                                actualData: data['userEntries'] ?? [],
+                                // predictedData: data['dailyTarget'] ?? [],
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[0] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedGroup.isNotEmpty &&
+                        selectedSubOffice.isNotEmpty &&
+                        selectedUser.isNotEmpty)
+                      FutureBuilder<Map<String, List<List<dynamic>>>>(
+                        future: ref
+                            .read(userDataControllerProvider)
+                            .fetchUserData(
+                                businessId!, selectedParameter, selectedUserId),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            final data = snapshot.data!;
+                            //       return Padding(
+                            //         padding: const EdgeInsets.all(8.0),
+                            //         child: CustomChart(
+                            //           parameter: selectedParameter,
+                            //           actualData: data['userEntries'] ?? [],
+                            //           predictedData: data['dailyTarget'] ?? [],
+                            //         ),
+                            //       );
+                            //     } else {
+                            //       return const Center(child: Text('No data available'));
+                            //     }
+                            //   },
+                            // ),
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: CustomChart(
+                                    parameter: selectedParameter,
+                                    actualData: data['userEntries'] ?? [],
+                                    predictedData: data['dailyTarget'] ?? [],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Graphicalstatistics(
+                                    parameter: selectedParameter,
+                                    actualData: data['userEntries'] ?? [],
+                                    predictedData: data['dailyTarget'] ?? [],
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return const Center(
+                                child: Text('No data available'));
+                          }
+                        },
+                      ),
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[0] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedGroup.isNotEmpty &&
+                        selectedSubOffice.isEmpty &&
+                        selectedUser.isNotEmpty)
+                      FutureBuilder<Map<String, List<List<dynamic>>>>(
+                        future: ref
+                            .read(userDataControllerProvider)
+                            .fetchUserData(
+                                businessId!, selectedParameter, selectedUserId),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            final data = snapshot.data!;
+                            //       return Padding(
+                            //         padding: const EdgeInsets.all(8.0),
+                            //         child: CustomChart(
+                            //           parameter: selectedParameter,
+                            //           actualData: data['userEntries'] ?? [],
+                            //           predictedData: data['dailyTarget'] ?? [],
+                            //         ),
+                            //       );
+                            //     } else {
+                            //       return const Center(child: Text('No data available'));
+                            //     }
+                            //   },
+                            // ),
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: CustomChart(
+                                    parameter: selectedParameter,
+                                    actualData: data['userEntries'] ?? [],
+                                    predictedData: data['dailyTarget'] ?? [],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Graphicalstatistics(
+                                    parameter: selectedParameter,
+                                    actualData: data['userEntries'] ?? [],
+                                    predictedData: data['dailyTarget'] ?? [],
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return const Center(
+                                child: Text('No data available'));
+                          }
+                        },
+                      ),
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[1] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedUser.isNotEmpty)
+                      FutureBuilder<Map<String, List<List<dynamic>>>>(
+                        future: ref
+                            .read(userDataControllerProvider)
+                            .fetchUserData(
+                                businessId!, selectedParameter, selectedUserId),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            final data = snapshot.data!;
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DataTableWidget(
+                                parameter: selectedParameter,
+                                actualData: data['userEntries'] ?? [],
+                                predictedData: data['dailyTarget'] ?? [],
+                              ),
+                            );
+                          } else {
+                            return const Center(
+                                child: Text('No data available'));
+                          }
+                        },
+                      ),
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[3] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedUser.isNotEmpty)
+                      FutureBuilder<Map<String, List<List<dynamic>>>>(
+                        future: ref
+                            .read(userDataControllerProvider)
+                            .fetchUserData(
+                                businessId!, selectedParameter, selectedUserId),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            final data = snapshot.data!;
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: PiechartGraph(
+                                parameter: selectedParameter,
+                                actualData: data['userEntries'] ?? [],
+                                // predictedData: data['dailyTarget'] ?? [],
+                              ),
+                            );
+                          } else {
+                            return const Center(
+                                child: Text('No data available'));
+                          }
+                        },
+                      ),
+                    if (selectedStates[2])
+                      Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Lottie.asset('assets/animations/empty_list.json',
+                                height: 200, width: 200),
+                            const Text(
+                              "Nothing to display",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    if (selectedStates[4])
+                      Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Lottie.asset('assets/animations/empty_list.json',
+                                height: 200, width: 200),
+                            const Text(
+                              "Nothing to display",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                  ],
+                ),
+              ),
       ),
     );
   }

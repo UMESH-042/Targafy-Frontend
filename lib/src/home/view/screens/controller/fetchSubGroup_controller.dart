@@ -10,20 +10,22 @@ final subGroupDetailsProvider =
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('authToken');
 
+  print('this is the parentGroupid for sub offices:- $parentGroupId');
+
   if (token == null) {
     throw Exception('Bearer token not found');
   }
 
   final response = await http.get(
-    Uri.parse('${domain}group/get-subgroup-details/$parentGroupId'),
+    Uri.parse('${domain}office/get-sublevel-office-name/$parentGroupId'),
     headers: {
       'Authorization': 'Bearer $token',
     },
   );
-
+  print(response.body);
   if (response.statusCode == 200) {
     final data = jsonDecode(response.body);
-    final subOffices = (data['data']['subOffices'] as List)
+    final subOffices = (data['data']['suboffices'] as List)
         .map((subOffice) => SubOffice.fromJson(subOffice))
         .toList();
     return subOffices;

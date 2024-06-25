@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/mandatory_Filed_name_controller.dart';
 import 'package:targafy/utils/remote_routes.dart';
+import 'package:targafy/widgets/submit_button.dart';
 
 String domain = AppRemoteRoutes.baseUrl;
 
@@ -160,7 +161,7 @@ class _AddscreenState extends ConsumerState<Addscreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton(
+                SubmitButton(
                   onPressed: () {
                     if (selectedParameter != null && businessId != null) {
                       final todayData = todayDataController.text;
@@ -192,13 +193,6 @@ class _AddscreenState extends ConsumerState<Addscreen> {
                       });
                     }
                   },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  child: const Text('Add Data'),
                 ),
               ],
             );

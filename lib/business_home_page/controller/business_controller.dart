@@ -11,10 +11,10 @@ import 'package:targafy/utils/remote_routes.dart';
 
 String domain = AppRemoteRoutes.baseUrl;
 
-final businessAndUserProvider =
-    StreamProvider<Map<String, dynamic>>((ref) async* {
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('authToken');
+final businessAndUserProvider = StreamProvider.autoDispose
+    .family<Map<String, dynamic>, String>((ref, token) async* {
+  // final prefs = await SharedPreferences.getInstance();
+  // final token = prefs.getString('authToken');
   print('this is the token for drawer:- $token');
   if (token == null) {
     throw Exception('No token found');
@@ -69,11 +69,41 @@ final currentBusinessProvider =
 // Function to update the currently selected business and userType
 Future<void> selectBusiness(Business business, String userType,
     String businessCode, WidgetRef ref) async {
-  final selectedBusinessData = {
-    'business': business.toJson(),
+  // final selectedBusinessData = {
+  //   'business': business,
+  //   'userType': userType,
+  //   'businessCode': businessCode,
+  // };
+  final Map<String, dynamic> selectedBusinessData = {
+    'business': Business(
+      id: business.id,
+      businessCode: business.businessCode,
+      name: business.name,
+      logo: business.logo,
+      industryType: business.industryType,
+      city: business.city,
+      country: business.country,
+    ),
     'userType': userType,
     'businessCode': businessCode,
   };
 
   ref.read(currentBusinessProvider.state).state = selectedBusinessData;
+}
+
+Future<void> clearSelectedBusiness(WidgetRef ref) async {
+  final Map<String, dynamic> selectedBusinessData = {
+    'business': Business(
+      id: '',
+      businessCode: '',
+      name: '',
+      logo: '',
+      industryType: '',
+      city: '',
+      country: '',
+    ),
+    'userType': '',
+    'businessCode': '',
+  };
+  ref.read(currentBusinessProvider.notifier).state = selectedBusinessData;
 }

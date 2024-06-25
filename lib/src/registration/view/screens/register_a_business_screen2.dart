@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/controller/create_business_controller.dart';
+import 'package:targafy/business_home_page/screens/next_page2_suboffice.dart';
+import 'package:targafy/business_home_page/screens/next_page_suboffice.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/shared/components/primary_button.dart';
@@ -38,6 +41,76 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
     });
   }
 
+  // Future<void> _createBusiness() async {
+  //   if (_image == null) {
+  //     // Show error if no image selected
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Please select a logo')),
+  //     );
+  //     return;
+  //   }
+
+  //   // Show loading dialog
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (BuildContext context) {
+  //       return Dialog(
+  //         child: Padding(
+  //           padding: const EdgeInsets.all(20.0),
+  //           child: Row(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               CircularProgressIndicator(),
+  //               SizedBox(width: 20),
+  //               Text("Creating Business..."),
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+
+  //   try {
+  //     SharedPreferences prefs = await SharedPreferences.getInstance();
+  //     String? bearerToken = prefs.getString('authToken');
+  //     final logoUrl =
+  //         await _createBusinessController.uploadLogo(File(_image!.path));
+  //     _createBusinessController.createBusiness(
+  //       buisnessName: _businessNameController.text,
+  //       logo: logoUrl,
+  //       industryType: _industryTypeController.text,
+  //       city: _cityController.text,
+  //       country: _countryController.text,
+  //       onCompletion: (isSuccess) {
+  //         Navigator.of(context).pop(); // Dismiss the loading dialog
+
+  //         if (isSuccess) {
+  //           Navigator.pushAndRemoveUntil(
+  //             context,
+  //             MaterialPageRoute(
+  //               builder: (context) => BottomNavigationAndAppBar(
+  //                 token: bearerToken,
+  //               ),
+  //             ),
+  //             (route) => false,
+  //           );
+  //         } else {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             SnackBar(content: Text('Failed to create business')),
+  //           );
+  //         }
+  //       },
+  //     );
+  //   } catch (e) {
+  //     Navigator.of(context).pop(); // Dismiss the loading dialog
+
+  //     print('Error: $e');
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Error: $e')),
+  //     );
+  //   }
+  // }
   Future<void> _createBusiness() async {
     if (_image == null) {
       // Show error if no image selected
@@ -69,32 +142,32 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
     );
 
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? bearerToken = prefs.getString('authToken');
       final logoUrl =
           await _createBusinessController.uploadLogo(File(_image!.path));
-      _createBusinessController.createBusiness(
+      final response = await _createBusinessController.createBusiness(
         buisnessName: _businessNameController.text,
         logo: logoUrl,
         industryType: _industryTypeController.text,
         city: _cityController.text,
         country: _countryController.text,
-        onCompletion: (isSuccess) {
-          Navigator.of(context).pop(); // Dismiss the loading dialog
-
-          if (isSuccess) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const BottomNavigationAndAppBar(),
-              ),
-              (route) => false,
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to create business')),
-            );
-          }
-        },
       );
+
+      Navigator.of(context).pop(); // Dismiss the loading dialog
+
+      if (response != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NextPage2(response: response),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create business')),
+        );
+      }
     } catch (e) {
       Navigator.of(context).pop(); // Dismiss the loading dialog
 

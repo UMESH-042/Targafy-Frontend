@@ -447,8 +447,8 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
 
-    final usersStream =
-        ref.watch(businessUsersStreamProvider(businessId ?? ''));
+    final usersStream2 =
+        ref.watch(businessUsersStreamProvider2(businessId ?? ''));
 
     const placeholderImageUrl =
         'https://randomuser.me/api/portraits/lego/2.jpg';
@@ -478,8 +478,8 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                           subject: 'Join our business on BizIssue');
                     },
                     style: ElevatedButton.styleFrom(
-                      padding:
-                          const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 16),
                       backgroundColor: lightblue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
@@ -525,8 +525,8 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      padding:
-                          const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 16),
                       backgroundColor: lightblue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
@@ -549,8 +549,8 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      padding:
-                          const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 16),
                       backgroundColor: lightblue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
@@ -568,7 +568,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
             SizedBox(
               height: getScreenheight(context) * 0.03,
             ),
-            usersStream.when(
+            usersStream2.when(
               data: (users) => Expanded(
                 child: ListView.separated(
                   itemCount: users.length,

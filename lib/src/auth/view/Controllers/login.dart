@@ -233,6 +233,24 @@ class LoginNotifier extends StateNotifier<LoginState> {
     return state.number.isNotEmpty && state.number.length == 10 && tnc;
   }
 
+  Future<void> logout(BuildContext context) async {
+    try {
+      // final sharedPrefs = await SharedPreferences.getInstance();
+      // await sharedPrefs.clear(); // Clear all shared preferences
+
+      state = LoginState(); // Reset login state to initial values
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      debugPrint("Error during logout: $e");
+      showSnackBar(context, "Failed to logout. Please try again.", Colors.red);
+    }
+  }
+
   // Future<void> logout(BuildContext context) async {
   //   try {
   //     final sharedPrefs = SharedPreferenceService();

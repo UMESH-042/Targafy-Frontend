@@ -258,7 +258,9 @@ class _RegisterABusinessScreen1State
                   if (isRegisterSelected) {
                     // Call the function to check business existence
                     final exists = await loginNotifier.checkBusinessExists();
-
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    String? bearerToken = prefs.getString('authToken');
                     if (exists) {
                       // Business already exists
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -274,18 +276,28 @@ class _RegisterABusinessScreen1State
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              const BottomNavigationAndAppBar(),
+                          builder: (context) => BottomNavigationAndAppBar(
+                            token: bearerToken,
+                          ),
                         ),
                         (route) => false,
                       );
                     } else {
                       // Navigate to the next screen if business does not exist
-                      Navigator.push(
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //       builder: (context) =>
+                      //           const RegisterABusinessScreen2()),
+                      // );
+                      Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                const RegisterABusinessScreen2()),
+                          builder: (context) => BottomNavigationAndAppBar(
+                            token: bearerToken,
+                          ),
+                        ),
+                        (route) => false,
                       );
                     }
                   } else if (!isRegisterSelected) {
@@ -329,6 +341,9 @@ class _RegisterABusinessScreen1State
                         // },
                         if (success) {
                           // Show success message in AlertDialog
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                          String? bearerToken = prefs.getString('authToken');
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
@@ -348,7 +363,9 @@ class _RegisterABusinessScreen1State
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            const BottomNavigationAndAppBar(),
+                                            BottomNavigationAndAppBar(
+                                          token: bearerToken,
+                                        ),
                                       ),
                                       (route) => false,
                                     );
