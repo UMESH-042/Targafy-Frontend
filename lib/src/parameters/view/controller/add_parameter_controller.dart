@@ -156,19 +156,32 @@ class ParameterNotifier extends StateNotifier<List<Parameter>> {
 
 
 
+// StateNotifier to manage the state of the parameters
+class ParametersNotifierHome extends StateNotifier<List<Parameter2>> {
+  ParametersNotifierHome() : super([]);
 
-// class Parameter {
-//   final String name;
-//   // Add other fields as necessary
+  Future<void> fetchParametersforHome(String businessId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
 
-//   Parameter({required this.name});
+    final response = await http.get(
+      Uri.parse('${domain}office/get-param-id/$businessId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
 
-//   factory Parameter.fromJson(Map<String, dynamic> json) {
-//     return Parameter(
-//       name: json['name'],
-//       // Initialize other fields as necessary
-//     );
-//   }
-// }
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body)['data']['level1'] as List;
+      state = data.map((json) => Parameter2.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load parameters');
+    }
+  }
+}
 
-
+// Create a provider for the ParametersNotifier
+final parametersProviderHome =
+    StateNotifierProvider<ParametersNotifierHome, List<Parameter2>>((ref) {
+  return ParametersNotifierHome();
+});

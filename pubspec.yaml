@@ -73,6 +73,8 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   flutter_local_notifications: ^17.1.2
   permission_handler: ^11.3.1
+  flutter_treeview: ^1.0.7+1
+  collection: ^1.18.0
 
 
 

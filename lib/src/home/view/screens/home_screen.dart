@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:graphview/GraphView.dart';
 import 'package:lottie/lottie.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/core/constants/colors.dart';
@@ -16,6 +17,8 @@ import 'package:targafy/src/home/view/widgets/selectable_sub_group.dart';
 import 'package:targafy/src/home/view/widgets/selectable_username.dart';
 import 'package:targafy/src/parameters/view/controller/add_parameter_controller.dart';
 import 'package:targafy/src/parameters/view/model/parameter_model.dart';
+import 'package:targafy/src/users/ui/controller/user_hierarchy_controller.dart';
+import 'package:targafy/src/users/ui/model/user_hierarchy_model.dart';
 import 'package:targafy/utils/remote_routes.dart';
 import 'widgets/CustomCharts.dart';
 import 'widgets/DataTable.dart';
@@ -28,17 +31,30 @@ final selectedBusinessData = Provider<Map<String, dynamic>?>((ref) {
   return ref.watch(currentBusinessProvider);
 });
 
+// final parameterListProvider =
+//     FutureProvider.autoDispose<List<Parameter>>((ref) async {
+//   final selectedBusinessData = ref.watch(currentBusinessProvider);
+//   final businessId = selectedBusinessData?['business']?.id;
+
+//   if (businessId != null) {
+//     final notifier = ref.read(parameterNotifierProvider.notifier);
+//     await notifier.fetchParameters(businessId);
+//     return ref.watch(parameterNotifierProvider);
+//   } else {
+//     return <Parameter>[];
+//   }
+// });
 final parameterListProvider =
-    FutureProvider.autoDispose<List<Parameter>>((ref) async {
+    FutureProvider.autoDispose<List<Parameter2>>((ref) async {
   final selectedBusinessData = ref.watch(currentBusinessProvider);
   final businessId = selectedBusinessData?['business']?.id;
 
   if (businessId != null) {
-    final notifier = ref.read(parameterNotifierProvider.notifier);
-    await notifier.fetchParameters(businessId);
-    return ref.watch(parameterNotifierProvider);
+    final notifier = ref.read(parametersProviderHome.notifier);
+    await notifier.fetchParametersforHome(businessId);
+    return ref.watch(parametersProviderHome);
   } else {
-    return <Parameter>[];
+    return <Parameter2>[];
   }
 });
 
@@ -59,8 +75,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   late String selectedUserId;
   late String selectedSubOffice;
   late String selectedSubgroupId;
+  late String selectedparameterId;
+  int currentIndex = 0;
+  Map<String, bool> expandedNodes = {};
 
   bool _isRefreshing = false;
+
   @override
   void initState() {
     super.initState();
@@ -73,21 +93,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     selectedSubOffice = '';
     selectedSubgroupId = '';
     groupId = '';
+    selectedparameterId = '';
+
     // _getToken();
   }
-
-  // Future<void> _refreshData() async {
-  //   // Here, you can invalidate any providers you need to refresh the data.
-  //   ref.invalidate(parameterListProvider);
-  //   ref.invalidate(GroupProvider);
-  //   ref.invalidate(subGroupDetailsProvider(IdForSubGroup));
-  //   ref.invalidate(userGroupProvider(IdForSubGroup));
-  //   ref.invalidate(userDataControllerProvider);
-  //   ref.invalidate(dataAddedControllerProvider);
-  //   ref.invalidate(SubGroupDataControllerProvider);
-
-  //   // You can also add any additional logic you need for refreshing data.
-  // }
 
   static const List<String> images = [
     'assets/img/line_chart_invert.png',
@@ -108,7 +117,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
-  Future<void> _handleTapForParameters(String parameterName) async {
+  Future<void> _handleTapForParameters(
+      String parameterName, String paramId) async {
     setState(() {
       selectedParameter =
           selectedParameter == parameterName ? '' : parameterName;
@@ -116,25 +126,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
 
     if (selectedParameter.isNotEmpty) {
-      ref.invalidate(GroupProvider);
+      selectedparameterId = paramId;
+      // ref.invalidate(GroupProvider);
     }
   }
 
-  Future<void> _handleTapForGroups(
-      String GroupName, String parentGroupId) async {
+  Future<void> _handleTapForGroups(String GroupName) async {
     setState(() {
       selectedGroup = selectedGroup == GroupName ? '' : GroupName;
+      currentIndex++;
     });
-
-    if (selectedGroup.isNotEmpty) {
-      IdForSubGroup = parentGroupId;
-      groupId = parentGroupId;
-      print('this is the parent Group Id :- ${IdForSubGroup}');
-    }
-
-    if (selectedGroup.isNotEmpty) {
-      ref.invalidate(subGroupDetailsProvider(IdForSubGroup));
-    }
   }
 
   void _handleUserTap(String username, String userId) {
@@ -181,6 +182,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
+  void _toggleNodeExpansion(String nodeId) {
+    setState(() {
+      expandedNodes[nodeId] = !(expandedNodes[nodeId] ?? false);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final parameterListAsync = ref.watch(parameterListProvider);
@@ -188,6 +195,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final SubGroupDataController = ref.read(SubGroupDataControllerProvider);
     final selectedBusinessData = ref.watch(currentBusinessProvider);
     final businessId = selectedBusinessData?['business']?.id;
+    final hierarchyAsync = businessId != null
+        ? ref
+            .read(businessControllerProvider.notifier)
+            .fetchBusinessUserHierarchy(businessId)
+        : null;
 
     return Scaffold(
       body: RefreshIndicator(
@@ -245,11 +257,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             itemCount: parameterList.length,
                             itemBuilder: (context, index) {
                               final parameterName = parameterList[index].name;
+                              final paramId = parameterList[index].id;
+                              print('This is param Id :-$paramId');
                               return SelectableParameterWidget(
                                 text: parameterName,
                                 isSelected: parameterName == selectedParameter,
-                                onTap: () =>
-                                    _handleTapForParameters(parameterName),
+                                onTap: () => _handleTapForParameters(
+                                    parameterName, paramId),
                               );
                             },
                           ),
@@ -260,48 +274,181 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       error: (error, stackTrace) => Center(child: Text('')),
                       // Center(child: Text('Error: $error')),
                     ),
-                    if (selectedParameter.isNotEmpty)
-                      ref.watch(GroupProvider).when(
-                            data: (Groups) {
-                              // if (selectedGroup.isEmpty && Groups.isNotEmpty) {
-                              //   selectedGroup = Groups[0].headOfficeName;
-                              //   IdForSubGroup = Groups[0].id;
-                              //   groupId = Groups[0].id;
-                              //   ref.invalidate(subGroupDetailsProvider(IdForSubGroup));
-                              // }
-                              return Container(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.04,
-                                margin: EdgeInsets.symmetric(
-                                  horizontal:
-                                      MediaQuery.of(context).size.width * 0.035,
-                                ).copyWith(
-                                  top:
-                                      MediaQuery.of(context).size.height * 0.01,
-                                ),
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: Groups.length,
-                                  itemBuilder: (context, index) {
-                                    final GroupName =
-                                        Groups[index].headOfficeName;
-                                    final parentGroupId = Groups[index].id;
-                                    return SelectableSubGroupWidget(
-                                      text: GroupName,
-                                      isSelected: GroupName == selectedGroup,
-                                      onTap: () => _handleTapForGroups(
-                                          GroupName, parentGroupId),
-                                    );
-                                  },
-                                ),
+                    // ref.watch(businessControllerProvider).when(
+                    //       data: (hierarchy) {
+                    //         final nodes = hierarchy.nodes;
+                    //         final edges = hierarchy.edges;
+
+                    //         // Create a map to store node labels by ID for quick access
+                    //         final Map<String, String> nodeIdToLabel =
+                    //             Map.fromEntries(
+                    //           nodes.map(
+                    //               (node) => MapEntry(node.id, node.label.name)),
+                    //         );
+
+                    //         // Initialize the hierarchy array with empty strings
+                    //         List<List<String>> hierarchyArray = List.generate(
+                    //           nodes.length,
+                    //           (_) => List.filled(nodes.length, ''),
+                    //         );
+
+                    //         // Populate hierarchyArray with non-empty node labels
+                    //         for (var edge in edges) {
+                    //           final fromIndex = nodes
+                    //               .indexWhere((node) => node.id == edge.from);
+                    //           final toIndex = nodes
+                    //               .indexWhere((node) => node.id == edge.to);
+
+                    //           if (fromIndex != -1 && toIndex != -1) {
+                    //             final label = nodeIdToLabel[edge.to];
+                    //             if (label != null) {
+                    //               hierarchyArray[fromIndex][toIndex] = label;
+                    //             }
+                    //           }
+                    //         }
+
+                    //         // Build UI based on hierarchyArray
+                    //         return Container(
+                    //           margin: EdgeInsets.symmetric(
+                    //             horizontal:
+                    //                 MediaQuery.of(context).size.width * 0.035,
+                    //           ).copyWith(
+                    //             top: MediaQuery.of(context).size.height * 0.01,
+                    //           ),
+                    //           child: SingleChildScrollView(
+                    //             scrollDirection: Axis.horizontal,
+                    //             child: Column(
+                    //               children: [
+                    //                 // Display the first level (level1) with only the root node
+                    //                 Padding(
+                    //                   padding: const EdgeInsets.symmetric(
+                    //                       vertical: 8.0),
+                    //                   child: Row(
+                    //                     children: [
+                    //                       SizedBox(
+                    //                         width: MediaQuery.of(context)
+                    //                                 .size
+                    //                                 .width *
+                    //                             0.035,
+                    //                       ),
+                    //                       SelectableSubGroupWidget(
+                    //                         text: nodes[0].label.name.isNotEmpty
+                    //                             ? nodes[0].label.name
+                    //                             : '-',
+                    //                         isSelected: nodes[0].label.name ==
+                    //                             selectedGroup,
+                    //                         onTap: () {},
+                    //                       ),
+                    //                     ],
+                    //                   ),
+                    //                 ),
+
+                    //                 // Display deeper levels using SelectableSubGroupWidget
+                    //                 ...hierarchyArray.map((row) {
+                    //                   return Padding(
+                    //                     padding: const EdgeInsets.symmetric(
+                    //                         vertical: 8.0),
+                    //                     child: Row(
+                    //                       children: row.map((name) {
+                    //                         return name.isNotEmpty
+                    //                             ? Padding(
+                    //                                 padding: const EdgeInsets
+                    //                                     .symmetric(
+                    //                                     horizontal: 4.0),
+                    //                                 child:
+                    //                                     SelectableSubGroupWidget(
+                    //                                   text: name,
+                    //                                   isSelected:
+                    //                                       name == selectedGroup,
+                    //                                   onTap: () {},
+                    //                                 ),
+                    //                               )
+                    //                             : SizedBox(
+                    //                                 width:
+                    //                                     0); // Replace empty cells with an empty SizedBox
+                    //                       }).toList(),
+                    //                     ),
+                    //                   );
+                    //                 }).toList(),
+                    //               ],
+                    //             ),
+                    //           ),
+                    //         );
+                    //       },
+                    //       loading: () =>
+                    //           const Center(child: CircularProgressIndicator()),
+                    //       error: (error, stackTrace) =>
+                    //           Center(child: Text('Error: $error')),
+                    //     ),
+                    ref.watch(businessControllerProvider).when(
+                          data: (hierarchy) {
+                            final nodes = hierarchy.nodes;
+                            final edges = hierarchy.edges;
+
+                            // Create a map to store node labels by ID for quick access
+                            final Map<String, String> nodeIdToLabel =
+                                Map.fromEntries(
+                              nodes.map(
+                                  (node) => MapEntry(node.id, node.label.name)),
+                            );
+
+                            // Create a map to store the children of each node
+                            final Map<String, List<String>> nodeChildren = {};
+
+                            for (var edge in edges) {
+                              if (!nodeChildren.containsKey(edge.from)) {
+                                nodeChildren[edge.from] = [];
+                              }
+                              nodeChildren[edge.from]!.add(edge.to);
+                            }
+
+                            Widget buildHierarchy(String nodeId) {
+                              final nodeName = nodeIdToLabel[nodeId] ?? '-';
+                              final isExpanded = expandedNodes[nodeId] ?? false;
+                              final children = nodeChildren[nodeId] ?? [];
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ListTile(
+                                    title: Text(nodeName),
+                                    trailing: isExpanded
+                                        ? Icon(Icons.expand_less)
+                                        : Icon(Icons.expand_more),
+                                    onTap: () => _toggleNodeExpansion(nodeId),
+                                  ),
+                                  if (isExpanded)
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(left: 16.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: children
+                                            .map(buildHierarchy)
+                                            .toList(),
+                                      ),
+                                    ),
+                                ],
                               );
-                            },
-                            loading: () => const Center(
-                                child: CircularProgressIndicator()),
-                            error: (error, stackTrace) =>
-                                Center(child: Text('')),
-                            // Center(child: Text('Error: $error')),
-                          ),
+                            }
+
+                            // Display the hierarchy starting from the root node
+                            return Container(
+                              margin: EdgeInsets.symmetric(
+                                horizontal:
+                                    MediaQuery.of(context).size.width * 0.035,
+                              ).copyWith(
+                                top: MediaQuery.of(context).size.height * 0.01,
+                              ),
+                              child: buildHierarchy(nodes[0].id),
+                            );
+                          },
+                          loading: () =>
+                              const Center(child: CircularProgressIndicator()),
+                          error: (error, stackTrace) =>
+                              Center(child: Text('Error: $error')),
+                        ),
                     if (selectedGroup.isNotEmpty &&
                         selectedParameter.isNotEmpty)
                       ref.watch(subGroupDetailsProvider(IdForSubGroup)).when(
@@ -344,8 +491,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             error: (error, stackTrace) =>
                                 Center(child: Text('')),
                           ),
-         
-
                     if (selectedSubOffice.isNotEmpty &&
                         selectedParameter.isNotEmpty &&
                         selectedGroup.isNotEmpty)
@@ -453,7 +598,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         selectedUser.isEmpty)
                       FutureBuilder(
                         future: dataAddedController.fetchDataAdded(
-                            businessId, selectedParameter),
+                            businessId, selectedparameterId),
                         builder: (context,
                             AsyncSnapshot<Map<String, List<List<dynamic>>>>
                                 snapshot) {
@@ -472,7 +617,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               child: CustomChart(
                                 parameter: selectedParameter,
                                 actualData: data['userEntries'] ?? [],
-                                predictedData: data['dailyTarget'] ?? [],
+                                predictedData:
+                                    data['dailyTargetAccumulated'] ?? [],
                               ),
                             );
                           }
@@ -548,8 +694,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         selectedSubOffice.isEmpty &&
                         selectedUser.isEmpty)
                       FutureBuilder(
-                        future: SubGroupDataController.fetchDataAdded(
-                            groupId, selectedParameter),
+                        future: dataAddedController.fetchDataAdded(
+                            businessId, selectedparameterId),
                         builder: (context,
                             AsyncSnapshot<Map<String, List<List<dynamic>>>>
                                 snapshot) {
@@ -568,7 +714,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               child: CustomChart(
                                 parameter: selectedParameter,
                                 actualData: data['userEntries'] ?? [],
-                                predictedData: data['dailyTarget'] ?? [],
+                                predictedData:
+                                    data['dailyTargetAccumulated'] ?? [],
                               ),
                             );
                           }

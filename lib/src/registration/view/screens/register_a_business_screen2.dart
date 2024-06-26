@@ -350,14 +350,14 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
                           child: ElevatedButton(
                             onPressed: _getImage,
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
+                              backgroundColor: WidgetStateProperty.all<Color>(
                                   primaryColor),
-                              minimumSize: MaterialStateProperty.all<Size>(Size(
+                              minimumSize: WidgetStateProperty.all<Size>(Size(
                                   getScreenheight(context) * 0.04 * 2,
                                   getScreenheight(
                                       context))), // Adjust size here
                               padding:
-                                  MaterialStateProperty.all<EdgeInsetsGeometry>(
+                                  WidgetStateProperty.all<EdgeInsetsGeometry>(
                                       const EdgeInsets.symmetric(
                                           horizontal:
                                               8)), // Adjust padding here

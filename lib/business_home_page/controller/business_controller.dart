@@ -16,9 +16,6 @@ final businessAndUserProvider = StreamProvider.autoDispose
   // final prefs = await SharedPreferences.getInstance();
   // final token = prefs.getString('authToken');
   print('this is the token for drawer:- $token');
-  if (token == null) {
-    throw Exception('No token found');
-  }
 
   while (true) {
     final response = await http.get(

@@ -1,6 +1,5 @@
 // feedback_model.dart
 
-import 'package:flutter/foundation.dart';
 
 class FeedbackModel {
   final String id;

@@ -11,8 +11,9 @@ final dataAddedControllerProvider =
 
 class DataAddedController {
   Future<Map<String, List<List<dynamic>>>> fetchDataAdded(
-      String businessId, String parameter) async {
-    final String url = '${domain}data/get-param-data/$businessId/$parameter';
+      String businessId, String parameterId) async {
+    final String url =
+        '${domain}office/get-param-data/$businessId/$parameterId';
     final authToken = await _getAuthToken(); // Get the auth token
 
     try {
@@ -26,16 +27,20 @@ class DataAddedController {
           final List<List<dynamic>> userEntries = data['userEntries'] != null
               ? List<List<dynamic>>.from(data['userEntries'])
               : [];
-          final List<List<dynamic>> dailyTarget = data['dailyTarget'] != null
-              ? List<List<dynamic>>.from(data['dailyTarget'])
-              : [];
-          return {'userEntries': userEntries, 'dailyTarget': dailyTarget};
+          final List<List<dynamic>> dailyTarget =
+              data['dailyTargetAccumulated'] != null
+                  ? List<List<dynamic>>.from(data['dailyTargetAccumulated'])
+                  : [];
+          return {
+            'userEntries': userEntries,
+            'dailyTargetAccumulated': dailyTarget
+          };
         }
       }
     } catch (e) {
       print('Error fetching growth data: $e');
     }
-    return {'userEntries': [], 'dailyTarget': []};
+    return {'userEntries': [], 'dailyTargetAccumulated': []};
   }
 }
 

@@ -11,3 +11,24 @@ class Parameter {
     );
   }
 }
+
+class Parameter2 {
+  final String id;
+  final String name;
+
+  Parameter2({required this.id, required this.name});
+
+  factory Parameter2.fromJson(Map<String, dynamic> json) {
+    return Parameter2(
+      id: json['_id'],
+      name: json['name'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'name': name,
+    };
+  }
+}

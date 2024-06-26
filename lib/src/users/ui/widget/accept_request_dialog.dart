@@ -486,7 +486,7 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(businessUsersProvider.notifier)
           .fetchBusinessUsers(widget.businessId);
