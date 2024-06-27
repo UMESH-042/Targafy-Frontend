@@ -153,9 +153,6 @@ class ParameterNotifier extends StateNotifier<List<Parameter>> {
   }
 }
 
-
-
-
 // StateNotifier to manage the state of the parameters
 class ParametersNotifierHome extends StateNotifier<List<Parameter2>> {
   ParametersNotifierHome() : super([]);
@@ -165,14 +162,14 @@ class ParametersNotifierHome extends StateNotifier<List<Parameter2>> {
     final token = prefs.getString('authToken');
 
     final response = await http.get(
-      Uri.parse('${domain}office/get-param-id/$businessId'),
+      Uri.parse('${domain}params/get-param-id/$businessId'),
       headers: {
         'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body)['data']['level1'] as List;
+      final data = json.decode(response.body)['data']['params'] as List;
       state = data.map((json) => Parameter2.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load parameters');

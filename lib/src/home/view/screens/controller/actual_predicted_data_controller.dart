@@ -11,11 +11,12 @@ final dataAddedControllerProvider =
 
 class DataAddedController {
   Future<Map<String, List<List<dynamic>>>> fetchDataAdded(
-      String businessId, String parameterId) async {
+      String businessId, String parameterName) async {
     final String url =
-        '${domain}office/get-param-data/$businessId/$parameterId';
+        '${domain}data/get-param-data/$businessId/$parameterName';
     final authToken = await _getAuthToken(); // Get the auth token
-
+    print('This is business Id :- $businessId');
+    print('This is parameterName :- $parameterName');
     try {
       final response = await http
           .get(Uri.parse(url), headers: {'Authorization': 'Bearer $authToken'});
