@@ -41,76 +41,6 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
     });
   }
 
-  // Future<void> _createBusiness() async {
-  //   if (_image == null) {
-  //     // Show error if no image selected
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Please select a logo')),
-  //     );
-  //     return;
-  //   }
-
-  //   // Show loading dialog
-  //   showDialog(
-  //     context: context,
-  //     barrierDismissible: false,
-  //     builder: (BuildContext context) {
-  //       return Dialog(
-  //         child: Padding(
-  //           padding: const EdgeInsets.all(20.0),
-  //           child: Row(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               CircularProgressIndicator(),
-  //               SizedBox(width: 20),
-  //               Text("Creating Business..."),
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-
-  //   try {
-  //     SharedPreferences prefs = await SharedPreferences.getInstance();
-  //     String? bearerToken = prefs.getString('authToken');
-  //     final logoUrl =
-  //         await _createBusinessController.uploadLogo(File(_image!.path));
-  //     _createBusinessController.createBusiness(
-  //       buisnessName: _businessNameController.text,
-  //       logo: logoUrl,
-  //       industryType: _industryTypeController.text,
-  //       city: _cityController.text,
-  //       country: _countryController.text,
-  //       onCompletion: (isSuccess) {
-  //         Navigator.of(context).pop(); // Dismiss the loading dialog
-
-  //         if (isSuccess) {
-  //           Navigator.pushAndRemoveUntil(
-  //             context,
-  //             MaterialPageRoute(
-  //               builder: (context) => BottomNavigationAndAppBar(
-  //                 token: bearerToken,
-  //               ),
-  //             ),
-  //             (route) => false,
-  //           );
-  //         } else {
-  //           ScaffoldMessenger.of(context).showSnackBar(
-  //             SnackBar(content: Text('Failed to create business')),
-  //           );
-  //         }
-  //       },
-  //     );
-  //   } catch (e) {
-  //     Navigator.of(context).pop(); // Dismiss the loading dialog
-
-  //     print('Error: $e');
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Error: $e')),
-  //     );
-  //   }
-  // }
   Future<void> _createBusiness() async {
     if (_image == null) {
       // Show error if no image selected
@@ -146,28 +76,32 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
       String? bearerToken = prefs.getString('authToken');
       final logoUrl =
           await _createBusinessController.uploadLogo(File(_image!.path));
-      final response = await _createBusinessController.createBusiness(
+      _createBusinessController.createBusiness(
         buisnessName: _businessNameController.text,
         logo: logoUrl,
         industryType: _industryTypeController.text,
         city: _cityController.text,
         country: _countryController.text,
+        onCompletion: (isSuccess) {
+          Navigator.of(context).pop(); // Dismiss the loading dialog
+
+          if (isSuccess) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BottomNavigationAndAppBar(
+                  token: bearerToken,
+                ),
+              ),
+              (route) => false,
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to create business')),
+            );
+          }
+        },
       );
-
-      Navigator.of(context).pop(); // Dismiss the loading dialog
-
-      if (response != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => NextPage2(response: response),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create business')),
-        );
-      }
     } catch (e) {
       Navigator.of(context).pop(); // Dismiss the loading dialog
 
@@ -350,8 +284,8 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
                           child: ElevatedButton(
                             onPressed: _getImage,
                             style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.all<Color>(
-                                  primaryColor),
+                              backgroundColor:
+                                  WidgetStateProperty.all<Color>(primaryColor),
                               minimumSize: WidgetStateProperty.all<Size>(Size(
                                   getScreenheight(context) * 0.04 * 2,
                                   getScreenheight(

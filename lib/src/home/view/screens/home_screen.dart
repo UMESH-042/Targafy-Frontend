@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
@@ -246,6 +248,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final businessId = selectedBusinessData?['business']?.id;
     final hierarchyAsync = ref.watch(businessHierarchyProvider);
+    String jsonData = '''
+  {
+    "statusCode": 200,
+    "data": {
+      "totalSum": 2424,
+      "userData": [
+        {
+          "name": "",
+          "value": 0,
+          "percentage": 0
+        },
+        {
+         "name": "",
+          "value": 0,
+          "percentage": 100
+        }
+      ]
+    },
+    "message": "Data retrieved successfully",
+    "success": true
+  }
+  ''';
+    Map<String, dynamic> parsedData = json.decode(jsonData);
+    List<dynamic> userData = parsedData['data']['userData'];
+    List<UserEntry> parseUserEntries(List<dynamic> jsonList) {
+      List<UserEntry> entries =
+          jsonList.map((json) => UserEntry.fromJson(json)).toList();
+      return entries;
+    }
+
+    // Convert JSON data to List<UserEntry>
+    List<UserEntry> userEntries = parseUserEntries(userData);
 
     return Scaffold(
       body: RefreshIndicator(
@@ -427,11 +461,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           final nodes = hierarchy.nodes;
                           final edges = hierarchy.edges;
 
-                          final Map<String, String> nodeIdToLabel = Map.fromEntries(
-                            nodes.map((node) => MapEntry(node.id, node.label.name)),
+                          final Map<String, String> nodeIdToLabel =
+                              Map.fromEntries(
+                            nodes.map(
+                                (node) => MapEntry(node.id, node.label.name)),
                           );
 
-                          final Map<String, List<String>> parentIdToChildren = {};
+                          final Map<String, List<String>> parentIdToChildren =
+                              {};
 
                           for (var edge in edges) {
                             parentIdToChildren.putIfAbsent(edge.from, () => []);
@@ -439,9 +476,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           }
 
                           return Container(
-                            alignment: Alignment.centerLeft, // Align to the left
+                            alignment:
+                                Alignment.centerLeft, // Align to the left
                             margin: EdgeInsets.symmetric(
-                              horizontal: MediaQuery.of(context).size.width * 0.035,
+                              horizontal:
+                                  MediaQuery.of(context).size.width * 0.035,
                             ).copyWith(
                               top: MediaQuery.of(context).size.height * 0.01,
                             ),
@@ -454,26 +493,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       SelectableSubGroupWidget(
-                                        text: nodes[0].label.name.isNotEmpty ? nodes[0].label.name : '-',
-                                        isSelected: currentPath.contains(nodes[0].id),
-                                        onTap: () => _handleNodeTap(nodes[0].label.name, nodes[0].id, parentIdToChildren),
+                                        text: nodes[0].label.name.isNotEmpty
+                                            ? nodes[0].label.name
+                                            : '-',
+                                        isSelected:
+                                            currentPath.contains(nodes[0].id),
+                                        onTap: () => _handleNodeTap(
+                                            nodes[0].label.name,
+                                            nodes[0].id,
+                                            parentIdToChildren),
                                       ),
                                     ],
                                   ),
                                 ),
                                 ...currentPath.map((parentId) {
-                                  final children = parentIdToChildren[parentId] ?? [];
+                                  final children =
+                                      parentIdToChildren[parentId] ?? [];
                                   return Padding(
                                     padding: const EdgeInsets.only(top: 16.0),
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: children.map((childId) {
                                           return SelectableSubGroupWidget(
                                             text: nodeIdToLabel[childId] ?? '',
-                                            isSelected: currentPath.contains(childId),
-                                            onTap: () => _handleNodeTap(nodeIdToLabel[childId]!, childId, parentIdToChildren),
+                                            isSelected:
+                                                currentPath.contains(childId),
+                                            onTap: () => _handleNodeTap(
+                                                nodeIdToLabel[childId]!,
+                                                childId,
+                                                parentIdToChildren),
                                           );
                                         }).toList(),
                                       ),
@@ -484,8 +535,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                           );
                         },
-                        loading: () => const Center(child: CircularProgressIndicator()),
-                        error: (error, stackTrace) => Center(child: Text('Error: $error')),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (error, stackTrace) =>
+                            Center(child: Text('Error: $error')),
                       ),
                     if (selectedHierarchyUser &&
                         selectedParameter.isNotEmpty &&
@@ -648,9 +701,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             print(data);
                             return Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: PiechartGraph(
+                                child: PiechartGraph1(
                                   parameter: selectedParameter,
-                                  actualData: data['userEntries'] ?? [],
+                                  actualData: userEntries,
                                 ));
                           }
                         },

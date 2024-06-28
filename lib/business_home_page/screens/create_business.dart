@@ -7,6 +7,7 @@ import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/business_home_page/controller/create_business_controller.dart';
 import 'package:targafy/business_home_page/screens/next_page_suboffice.dart';
 import 'package:targafy/widgets/next_button.dart';
+import 'package:targafy/widgets/submit_button.dart';
 
 import '../../core/shared/custom_text_field.dart';
 import '../../widgets/custom_back_button.dart';
@@ -137,57 +138,7 @@ class _CreateBusinessPageState extends ConsumerState<CreateBusinessPage> {
                 labelText: "Country",
               ),
               SizedBox(height: height * 0.02),
-              // NextButton(
-              //   onPressed: () async {
-              //     if (_selectedImagePath == null) {
-              //       ScaffoldMessenger.of(context).showSnackBar(
-              //         const SnackBar(content: Text('Please select an image')),
-              //       );
-              //       return;
-              //     }
-
-              //     setState(() {
-              //       _uploading = true;
-              //     });
-
-              //     try {
-              //       final logoUrl = await createBusinessController
-              //           .uploadLogo(File(_selectedImagePath!));
-              //       await createBusinessController.createBusiness(
-              //         buisnessName: nameController.text,
-              //         logo: logoUrl,
-              //         industryType: industryTypeController.text,
-              //         city: cityController.text,
-              //         country: countryController.text,
-              //         onCompletion: (bool isSuccess) {
-              //           if (isSuccess) {
-              //             ref.refresh(businessAndUserProvider(widget
-              //                 .token!)); // Example of refreshing data using Riverpod
-              //             ScaffoldMessenger.of(context).showSnackBar(
-              //               const SnackBar(
-              //                   content: Text('Business created successfully')),
-              //             );
-              //             Navigator.pop(context);
-              //           } else {
-              //             ScaffoldMessenger.of(context).showSnackBar(
-              //               const SnackBar(
-              //                   content: Text('Failed to create business')),
-              //             );
-              //           }
-              //         },
-              //       );
-              //     } catch (e) {
-              //       ScaffoldMessenger.of(context).showSnackBar(
-              //         SnackBar(content: Text('Error: $e')),
-              //       );
-              //     } finally {
-              //       setState(() {
-              //         _uploading = false;
-              //       });
-              //     }
-              //   },
-              // ),
-              NextButton(
+              SubmitButton(
                 onPressed: () async {
                   if (_selectedImagePath == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -203,38 +154,29 @@ class _CreateBusinessPageState extends ConsumerState<CreateBusinessPage> {
                   try {
                     final logoUrl = await createBusinessController
                         .uploadLogo(File(_selectedImagePath!));
-                    final responseData =
-                        await createBusinessController.createBusiness(
+                    await createBusinessController.createBusiness(
                       buisnessName: nameController.text,
                       logo: logoUrl,
                       industryType: industryTypeController.text,
                       city: cityController.text,
                       country: countryController.text,
+                      onCompletion: (bool isSuccess) {
+                        if (isSuccess) {
+                          ref.refresh(businessAndUserProvider(widget
+                              .token!)); // Example of refreshing data using Riverpod
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Business created successfully')),
+                          );
+                          Navigator.pop(context);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Failed to create business')),
+                          );
+                        }
+                      },
                     );
-                    print(responseData);
-                    if (responseData != null) {
-                      ref.refresh(businessAndUserProvider(widget
-                          .token!)); // Example of refreshing data using Riverpod
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Business created successfully')),
-                      );
-
-                      // Navigate to the next page and pass the entire response data
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NextPage(
-                            response: responseData,
-                          ),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Failed to create business')),
-                      );
-                    }
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Error: $e')),

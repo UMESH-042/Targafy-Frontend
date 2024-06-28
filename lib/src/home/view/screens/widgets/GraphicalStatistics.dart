@@ -6,7 +6,8 @@ class Graphicalstatistics extends StatelessWidget {
   final List<List<dynamic>> actualData;
   final List<List<dynamic>> predictedData;
 
-  const Graphicalstatistics({super.key, 
+  const Graphicalstatistics({
+    super.key,
     required this.parameter,
     required this.actualData,
     required this.predictedData,
@@ -23,9 +24,10 @@ class Graphicalstatistics extends StatelessWidget {
       ),
       primaryYAxis: NumericAxis(
         title: AxisTitle(
-          text: 'Actual/Predicted $parameter',
+          text: 'Achievement/Target $parameter',
           textStyle: const TextStyle(fontWeight: FontWeight.bold),
         ),
+        interval: 1,
       ),
       title: ChartTitle(text: 'Graphical Statistics $parameter Analysis'),
       legend: const Legend(isVisible: true),
@@ -35,7 +37,7 @@ class Graphicalstatistics extends StatelessWidget {
           dataSource: _calculateRatioData(actualData, predictedData),
           xValueMapper: (data, _) => data[0].toString(),
           yValueMapper: (data, _) => double.parse(data[1].toString()),
-          name: 'Ratio of Actual/Predicted $parameter',
+          name: 'Ratio of Achievement/Target $parameter',
           dataLabelSettings: const DataLabelSettings(isVisible: true),
           color: Colors.green,
         )
@@ -51,8 +53,9 @@ class Graphicalstatistics extends StatelessWidget {
       final double actualValue = double.parse(actualData[i][1].toString());
       final double predictedValue =
           double.parse(predictedData[i][1].toString());
-      final double ratio = actualValue / predictedValue;
-      ratioData.add([month, ratio]);
+      final double ratio = (actualValue / predictedValue) * 100;
+      final formattedRatio = double.parse(ratio.toStringAsFixed(2));
+      ratioData.add([month, formattedRatio]);
     }
     return ratioData;
   }

@@ -135,7 +135,7 @@ class _BottomNavigationAndAppBarState
     });
 
     // Perform your refresh logic here
-    await Future.delayed(Duration(seconds: 1)); // Simulating delay
+    await Future.delayed(Duration(seconds: 0)); // Simulating delay
 
     setState(() {
       _isRefreshing = false;
