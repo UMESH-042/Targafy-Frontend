@@ -170,15 +170,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
+  // void _handleNodeTap(String nodeName, String nodeId,
+  //     Map<String, List<String>> parentIdToChildren) {
+  //   print('$nodeName:- $nodeId');
+  //   setState(() {
+  //     if (currentPath.contains(nodeId)) {
+  //       _removeDescendants(nodeId, parentIdToChildren);
+  //       selectedUserId = currentPath.isNotEmpty ? currentPath.last : '';
+  //       selectedHierarchyUser = currentPath.isNotEmpty;
+  //     } else {
+  //       selectedUserId = nodeId;
+  //       currentPath.add(nodeId);
+  //       selectedHierarchyUser = true;
+  //     }
+  //   });
+  // }
   void _handleNodeTap(String nodeName, String nodeId,
       Map<String, List<String>> parentIdToChildren) {
-    print('$nodeName:- $nodeId');
     setState(() {
       if (currentPath.contains(nodeId)) {
         _removeDescendants(nodeId, parentIdToChildren);
         selectedUserId = currentPath.isNotEmpty ? currentPath.last : '';
         selectedHierarchyUser = currentPath.isNotEmpty;
       } else {
+        final parent = parentIdToChildren.entries
+            .firstWhere(
+              (entry) => entry.value.contains(nodeId),
+              orElse: () => MapEntry('', []),
+            )
+            .key;
+
+        // Unselect the previously selected node in the same row
+        if (parent.isNotEmpty) {
+          parentIdToChildren[parent]?.forEach((child) {
+            currentPath.remove(child);
+          });
+        }
+
         selectedUserId = nodeId;
         currentPath.add(nodeId);
         selectedHierarchyUser = true;
@@ -217,7 +245,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final dataAddedController = ref.watch(dataAddedControllerProvider);
 
     final businessId = selectedBusinessData?['business']?.id;
-
     final hierarchyAsync = ref.watch(businessHierarchyProvider);
 
     return Scaffold(
@@ -293,48 +320,128 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       error: (error, stackTrace) => Center(child: Text('')),
                       // Center(child: Text('Error: $error')),
                     ),
+                    // if (selectedParameter.isNotEmpty)
+                    //   hierarchyAsync.when(
+                    //     data: (hierarchy) {
+                    //       final nodes = hierarchy.nodes;
+                    //       final edges = hierarchy.edges;
+
+                    //       final Map<String, String> nodeIdToLabel =
+                    //           Map.fromEntries(
+                    //         nodes.map(
+                    //             (node) => MapEntry(node.id, node.label.name)),
+                    //       );
+
+                    //       final Map<String, List<String>> parentIdToChildren =
+                    //           {};
+
+                    //       for (var edge in edges) {
+                    //         parentIdToChildren.putIfAbsent(edge.from, () => []);
+                    //         parentIdToChildren[edge.from]!.add(edge.to);
+                    //       }
+
+                    //       List<Widget> buildHierarchy(String parentId) {
+                    //         if (!parentIdToChildren.containsKey(parentId)) {
+                    //           return [];
+                    //         }
+
+                    //         return parentIdToChildren[parentId]!.map((childId) {
+                    //           final childLabel = nodeIdToLabel[childId] ?? '-';
+                    //           return SelectableSubGroupWidget(
+                    //             text: childLabel,
+                    //             isSelected: currentPath.contains(childId),
+                    //             onTap: () => _handleNodeTap(
+                    //                 childLabel, childId, parentIdToChildren),
+                    //           );
+                    //         }).toList();
+                    //       }
+
+                    //       return Container(
+                    //         alignment:
+                    //             Alignment.centerLeft, // Align to the left
+                    //         margin: EdgeInsets.symmetric(
+                    //           horizontal:
+                    //               MediaQuery.of(context).size.width * 0.035,
+                    //         ).copyWith(
+                    //           top: MediaQuery.of(context).size.height * 0.01,
+                    //         ),
+                    //         child: Column(
+                    //           crossAxisAlignment: CrossAxisAlignment.start,
+                    //           children: [
+                    //             SingleChildScrollView(
+                    //               scrollDirection: Axis.horizontal,
+                    //               child: Row(
+                    //                 mainAxisAlignment: MainAxisAlignment.start,
+                    //                 children: [
+                    //                   SelectableSubGroupWidget(
+                    //                     text: nodes[0].label.name.isNotEmpty
+                    //                         ? nodes[0].label.name
+                    //                         : '-',
+                    //                     isSelected:
+                    //                         currentPath.contains(nodes[0].id),
+                    //                     onTap: () => _handleNodeTap(
+                    //                         nodes[0].label.name,
+                    //                         nodes[0].id,
+                    //                         parentIdToChildren),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             ),
+                    //             ...currentPath.map((parentId) {
+                    //               final children =
+                    //                   parentIdToChildren[parentId] ?? [];
+                    //               return Padding(
+                    //                 padding: const EdgeInsets.only(top: 16.0),
+                    //                 child: SingleChildScrollView(
+                    //                   scrollDirection: Axis.horizontal,
+                    //                   child: Row(
+                    //                     mainAxisAlignment:
+                    //                         MainAxisAlignment.start,
+                    //                     children: children.map((childId) {
+                    //                       return SelectableSubGroupWidget(
+                    //                         text: nodeIdToLabel[childId] ?? '',
+                    //                         isSelected:
+                    //                             currentPath.contains(childId),
+                    //                         onTap: () => _handleNodeTap(
+                    //                             nodeIdToLabel[childId]!,
+                    //                             childId,
+                    //                             parentIdToChildren),
+                    //                       );
+                    //                     }).toList(),
+                    //                   ),
+                    //                 ),
+                    //               );
+                    //             }).toList(),
+                    //           ],
+                    //         ),
+                    //       );
+                    //     },
+                    //     loading: () =>
+                    //         const Center(child: CircularProgressIndicator()),
+                    //     error: (error, stackTrace) =>
+                    //         Center(child: Text('Error: $error')),
+                    //   ),
                     if (selectedParameter.isNotEmpty)
                       hierarchyAsync.when(
                         data: (hierarchy) {
                           final nodes = hierarchy.nodes;
                           final edges = hierarchy.edges;
 
-                          final Map<String, String> nodeIdToLabel =
-                              Map.fromEntries(
-                            nodes.map(
-                                (node) => MapEntry(node.id, node.label.name)),
+                          final Map<String, String> nodeIdToLabel = Map.fromEntries(
+                            nodes.map((node) => MapEntry(node.id, node.label.name)),
                           );
 
-                          final Map<String, List<String>> parentIdToChildren =
-                              {};
+                          final Map<String, List<String>> parentIdToChildren = {};
 
                           for (var edge in edges) {
                             parentIdToChildren.putIfAbsent(edge.from, () => []);
                             parentIdToChildren[edge.from]!.add(edge.to);
                           }
 
-                          List<Widget> buildHierarchy(String parentId) {
-                            if (!parentIdToChildren.containsKey(parentId)) {
-                              return [];
-                            }
-
-                            return parentIdToChildren[parentId]!.map((childId) {
-                              final childLabel = nodeIdToLabel[childId] ?? '-';
-                              return SelectableSubGroupWidget(
-                                text: childLabel,
-                                isSelected: currentPath.contains(childId),
-                                onTap: () => _handleNodeTap(
-                                    childLabel, childId, parentIdToChildren),
-                              );
-                            }).toList();
-                          }
-
                           return Container(
-                            alignment:
-                                Alignment.centerLeft, // Align to the left
+                            alignment: Alignment.centerLeft, // Align to the left
                             margin: EdgeInsets.symmetric(
-                              horizontal:
-                                  MediaQuery.of(context).size.width * 0.035,
+                              horizontal: MediaQuery.of(context).size.width * 0.035,
                             ).copyWith(
                               top: MediaQuery.of(context).size.height * 0.01,
                             ),
@@ -347,38 +454,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       SelectableSubGroupWidget(
-                                        text: nodes[0].label.name.isNotEmpty
-                                            ? nodes[0].label.name
-                                            : '-',
-                                        isSelected:
-                                            currentPath.contains(nodes[0].id),
-                                        onTap: () => _handleNodeTap(
-                                            nodes[0].label.name,
-                                            nodes[0].id,
-                                            parentIdToChildren),
+                                        text: nodes[0].label.name.isNotEmpty ? nodes[0].label.name : '-',
+                                        isSelected: currentPath.contains(nodes[0].id),
+                                        onTap: () => _handleNodeTap(nodes[0].label.name, nodes[0].id, parentIdToChildren),
                                       ),
                                     ],
                                   ),
                                 ),
                                 ...currentPath.map((parentId) {
-                                  final children =
-                                      parentIdToChildren[parentId] ?? [];
+                                  final children = parentIdToChildren[parentId] ?? [];
                                   return Padding(
                                     padding: const EdgeInsets.only(top: 16.0),
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.start,
                                         children: children.map((childId) {
                                           return SelectableSubGroupWidget(
                                             text: nodeIdToLabel[childId] ?? '',
-                                            isSelected:
-                                                currentPath.contains(childId),
-                                            onTap: () => _handleNodeTap(
-                                                nodeIdToLabel[childId]!,
-                                                childId,
-                                                parentIdToChildren),
+                                            isSelected: currentPath.contains(childId),
+                                            onTap: () => _handleNodeTap(nodeIdToLabel[childId]!, childId, parentIdToChildren),
                                           );
                                         }).toList(),
                                       ),
@@ -389,10 +484,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                           );
                         },
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
-                        error: (error, stackTrace) =>
-                            Center(child: Text('Error: $error')),
+                        loading: () => const Center(child: CircularProgressIndicator()),
+                        error: (error, stackTrace) => Center(child: Text('Error: $error')),
                       ),
                     if (selectedHierarchyUser &&
                         selectedParameter.isNotEmpty &&
