@@ -57,7 +57,7 @@ class CreateBusinessController {
     };
 
     final businessData = {
-      'buisnessName': buisnessName,
+      'businessName': buisnessName,
       'logo': logo,
       'industryType': industryType,
       'city': city,
@@ -78,7 +78,7 @@ class CreateBusinessController {
     } else {
       // Handle error
       print("Error: ${response.statusCode}");
-      onCompletion(true); // Invoke callback with success status
+      onCompletion(false); // Invoke callback with success status
     }
   }
 }

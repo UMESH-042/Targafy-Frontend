@@ -36,14 +36,14 @@ class DataTableWidget extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Text(
-                    'Actual',
+                    'Achievement',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Text(
-                    'Predicted',
+                    'Target',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
