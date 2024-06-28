@@ -1,25 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:graphview/GraphView.dart';
 import 'package:lottie/lottie.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/src/home/view/screens/controller/actual_predicted_data_controller.dart';
-import 'package:targafy/src/home/view/screens/controller/data_of_subgroup_users_controller.dart';
-import 'package:targafy/src/home/view/screens/controller/fetchSubGroup_controller.dart';
-import 'package:targafy/src/home/view/screens/controller/parameter_group_list_controller.dart';
-import 'package:targafy/src/home/view/screens/controller/sub_group_data_provider_controller.dart';
-import 'package:targafy/src/home/view/screens/controller/subgroup_user_controller.dart';
+import 'package:targafy/src/home/view/screens/controller/user_hierarchy_data_controller.dart';
 import 'package:targafy/src/home/view/screens/widgets/GraphicalStatistics.dart';
 import 'package:targafy/src/home/view/widgets/selectable_chart.dart';
 import 'package:targafy/src/home/view/widgets/selectable_parameter.dart';
 import 'package:targafy/src/home/view/widgets/selectable_sub_group.dart';
-import 'package:targafy/src/home/view/widgets/selectable_username.dart';
 import 'package:targafy/src/parameters/view/controller/add_parameter_controller.dart';
 import 'package:targafy/src/parameters/view/model/parameter_model.dart';
 import 'package:targafy/src/users/ui/controller/user_hierarchy_controller.dart';
 import 'package:targafy/src/users/ui/model/user_hierarchy_model.dart';
 import 'package:targafy/utils/remote_routes.dart';
+import 'package:tuple/tuple.dart';
 import 'widgets/CustomCharts.dart';
 import 'widgets/DataTable.dart';
 import 'widgets/PieChart.dart';
@@ -66,6 +61,42 @@ final businessHierarchyProvider =
   }
 });
 
+final userDataFutureProvider =
+    FutureProvider.family<UserData, Tuple3<String, String, String>>(
+        (ref, params) async {
+  final businessId = params.item1;
+  final userId = params.item2;
+  final selectedParameter = params.item3;
+
+  final controller = ref.read(userDataProvider.notifier);
+  await controller.fetchUserData(businessId, userId, selectedParameter);
+  final result = ref.watch(userDataProvider);
+
+  if (result is AsyncData<UserData>) {
+    return result.value; // Return the fetched UserData
+  } else {
+    throw StateError('Failed to fetch user data');
+  }
+});
+
+final userPieDataFutureProvider =
+    FutureProvider.family<UserPieData, Tuple3<String, String, String>>(
+        (ref, params) async {
+  final businessId = params.item1;
+  final userId = params.item2;
+  final selectedParameter = params.item3;
+
+  final controller = ref.read(userPieDataProvider.notifier);
+  await controller.fetchUserPieData(businessId, userId, selectedParameter);
+  final result = ref.watch(userPieDataProvider);
+
+  if (result is AsyncData<UserPieData>) {
+    return result.value; // Return the fetched UserData
+  } else {
+    throw StateError('Failed to fetch user data');
+  }
+});
+
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -79,11 +110,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   late String selectedUser;
   late String selectedUserId;
   int currentIndex = 0;
-  // Map<String, bool> expandedNodes = {};
-  // List<String> visibleNodeIds = [];
+
   List<String> currentPath = [];
 
+  Map<int, String> selectedItemsByRow = {};
+
   bool _isRefreshing = false;
+  late bool selectedHierarchyUser;
 
   @override
   void initState() {
@@ -92,6 +125,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     selectedParameter = '';
     selectedUser = '';
     selectedUserId = '';
+    selectedHierarchyUser = false;
 
     // _getToken();
   }
@@ -136,38 +170,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
-  // void _toggleNodeExpansion(String nodeId) {
-  //   setState(() {
-  //     expandedNodes[nodeId] = !(expandedNodes[nodeId] ?? false);
-  //   });
-  // }
-
-  // void _handleNodeTap(String nodeId) {
-  //   setState(() {
-  //     if (visibleNodeIds.contains(nodeId)) {
-  //       visibleNodeIds.remove(nodeId);
-  //     } else {
-  //       visibleNodeIds.add(nodeId);
-  //     }
-  //   });
-  // }
-  // void _handleNodeTap(String nodeName, String nodeId) {
-  //   setState(() {
-  //     if (currentPath.contains(nodeId)) {
-  //       currentPath.remove(nodeId);
-  //     } else {
-  //       currentPath.add(nodeId);
-  //     }
-  //   });
-  // }
-  // Function to handle node tap
   void _handleNodeTap(String nodeName, String nodeId,
       Map<String, List<String>> parentIdToChildren) {
+    print('$nodeName:- $nodeId');
     setState(() {
       if (currentPath.contains(nodeId)) {
         _removeDescendants(nodeId, parentIdToChildren);
+        selectedUserId = currentPath.isNotEmpty ? currentPath.last : '';
+        selectedHierarchyUser = currentPath.isNotEmpty;
       } else {
+        selectedUserId = nodeId;
         currentPath.add(nodeId);
+        selectedHierarchyUser = true;
       }
     });
   }
@@ -180,7 +194,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     currentPath.remove(nodeId);
   }
 
-// Helper function to get all descendants of a node
   List<String> _getDescendants(
       String nodeId, Map<String, List<String>> parentIdToChildren) {
     final List<String> descendants = [];
@@ -196,15 +209,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     addDescendants(nodeId);
     return descendants;
   }
-  // void _handleNodeTap(String nodeName, String nodeId) {
-  //   setState(() {
-  //     if (currentPath.contains(nodeId)) {
-  //       currentPath.remove(nodeId);
-  //     } else {
-  //       currentPath.add(nodeId);
-  //     }
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -295,14 +299,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           final nodes = hierarchy.nodes;
                           final edges = hierarchy.edges;
 
-                          // Create a map to store node labels by ID for quick access
                           final Map<String, String> nodeIdToLabel =
                               Map.fromEntries(
                             nodes.map(
                                 (node) => MapEntry(node.id, node.label.name)),
                           );
 
-                          // Initialize a map to track child nodes by parent ID
                           final Map<String, List<String>> parentIdToChildren =
                               {};
 
@@ -311,7 +313,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             parentIdToChildren[edge.from]!.add(edge.to);
                           }
 
-                          // Function to build the hierarchy rows
                           List<Widget> buildHierarchy(String parentId) {
                             if (!parentIdToChildren.containsKey(parentId)) {
                               return [];
@@ -329,6 +330,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           }
 
                           return Container(
+                            alignment:
+                                Alignment.centerLeft, // Align to the left
                             margin: EdgeInsets.symmetric(
                               horizontal:
                                   MediaQuery.of(context).size.width * 0.035,
@@ -341,6 +344,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       SelectableSubGroupWidget(
                                         text: nodes[0].label.name.isNotEmpty
@@ -364,6 +368,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: children.map((childId) {
                                           return SelectableSubGroupWidget(
                                             text: nodeIdToLabel[childId] ?? '',
@@ -388,6 +394,92 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         error: (error, stackTrace) =>
                             Center(child: Text('Error: $error')),
                       ),
+                    if (selectedHierarchyUser &&
+                        selectedParameter.isNotEmpty &&
+                        selectedUserId.isNotEmpty &&
+                        selectedHierarchyUser &&
+                        selectedStates[0])
+                      ref
+                          .watch(userDataFutureProvider(Tuple3(
+                              businessId, selectedUserId, selectedParameter)))
+                          .when(
+                            data: (userData) {
+                              // return CustomChart(
+                              //   parameter: selectedParameter,
+                              //   predictedData: userData.userEntries,
+                              //   actualData: userData.dailyTarget,
+                              // );
+                              return Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: CustomChart(
+                                      parameter: selectedParameter,
+                                      actualData: userData.userEntries,
+                                      predictedData: userData.dailyTarget,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Graphicalstatistics(
+                                      parameter: selectedParameter,
+                                      actualData: userData.userEntries,
+                                      predictedData: userData.dailyTarget,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                            loading: () => const Center(
+                                child: CircularProgressIndicator()),
+                            error: (error, stackTrace) =>
+                                Center(child: Text('Error: $error')),
+                          ),
+                    if (selectedHierarchyUser &&
+                        selectedParameter.isNotEmpty &&
+                        selectedUserId.isNotEmpty &&
+                        selectedStates[1])
+                      ref
+                          .watch(userDataFutureProvider(Tuple3(
+                              businessId, selectedUserId, selectedParameter)))
+                          .when(
+                            data: (userData) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: DataTableWidget(
+                                  parameter: selectedParameter,
+                                  actualData: userData.userEntries,
+                                  predictedData: userData.dailyTarget,
+                                ),
+                              );
+                            },
+                            loading: () => const Center(
+                                child: CircularProgressIndicator()),
+                            error: (error, stackTrace) =>
+                                Center(child: Text('Error: $error')),
+                          ),
+                    if (selectedHierarchyUser &&
+                        selectedParameter.isNotEmpty &&
+                        selectedUserId.isNotEmpty &&
+                        selectedStates[3])
+                      ref
+                          .watch(userPieDataFutureProvider(Tuple3(
+                              businessId, selectedUserId, selectedParameter)))
+                          .when(
+                            data: (userData) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: PiechartGraph1(
+                                  parameter: selectedParameter,
+                                  actualData: userData.userEntries,
+                                ),
+                              );
+                            },
+                            loading: () => const Center(
+                                child: CircularProgressIndicator()),
+                            error: (error, stackTrace) =>
+                                Center(child: Text('Error: $error')),
+                          ),
                     if (selectedStates.isNotEmpty &&
                         selectedStates[0] &&
                         selectedParameter.isEmpty)
@@ -401,7 +493,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     if (selectedStates.isNotEmpty &&
                         selectedStates[0] &&
-                        selectedParameter.isNotEmpty)
+                        selectedParameter.isNotEmpty &&
+                        selectedUserId.isEmpty &&
+                        !selectedHierarchyUser)
                       FutureBuilder<Map<String, List<List<dynamic>>>>(
                         future: dataAddedController.fetchDataAdded(
                             businessId, selectedParameter),
@@ -441,7 +535,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     if (selectedStates.isNotEmpty &&
                         selectedStates[3] &&
-                        selectedParameter.isNotEmpty)
+                        selectedParameter.isNotEmpty &&
+                        !selectedHierarchyUser)
                       FutureBuilder(
                         future: dataAddedController.fetchDataAdded(
                             businessId, selectedParameter),
@@ -469,7 +564,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     if (selectedStates.isNotEmpty &&
                         selectedStates[1] &&
-                        selectedParameter.isNotEmpty)
+                        selectedParameter.isNotEmpty &&
+                        !selectedHierarchyUser)
                       FutureBuilder(
                         future: dataAddedController.fetchDataAdded(
                             businessId, selectedParameter),
