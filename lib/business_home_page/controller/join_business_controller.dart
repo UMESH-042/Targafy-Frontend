@@ -29,7 +29,7 @@ final joinBusinessProvider =
     },
     body: json.encode(request.toJson()),
   );
-
+  print(response.body);
   if (response.statusCode == 200) {
     return true;
   } else {

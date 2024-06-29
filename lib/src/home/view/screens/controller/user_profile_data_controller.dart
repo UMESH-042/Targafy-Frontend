@@ -78,7 +78,7 @@ class UserProfileLogoController {
     }
   }
 
-  Future<String> fetchUserAvatar() async {
+  Future<String> fetchUserAvatar(String token) async {
     final fetchUrl = Uri.parse('${domain}user/request/user-avatar');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');

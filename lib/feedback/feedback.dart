@@ -40,7 +40,7 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
     final asyncValue = ref.watch(businessAndUserProvider(widget.token!));
 
     // Extracting userName from asyncValue
-    final User user = asyncValue.asData!.value['user'] as User;
+    final User user = asyncValue.asData!.value?['user'] as User;
     final username = user.name;
 
     print(username);

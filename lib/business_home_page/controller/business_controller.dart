@@ -12,7 +12,7 @@ import 'package:targafy/utils/remote_routes.dart';
 String domain = AppRemoteRoutes.baseUrl;
 
 final businessAndUserProvider = StreamProvider.autoDispose
-    .family<Map<String, dynamic>, String>((ref, token) async* {
+    .family<Map<String, dynamic>?, String>((ref, token) async* {
   // final prefs = await SharedPreferences.getInstance();
   // final token = prefs.getString('authToken');
   print('this is the token for drawer:- $token');
@@ -102,5 +102,6 @@ Future<void> clearSelectedBusiness(WidgetRef ref) async {
     'userType': '',
     'businessCode': '',
   };
-  ref.read(currentBusinessProvider.notifier).state = selectedBusinessData;
+  // ref.read(currentBusinessProvider.notifier).state = selectedBusinessData;
+  ref.read(currentBusinessProvider.notifier).state = null;
 }

@@ -18,6 +18,7 @@ import 'package:targafy/core/utils/texts.dart';
 import 'package:targafy/feedback/feedback.dart';
 import 'package:targafy/src/activity/ui/activity_screen.dart';
 import 'package:targafy/src/auth/view/Controllers/login.dart';
+import 'package:targafy/src/auth/view/screens/login_screen.dart';
 import 'package:targafy/src/home/view/screens/AddScreen.dart';
 import 'package:targafy/src/home/view/screens/UserProfile.dart';
 import 'package:targafy/src/home/view/screens/controller/user_profile_data_controller.dart';
@@ -27,10 +28,10 @@ import 'package:targafy/src/parameters/view/screens/add_parameter_target_screen.
 import 'package:targafy/src/users/ui/UsersScreen.dart';
 import 'package:targafy/utils/remote_routes.dart';
 
-final userAvatarProvider = FutureProvider<String>((ref) async {
-  final controller = ref.read(userProfileLogoControllerProvider);
-  return await controller.fetchUserAvatar();
-});
+// final userAvatarProvider = FutureProvider<String>((ref) async {
+//   final controller = ref.read(userProfileLogoControllerProvider);
+//   return await controller.fetchUserAvatar();
+// });
 
 String domain = AppRemoteRoutes.baseUrl;
 
@@ -69,6 +70,7 @@ class _BottomNavigationAndAppBarState
       const ActivityScreen(),
       FeedbackScreen(token: widget.token!), // Pass the token here
     ];
+
     _getToken();
   }
 
@@ -147,12 +149,28 @@ class _BottomNavigationAndAppBarState
     // print(
     //     'This is the final authToken which will be used for doing all functions :- ${widget.token}');
     final asyncValue = ref.watch(businessAndUserProvider(widget.token!));
-    final selectedBusinessData = ref.watch(currentBusinessProvider);
-    // Check if a business is selected, if not, try to select the first one
+    var selectedBusinessData = ref.read(currentBusinessProvider);
+    // final Map<String, dynamic>? selectedBusinessData1 = {
+    //   'business': Business(
+    //     id: '',
+    //     businessCode: '',
+    //     name: '',
+    //     logo: '',
+    //     industryType: '',
+    //     city: '',
+    //     country: '',
+    //   ),
+    //   'userType': '',
+    //   'businessCode': '',
+    // };
+    // // Check if a business is selected, if not, try to select the first one
+    // print('This is $selectedBusinessData');
+    // print('This is 1 $selectedBusinessData1');
+
     if (selectedBusinessData == null) {
       asyncValue.whenData((data) {
-        final businesses = (data['businesses'] as List<Business>?) ?? [];
-        final user = data['user'] as User?;
+        final businesses = (data?['businesses'] as List<Business>?) ?? [];
+        final user = data?['user'] as User?;
 
         if (businesses.isNotEmpty && user != null) {
           final firstBusiness = businesses.first;
@@ -161,14 +179,14 @@ class _BottomNavigationAndAppBarState
             orElse: () => BusinessUser(name: '', userType: '', businessId: ''),
           );
 
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            selectBusiness(
-              firstBusiness,
-              businessUser.userType ?? 'No User Type',
-              firstBusiness.businessCode ?? 'No Code',
-              ref,
-            );
-          });
+          // WidgetsBinding.instance.addPostFrameCallback((_) {
+          selectBusiness(
+            firstBusiness,
+            businessUser.userType ?? 'No User Type',
+            firstBusiness.businessCode ?? 'No Code',
+            ref,
+          );
+          // });
         }
       });
     }
@@ -331,13 +349,10 @@ class _BottomNavigationAndAppBarState
 
                   // final businesses = data['businesses'] as List<Business>?;
                   final businesses =
-                      (data['businesses'] as List<Business>?) ?? [];
+                      (data?['businesses'] as List<Business>?) ?? [];
                   print(businesses);
-                  final user = data['user'] as User?;
+                  final user = data?['user'] as User?;
                   print(user);
-
-                  // Fetch user avatar
-                  final userAvatar = ref.watch(userAvatarProvider);
 
                   return Column(
                     children: [
@@ -345,116 +360,44 @@ class _BottomNavigationAndAppBarState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // userAvatar.when(
-                            //   data: (avatarUrl) => Container(
-                            //     alignment: Alignment.centerLeft,
-                            //     width: double.infinity,
-                            //     child: Container(
-                            //       decoration: BoxDecoration(
-                            //         color: primaryColor,
-                            //         shape: BoxShape.circle,
-                            //       ),
-                            //       padding: const EdgeInsets.all(1.5),
-                            //       child: Center(
-                            //         child: CircleAvatar(
-                            //           radius: getScreenWidth(context) * 0.09,
-                            //           // backgroundImage:
-                            //           //     NetworkImage(avatarUrl),
-                            //           backgroundImage:
-                            //               CachedNetworkImageProvider(avatarUrl),
-                            //           onBackgroundImageError:
-                            //               (exception, stackTrace) {
-                            //             // Fallback image if loading fails
-
-                            //           },
-                            //           child: null,
-                            //         ),
-                            //       ),
-                            //     ),
-                            //   ),
-                            //   loading: () => const CircularProgressIndicator(),
-                            //   error: (error, stack) => Icon(
-                            //     Icons.error,
-                            //     size: getScreenWidth(context) * 0.09,
-                            //   ),
-                            // ),
-                            userAvatar.when(
-                              data: (avatarUrl) => Container(
-                                alignment: Alignment.centerLeft,
-                                width: double.infinity,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: primaryColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  padding: const EdgeInsets.all(1.5),
-                                  child: Center(
-                                    child: CircleAvatar(
-                                      radius: getScreenWidth(context) * 0.09,
-                                      backgroundImage:
-                                          CachedNetworkImageProvider(avatarUrl),
-                                      onBackgroundImageError:
-                                          (exception, stackTrace) {
-                                        // Fallback image if loading fails
-                                        const NetworkImage(
-                                            'https://codeskulptor-demos.commondatastorage.googleapis.com/pang/LdTCEUo.png');
-                                      },
-                                      child: null,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              loading: () => const CircularProgressIndicator(),
-                              error: (error, stack) {
-                                // Check for specific error message and display fallback image
-                                // if (error
-                                //     .toString()
-                                //     .contains("User avatar does not exist")) {
-                                //   return Container(
-                                //     alignment: Alignment.centerLeft,
-                                //     width: double.infinity,
-                                //     child: Container(
-                                //       decoration: BoxDecoration(
-                                //         color: primaryColor,
-                                //         shape: BoxShape.circle,
-                                //       ),
-                                //       padding: const EdgeInsets.all(1.5),
-                                //       child: Center(
-                                //         child: CircleAvatar(
-                                //           radius:
-                                //               getScreenWidth(context) * 0.09,
-                                //           backgroundImage: NetworkImage(
-                                //               'https://codeskulptor-demos.commondatastorage.googleapis.com/pang/LdTCEUo.png'),
-                                //           child: null,
-                                //         ),
-                                //       ),
-                                //     ),
-                                //   );
-                                // } else {
-                                // return Icon(
-                                //   Icons.error,
-                                //   size: getScreenWidth(context) * 0.09,
-                                // );
-                                return Container(
-                                  alignment: Alignment.centerLeft,
-                                  width: double.infinity,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: primaryColor,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    padding: const EdgeInsets.all(1.5),
-                                    child: Center(
-                                      child: CircleAvatar(
-                                        radius: getScreenWidth(context) * 0.09,
-                                        backgroundImage: const NetworkImage(
-                                            'https://codeskulptor-demos.commondatastorage.googleapis.com/pang/LdTCEUo.png'),
-                                        child: null,
+                            FutureBuilder<String>(
+                              future: ref
+                                  .read(userProfileLogoControllerProvider)
+                                  .fetchUserAvatar(widget.token!),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) {
+                                  return _buildFallbackAvatar();
+                                } else if (!snapshot.hasData ||
+                                    snapshot.data!.isEmpty) {
+                                  return _buildFallbackAvatar();
+                                } else {
+                                  return Container(
+                                    alignment: Alignment.centerLeft,
+                                    width: double.infinity,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: primaryColor,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      padding: const EdgeInsets.all(1.5),
+                                      child: Center(
+                                        child: CircleAvatar(
+                                          radius:
+                                              getScreenWidth(context) * 0.09,
+                                          backgroundImage:
+                                              CachedNetworkImageProvider(
+                                                  snapshot.data!),
+                                          onBackgroundImageError:
+                                              (exception, stackTrace) {
+                                            // Fallback image if loading fails
+                                            _buildFallbackAvatar();
+                                          },
+                                          child: null,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                                // }
+                                  );
+                                }
                               },
                             ),
                             Padding(
@@ -565,37 +508,12 @@ class _BottomNavigationAndAppBarState
                         leading: const Icon(Icons.logout),
                         title: const Text('Log out'),
                         onTap: () async {
-                          // Clear SharedPreferences
+                          ref.read(currentBusinessProvider.notifier).state =
+                              null;
 
-                          // ref.invalidate(currentBusinessProvider);
-                          // ref.invalidate(businessAndUserProvider);
-                          // ref.invalidate(userProfileLogoControllerProvider);
-                          // ref.invalidate(userRoleProvider);
-                          // ref.invalidate(businessUsersStreamProvider);
-                          // ref.invalidate(businessUsersStreamProvider2);
-                          // ref.invalidate(activityListProvider);
-                          // ref.invalidate(activityServiceProvider);
-                          // ref.invalidate(businessUsersProvider);
-                          // ref.invalidate(parameterListProvider);
-                          // ref.invalidate(parameterNotifierProvider);
-                          // ref.invalidate(parametersProvider);
-                          // ref.invalidate(userDataControllerProvider);
-                          // ref.invalidate(userRequestProvider);
-                          // ref.invalidate(userGroupProvider);
-                          // ref.invalidate(userRoleProvider);
-                          // ref.invalidate(userStreamProvider);
-                          // ref.invalidate(dataAddedControllerProvider);
-                          // ref.invalidate(subGroupDetailsProvider);
-                          // ref.invalidate(subgroupUsersControllerProvider);
-                          // ref.invalidate(SubGroupDataControllerProvider);
-                          // ref.invalidate(GroupProvider);
-                          // ref.invalidate(GroupDataControllerProvider);
-                          // ref.invalidate(
-                          //     businessAndUserProvider(widget.token!));
-                          clearSelectedBusiness(ref);
-                          ref.read(loginProvider.notifier).logout(context);
                           final prefs = await SharedPreferences.getInstance();
                           await prefs.remove('authToken');
+                          ref.read(loginProvider.notifier).logout(context);
 
                           // Navigate to login screen and remove all previous routes
                           // if (context.mounted) {
@@ -699,6 +617,29 @@ class _BottomNavigationAndAppBarState
           Icon(Icons.feedback, size: 30, color: Colors.white),
         ],
         onTap: _onItemTapped,
+      ),
+    );
+  }
+
+  Widget _buildFallbackAvatar() {
+    return Container(
+      alignment: Alignment.centerLeft,
+      width: double.infinity,
+      child: Container(
+        decoration: BoxDecoration(
+          color: primaryColor,
+          shape: BoxShape.circle,
+        ),
+        padding: const EdgeInsets.all(1.5),
+        child: Center(
+          child: CircleAvatar(
+            radius: getScreenWidth(context) * 0.09,
+            backgroundImage: const NetworkImage(
+              'https://codeskulptor-demos.commondatastorage.googleapis.com/pang/LdTCEUo.png',
+            ),
+            child: null,
+          ),
+        ),
       ),
     );
   }

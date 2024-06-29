@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/src/home/view/screens/controller/user_profile_data_controller.dart';
 import 'model/user_business_model_drawer.dart';
 
@@ -26,9 +27,11 @@ class _UserProfileState extends ConsumerState<UserProfile> {
   }
 
   Future<void> _fetchUserAvatar() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
     final controller = ref.read(userProfileLogoControllerProvider);
     try {
-      final avatarUrl = await controller.fetchUserAvatar();
+      final avatarUrl = await controller.fetchUserAvatar(token!);
       setState(() {
         _profileImageUrl = avatarUrl;
       });
