@@ -81,146 +81,160 @@ class _AddscreenState extends ConsumerState<Addscreen> {
       // appBar: AppBar(
       //   title: const Text('Add Data'),
       // ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: parametersAsyncValue.when(
-          data: (parameters) {
-            if (parameters.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Lottie.asset('assets/animations/empty_list.json',
-                        height: 200, width: 200),
-                    const Text(
-                      "Nothing to Add",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+      body: businessId == null
+          ? Center(
+              child: Text(
+                'Please select a business',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
                 ),
-              );
-            }
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text(
-                  'Add Data',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                DropdownButtonFormField<String>(
-                  value: selectedParameter ??
-                      (parameters.isNotEmpty ? parameters[0] : null),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedParameter = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Select Parameter',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  items: parameters
-                      .map<DropdownMenuItem<String>>((String parameter) {
-                    return DropdownMenuItem<String>(
-                      value: parameter,
-                      child: Text(parameter),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: todayDataController,
-                  decoration: InputDecoration(
-                    labelText: 'Today\'s Data',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: commentController,
-                  decoration: InputDecoration(
-                    labelText: 'Comment',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                SubmitButton(
-                  onPressed: () {
-                    if (selectedParameter != null && businessId != null) {
-                      final todayData = todayDataController.text;
-                      final comment = commentController.text;
-                      ref
-                          .read(addDataForParameterProvider({
-                        'businessId': businessId,
-                        'parameterName': selectedParameter!,
-                        'todayData': todayData,
-                        'comment': comment,
-                      }).future)
-                          .then((_) {
-                        // Data added successfully
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Data added successfully')),
-                        );
-                        // Clear the input fields
-                        todayDataController.clear();
-                        commentController.clear();
-                        setState(() {
-                          selectedParameter = null;
-                        });
-                      }).catchError((error) {
-                        // Handle error
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Failed to add data')),
-                        );
-                      });
-                    }
-                  },
-                ),
-              ],
-            );
-          },
-          loading: () {
-            return const Center(child: CircularProgressIndicator());
-          },
-          error: (error, stack) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Lottie.asset('assets/animations/empty_list.json',
-                      height: 200, width: 200),
-                  const Text(
-                    "Nothing to Add",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
               ),
-            );
-          },
-        ),
-      ),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: parametersAsyncValue.when(
+                data: (parameters) {
+                  if (parameters.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Lottie.asset('assets/animations/empty_list.json',
+                              height: 200, width: 200),
+                          const Text(
+                            "Nothing to Add",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        'Add Data',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      DropdownButtonFormField<String>(
+                        hint: const Text('Select Parameter'),
+                        // value: selectedParameter ??
+                        //     (parameters.isNotEmpty ? parameters[0] : null),
+                        value: selectedParameter,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedParameter = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Select Parameter',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        items: parameters
+                            .map<DropdownMenuItem<String>>((String parameter) {
+                          return DropdownMenuItem<String>(
+                            value: parameter,
+                            child: Text(parameter),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: todayDataController,
+                        decoration: InputDecoration(
+                          labelText: 'Today\'s Data',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: commentController,
+                        decoration: InputDecoration(
+                          labelText: 'Comment',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      SubmitButton(
+                        onPressed: () {
+                          if (selectedParameter != null && businessId != null) {
+                            final todayData = todayDataController.text;
+                            final comment = commentController.text;
+                            ref
+                                .read(addDataForParameterProvider({
+                              'businessId': businessId,
+                              'parameterName': selectedParameter!,
+                              'todayData': todayData,
+                              'comment': comment,
+                            }).future)
+                                .then((_) {
+                              // Data added successfully
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Data added successfully')),
+                              );
+                              // Clear the input fields
+                              todayDataController.clear();
+                              commentController.clear();
+                              setState(() {
+                                selectedParameter = null;
+                              });
+                            }).catchError((error) {
+                              // Handle error
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Failed to add data')),
+                              );
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  );
+                },
+                loading: () {
+                  return const Center(child: CircularProgressIndicator());
+                },
+                error: (error, stack) {
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Lottie.asset('assets/animations/empty_list.json',
+                            height: 200, width: 200),
+                        const Text(
+                          "Nothing to Add",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
     );
   }
 
