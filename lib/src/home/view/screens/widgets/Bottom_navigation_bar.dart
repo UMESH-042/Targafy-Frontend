@@ -434,6 +434,7 @@ class _BottomNavigationAndAppBarState
                       ),
                       if (businesses.isNotEmpty)
                         ExpansionTile(
+                          initiallyExpanded: true,
                           leading: const Icon(Icons.business),
                           title: const Text('Businesses'),
                           children: businesses.map((business) {
