@@ -41,7 +41,7 @@ class UserDataController extends StateNotifier<AsyncValue<UserData>> {
         state = AsyncValue.data(UserData(userEntries: [], dailyTarget: []));
         // AsyncValue.error('Failed to fetch user data', StackTrace.current);
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       // state = AsyncValue.error('Error: $e', stackTrace);
       state = AsyncValue.data(UserData(userEntries: [], dailyTarget: []));
     }
@@ -197,7 +197,7 @@ class UserPieDataController extends StateNotifier<AsyncValue<UserPieData>> {
             totalSum: 0,
             userEntries: [UserEntry(name: ' ', value: 0, percentage: 0)]));
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       print('Error: $e');
       state = AsyncValue.data(UserPieData(
           totalSum: 0,

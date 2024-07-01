@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
 import 'package:targafy/utils/remote_routes.dart';
 

@@ -18,7 +18,6 @@ import 'package:targafy/core/utils/texts.dart';
 import 'package:targafy/feedback/feedback.dart';
 import 'package:targafy/src/activity/ui/activity_screen.dart';
 import 'package:targafy/src/auth/view/Controllers/login.dart';
-import 'package:targafy/src/auth/view/screens/login_screen.dart';
 import 'package:targafy/src/home/view/screens/AddScreen.dart';
 import 'package:targafy/src/home/view/screens/UserProfile.dart';
 import 'package:targafy/src/home/view/screens/controller/user_profile_data_controller.dart';

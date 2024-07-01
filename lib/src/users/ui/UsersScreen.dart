@@ -508,7 +508,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) =>
-                                UserHierarchy(businessId: businessId!)));
+                                UserHierarchy(businessId: businessId)));
                       },
                       child: Container(
                         padding: const EdgeInsets.all(5),
@@ -673,7 +673,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                                                       .read(
                                                           promoteUserToAdminProvider)
                                                       .promote(
-                                                        businessId!,
+                                                        businessId,
                                                         user.userId,
                                                       );
 
@@ -688,7 +688,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                                                       .read(
                                                           promoteUserToMiniAdminProvider)
                                                       .promote(
-                                                        businessId!,
+                                                        businessId,
                                                         user.userId,
                                                       );
                                                   break;
@@ -697,7 +697,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                                                   ref
                                                       .read(demoteUserProvider)
                                                       .demoteUser(
-                                                        businessId!,
+                                                        businessId,
                                                         user.userId,
                                                       );
                                                   break;

@@ -612,6 +612,7 @@
 //     );
 //   }
 // }
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
@@ -621,6 +622,7 @@ import 'package:targafy/core/shared/components/back_button.dart';
 import 'package:targafy/core/shared/components/primary_button.dart';
 import 'package:targafy/core/utils/texts.dart';
 import 'package:targafy/src/parameters/view/controller/target_controller.dart';
+import 'package:targafy/src/parameters/view/screens/parameter_screen.dart';
 import 'package:targafy/src/parameters/view/widgets/parameter_tile.dart';
 import 'package:targafy/src/parameters/view/widgets/target_tile.dart';
 import 'package:targafy/src/parameters/view/screens/add_parameter.dart';
@@ -755,9 +757,28 @@ class _AddParameterTargetScreenState
                     itemCount: parameters.length,
                     itemBuilder: (context, index) {
                       final parameter = parameters[index];
-                      return ParameterTile(
-                        parameterName: parameter.name,
-                        userAssigned: parameter.assignedUsersCount,
+                      final paramId = parameters[index].id;
+
+                      return GestureDetector(
+                        onTap: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ParameterScreen(
+                                paramId: paramId,
+                                parameterName: parameter.name,
+                              ),
+                            ),
+                          );
+                          if (result == true) {
+                            _refreshParameters();
+                          }
+                        },
+                        child: ParameterTile(
+                          paramId: paramId,
+                          parameterName: parameter.name,
+                          userAssigned: parameter.assignedUsersCount,
+                        ),
                       );
                     },
                   ),
@@ -811,6 +832,7 @@ class _AddParameterTargetScreenState
                         itemCount: parameters.length,
                         itemBuilder: (context, index) {
                           final parameter = parameters[index];
+                          final parameterId = parameters[index].id;
                           return TargetTile(
                             parameterName: parameter.name,
                             target: 0,

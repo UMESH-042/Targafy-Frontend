@@ -121,8 +121,10 @@ class _TargetTileState extends State<TargetTile> {
           context,
           MaterialPageRoute(
             builder: (context) => ParameterTargetScreen(
+  
               parameterName: widget.parameterName,
               businessId: widget.businessId,
+          
               onDataAdded: widget.onDataAdded,
             ),
           ),

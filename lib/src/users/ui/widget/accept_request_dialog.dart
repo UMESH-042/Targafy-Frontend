@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
-import 'package:targafy/src/users/ui/controller/fetch_offices_controller.dart';
 import 'package:targafy/src/users/ui/model/business_user_list_model.dart';
 
 // class UserSelectionDialog extends ConsumerStatefulWidget {
@@ -220,10 +219,6 @@ import 'package:targafy/src/users/ui/model/business_user_list_model.dart';
 //   }
 // }
 
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
-import 'package:targafy/src/users/ui/model/business_user_list_model.dart';
 
 class UserSelectionDialog extends ConsumerStatefulWidget {
   final String userId;

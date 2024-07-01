@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/controller/create_business_controller.dart';
-import 'package:targafy/business_home_page/screens/next_page2_suboffice.dart';
-import 'package:targafy/business_home_page/screens/next_page_suboffice.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/shared/components/primary_button.dart';

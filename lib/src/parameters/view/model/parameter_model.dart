@@ -1,11 +1,14 @@
 class Parameter {
+  final String id;
   final String name;
   final int assignedUsersCount;
 
-  Parameter({required this.name, required this.assignedUsersCount});
+  Parameter(
+      {required this.id, required this.name, required this.assignedUsersCount});
 
   factory Parameter.fromJson(Map<String, dynamic> json) {
     return Parameter(
+      id: json['id'],
       name: json['name'],
       assignedUsersCount: json['assignedUsersCount'],
     );

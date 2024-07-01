@@ -149,7 +149,7 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
                                   userId: selectedUserListItem!,
                                   userName: username ?? '',
                                   businessId:
-                                      businessId!, // Dummy ID for UI purpose
+                                      businessId, // Dummy ID for UI purpose
                                   rateUserCallback: (success) {
                                     if (success) {
                                       setState(() {

@@ -686,7 +686,7 @@ class CustomChart extends StatelessWidget {
         intervalType: DateTimeIntervalType.days,
         majorGridLines: MajorGridLines(width: 0),
         edgeLabelPlacement: EdgeLabelPlacement.shift,
-        labelIntersectAction: AxisLabelIntersectAction.rotate45,
+        // labelIntersectAction: AxisLabelIntersectAction.rotate45,
         labelFormat: 'd-MMM',
         axisLabelFormatter: (AxisLabelRenderDetails args) {
           DateTime date =
