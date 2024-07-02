@@ -315,13 +315,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/shared/components/primary_button.dart';
 import 'package:targafy/src/auth/view/Controllers/login.dart';
 import 'package:targafy/src/home/view/screens/Mandatory_filed.dart';
 import 'package:targafy/src/home/view/screens/controller/mandatory_Filed_name_controller.dart';
-import 'package:targafy/src/registration/view/screens/register_a_business_screen1.dart';
+import 'package:targafy/src/home/view/screens/widgets/Bottom_navigation_bar.dart';
 import 'package:targafy/utils/utils.dart';
 
 class VerifyOTPScreen extends ConsumerStatefulWidget {
@@ -375,7 +376,6 @@ class _VerifyOTPScreenState extends ConsumerState<VerifyOTPScreen> {
   @override
   Widget build(BuildContext context) {
     final loginNotifier = ref.read(loginProvider.notifier);
-    final state = ref.watch(nameControllerProvider);
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -475,24 +475,67 @@ class _VerifyOTPScreenState extends ConsumerState<VerifyOTPScreen> {
                       final success =
                           await loginNotifier.verifyLoginOtp(context);
                       if (success) {
-                        if (state.isFirstTime) {
+                        final exists =
+                            await loginNotifier.checkBusinessExists();
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        String? bearerToken = prefs.getString('authToken');
+                        if (exists) {
+                          // Business already exists
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Business already exists')),
+                          );
+                          // Navigator.pushReplacement(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //       builder: (context) =>
+                          //           const BottomNavigationAndAppBar()),
+                          // );
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const MandatoryFieldPage(),
+                              builder: (context) => BottomNavigationAndAppBar(
+                                token: bearerToken,
+                              ),
                             ),
                             (route) => false,
                           );
                         } else {
+                          // Navigate to the next screen if business does not exist
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //       builder: (context) =>
+                          //           const RegisterABusinessScreen2()),
+                          // );
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const RegisterABusinessScreen1(),
+                              builder: (context) => MandatoryFieldPage(),
                             ),
                             (route) => false,
                           );
                         }
+
+                        // if (state.isFirstTime) {
+                        //   Navigator.pushAndRemoveUntil(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //       builder: (context) => const MandatoryFieldPage(),
+                        //     ),
+                        //     (route) => false,
+                        //   );
+                        // } else {
+                        //   Navigator.pushAndRemoveUntil(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //       builder: (context) =>
+                        //           const RegisterABusinessScreen1(),
+                        //     ),
+                        //     (route) => false,
+                        //   );
+                        // }
                       } else {
                         showSnackBar(context, 'Invalid OTP. Please try again.',
                             Colors.red);
