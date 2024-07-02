@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/src/home/view/screens/controller/mandatory_Filed_name_controller.dart';
 import 'package:targafy/src/registration/view/screens/register_a_business_screen1.dart';
 import 'package:targafy/utils/colors.dart';
@@ -38,7 +39,6 @@ class _MandatoryFieldPageState extends ConsumerState<MandatoryFieldPage> {
     if (!state.isFirstTime) {
       // Navigate to the next screen if not first time
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Navigator.pushReplacementNamed(context, '/nextScreen');
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
@@ -73,32 +73,59 @@ class _MandatoryFieldPageState extends ConsumerState<MandatoryFieldPage> {
         child: Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextFormField(controller: nameController, autofocus: true),
-              const SizedBox(height: 20),
-              SubmitButton(
-                onPressed: () async {
-                  if (nameController.text.isEmpty ||
-                      nameController.text == "Guest") {
-                    showSnackBar(context, "Enter Correct Name!!", invalidColor);
-                    return;
-                  }
+              Expanded(
+                child: Center(
+                  child: TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Enter your name',
+                      labelStyle: TextStyle(color: primaryColor),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: primaryColor, width: 2.0),
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: primaryColor, width: 2.0),
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: primaryColor, width: 2.0),
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: SubmitButton(
+                    onPressed: () async {
+                      if (nameController.text.isEmpty ||
+                          nameController.text == "Guest") {
+                        showSnackBar(
+                            context, "Enter Correct Name!!", invalidColor);
+                        return;
+                      }
 
-                  try {
-                    await ref
-                        .read(nameControllerProvider.notifier)
-                        .updateName(nameController.text);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const RegisterABusinessScreen1()));
-                  } catch (e) {
-                    showSnackBar(
-                        context, "Failed to update name", invalidColor);
-                  }
-                },
+                      try {
+                        await ref
+                            .read(nameControllerProvider.notifier)
+                            .updateName(nameController.text);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const RegisterABusinessScreen1()));
+                      } catch (e) {
+                        showSnackBar(
+                            context, "Failed to update name", invalidColor);
+                      }
+                    },
+                  ),
+                ),
               ),
             ],
           ),

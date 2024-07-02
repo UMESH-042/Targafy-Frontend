@@ -47,7 +47,7 @@ class Graphicalstatistics extends StatelessWidget {
 
   List<List<dynamic>> _calculateRatioData(
       List<List<dynamic>> actualData, List<List<dynamic>> predictedData) {
-    final List<List<dynamic>> ratioData = [];
+    List<List<dynamic>> ratioData = [];
     for (int i = 0; i < actualData.length; i++) {
       final String month = actualData[i][0].toString();
       final double actualValue = double.parse(actualData[i][1].toString());
@@ -57,6 +57,9 @@ class Graphicalstatistics extends StatelessWidget {
       final formattedRatio = double.parse(ratio.toStringAsFixed(2));
       ratioData.add([month, formattedRatio]);
     }
+    ratioData = ratioData
+        .where((data) => double.parse(data[1].toString()) != 0)
+        .toList();
     return ratioData;
   }
 }

@@ -178,14 +178,14 @@ class _BottomNavigationAndAppBarState
             orElse: () => BusinessUser(name: '', userType: '', businessId: ''),
           );
 
-          // WidgetsBinding.instance.addPostFrameCallback((_) {
-          selectBusiness(
-            firstBusiness,
-            businessUser.userType ?? 'No User Type',
-            firstBusiness.businessCode ?? 'No Code',
-            ref,
-          );
-          // });
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            selectBusiness(
+              firstBusiness,
+              businessUser.userType ?? 'No User Type',
+              firstBusiness.businessCode ?? 'No Code',
+              ref,
+            );
+          });
         }
       });
     }

@@ -543,7 +543,8 @@
 //         _findMinDate(formattedActualData, formattedPredictedData);
 //     DateTime maxDate =
 //         _findMaxDate(formattedActualData, formattedPredictedData);
-
+//     print(minDate);
+//     print(maxDate);
 //     return SfCartesianChart(
 //       primaryXAxis: DateTimeAxis(
 //         title: AxisTitle(
@@ -669,6 +670,11 @@ class CustomChart extends StatelessWidget {
     List<List<dynamic>> formattedActualData = _convertDates(actualData);
     List<List<dynamic>> formattedPredictedData = _convertDates(predictedData);
 
+    // // Filter out zero values from actual data
+    formattedActualData = formattedActualData
+        .where((data) => double.parse(data[1].toString()) != 0)
+        .toList();
+
     DateTime minDate =
         _findMinDate(formattedActualData, formattedPredictedData);
     DateTime maxDate =
@@ -736,7 +742,19 @@ class CustomChart extends StatelessWidget {
           xValueMapper: (data, _) => DateTime.parse(data[0].toString()),
           yValueMapper: (data, _) => double.parse(data[1].toString()),
           name: 'Target $parameter',
-          dataLabelSettings: const DataLabelSettings(isVisible: true),
+          dataLabelSettings: DataLabelSettings(
+            isVisible: true,
+            labelPosition: ChartDataLabelPosition.inside,
+            useSeriesColor: true,
+            builder: (dynamic data, dynamic point, dynamic series,
+                int pointIndex, int seriesIndex) {
+              if (pointIndex == formattedPredictedData.length - 1) {
+                return Text(point.y.toStringAsFixed(2),
+                    style: TextStyle(color: Colors.black));
+              }
+              return SizedBox.shrink();
+            },
+          ),
           color: Colors.blue,
         )
       ],

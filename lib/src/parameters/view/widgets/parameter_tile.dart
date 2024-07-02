@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/utils/texts.dart';
-import 'package:targafy/src/parameters/view/screens/parameter_screen.dart';
 
 class ParameterTile extends StatelessWidget {
   const ParameterTile(
