@@ -10,6 +10,7 @@ import 'package:targafy/core/shared/components/primary_button.dart';
 import 'package:targafy/src/auth/view/Controllers/login.dart';
 import 'package:targafy/src/home/view/screens/widgets/Bottom_navigation_bar.dart';
 import 'package:http/http.dart' as http;
+import 'package:targafy/src/registration/view/screens/register_a_business_screen2.dart';
 import 'package:targafy/utils/remote_routes.dart';
 
 String domain = AppRemoteRoutes.baseUrl;
@@ -283,20 +284,11 @@ class _RegisterABusinessScreen1State
                       );
                     } else {
                       // Navigate to the next screen if business does not exist
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) =>
-                      //           const RegisterABusinessScreen2()),
-                      // );
-                      Navigator.pushAndRemoveUntil(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => BottomNavigationAndAppBar(
-                            token: bearerToken,
-                          ),
-                        ),
-                        (route) => false,
+                            builder: (context) =>
+                                const RegisterABusinessScreen2()),
                       );
                     }
                   } else if (!isRegisterSelected) {

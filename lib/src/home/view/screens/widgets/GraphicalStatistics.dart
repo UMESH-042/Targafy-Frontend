@@ -29,7 +29,7 @@ class Graphicalstatistics extends StatelessWidget {
         ),
         interval: 1,
       ),
-      title: ChartTitle(text: 'Graphical Statistics $parameter Analysis'),
+      // title: ChartTitle(text: 'Graphical Statistics $parameter Analysis'),
       legend: const Legend(isVisible: true),
       tooltipBehavior: TooltipBehavior(enable: true),
       series: <LineSeries<dynamic, String>>[

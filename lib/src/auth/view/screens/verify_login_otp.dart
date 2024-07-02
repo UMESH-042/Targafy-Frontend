@@ -340,7 +340,6 @@ class _VerifyOTPScreenState extends ConsumerState<VerifyOTPScreen> {
   @override
   void initState() {
     super.initState();
-    ref.read(nameControllerProvider.notifier).checkFirstTime();
     _startTimer();
   }
 

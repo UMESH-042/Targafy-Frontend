@@ -15,13 +15,13 @@ class UserDataController extends StateNotifier<AsyncValue<UserData>> {
   UserDataController() : super(const AsyncLoading());
 
   Future<void> fetchUserData(
-      String businessId, String userId, String parameter) async {
+      String businessId, String userId, String parameter, String month) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
     try {
       final url = Uri.parse(
-          '${domain}data/get-level-data/$businessId/$userId/$parameter');
+          '${domain}data/get-level-data/$businessId/$userId/$parameter/$month');
       print(url);
       final response = await http.get(
         url,

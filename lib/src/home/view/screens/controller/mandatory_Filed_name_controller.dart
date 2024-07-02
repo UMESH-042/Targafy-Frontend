@@ -22,11 +22,6 @@ class NameState {
 class NameController extends StateNotifier<NameState> {
   NameController() : super(NameState(isFirstTime: true, name: ''));
 
-  Future<void> checkFirstTime() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isFirstTime = prefs.getBool('isFirstTime') ?? true;
-    state = NameState(isFirstTime: isFirstTime, name: state.name);
-  }
 
   Future<void> updateName(String name) async {
     final token = await SharedPreferenceService().getAuthToken();

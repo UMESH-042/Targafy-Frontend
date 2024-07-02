@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
@@ -64,14 +63,15 @@ final businessHierarchyProvider =
 });
 
 final userDataFutureProvider =
-    FutureProvider.family<UserData, Tuple3<String, String, String>>(
+    FutureProvider.family<UserData, Tuple4<String, String, String, String>>(
         (ref, params) async {
   final businessId = params.item1;
   final userId = params.item2;
   final selectedParameter = params.item3;
+  final month = params.item4;
 
   final controller = ref.read(userDataProvider.notifier);
-  await controller.fetchUserData(businessId, userId, selectedParameter);
+  await controller.fetchUserData(businessId, userId, selectedParameter, month);
   final result = ref.watch(userDataProvider);
 
   if (result is AsyncData<UserData>) {
@@ -112,6 +112,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   late String selectedUser;
   late String selectedUserId;
   int currentIndex = 0;
+  int currentMonth = DateTime.now().month;
 
   List<String> currentPath = [];
 
@@ -172,21 +173,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
-  // void _handleNodeTap(String nodeName, String nodeId,
-  //     Map<String, List<String>> parentIdToChildren) {
-  //   print('$nodeName:- $nodeId');
-  //   setState(() {
-  //     if (currentPath.contains(nodeId)) {
-  //       _removeDescendants(nodeId, parentIdToChildren);
-  //       selectedUserId = currentPath.isNotEmpty ? currentPath.last : '';
-  //       selectedHierarchyUser = currentPath.isNotEmpty;
-  //     } else {
-  //       selectedUserId = nodeId;
-  //       currentPath.add(nodeId);
-  //       selectedHierarchyUser = true;
-  //     }
-  //   });
-  // }
   void _handleNodeTap(String nodeName, String nodeId,
       Map<String, List<String>> parentIdToChildren) {
     setState(() {
@@ -240,8 +226,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return descendants;
   }
 
+  void _handlePrevTap() {
+    setState(() {
+      currentMonth = (currentMonth - 1) % 12;
+      if (currentMonth == 0) currentMonth = 12;
+    });
+  }
+
+  void _handleNextTap() {
+    setState(() {
+      currentMonth = (currentMonth + 1) % 12;
+      if (currentMonth == 0) currentMonth = 12;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    print(currentMonth);
+
     final parameterListAsync = ref.watch(parameterListProvider);
     final selectedBusinessData = ref.watch(currentBusinessProvider);
     final dataAddedController = ref.watch(dataAddedControllerProvider);
@@ -296,9 +298,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Container(
                       height: MediaQuery.of(context).size.height * 0.04,
                       margin: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.035,
+                        horizontal: MediaQuery.of(context).size.width * 0.02,
                       ).copyWith(
-                        top: MediaQuery.of(context).size.height * 0.03,
+                        top: MediaQuery.of(context).size.height * 0.01,
                       ),
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
@@ -328,9 +330,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           height: MediaQuery.of(context).size.height * 0.04,
                           margin: EdgeInsets.symmetric(
                             horizontal:
-                                MediaQuery.of(context).size.width * 0.035,
+                                MediaQuery.of(context).size.width * 0.02,
                           ).copyWith(
-                            top: MediaQuery.of(context).size.height * 0.01,
+                            top: MediaQuery.of(context).size.height * 0.005,
                           ),
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
@@ -379,9 +381,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 Alignment.centerLeft, // Align to the left
                             margin: EdgeInsets.symmetric(
                               horizontal:
-                                  MediaQuery.of(context).size.width * 0.035,
+                                  MediaQuery.of(context).size.width * 0.02,
                             ).copyWith(
-                              top: MediaQuery.of(context).size.height * 0.01,
+                              top: MediaQuery.of(context).size.height * 0.005,
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,7 +411,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   final children =
                                       parentIdToChildren[parentId] ?? [];
                                   return Padding(
-                                    padding: const EdgeInsets.only(top: 16.0),
+                                    padding: EdgeInsets.only(
+                                        top:
+                                            MediaQuery.of(context).size.height *
+                                                0.005),
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
@@ -439,14 +444,65 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         error: (error, stackTrace) =>
                             Center(child: Text('Error: $error')),
                       ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: _handlePrevTap,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color.fromARGB(
+                                255, 145, 173, 216), // Background color
+                            minimumSize:
+                                Size(30, 35), // Width and height of the button
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16), // Horizontal padding
+                          ),
+                          child: Text(
+                            'Prev',
+                            style: TextStyle(
+                              color: Colors
+                                  .black, // Change text color based on isSelected
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 5),
+                        ElevatedButton(
+                          onPressed: currentMonth == DateTime.now().month
+                              ? null
+                              : _handleNextTap,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color.fromARGB(
+                                255, 145, 173, 216), // Background color
+                            minimumSize:
+                                Size(30, 35), // Width and height of the button
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16), // Horizontal padding
+                          ),
+                          child: Text(
+                            'Next',
+                            style: TextStyle(
+                              color: Colors
+                                  .black, // Change text color based on isSelected
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     if (selectedHierarchyUser &&
                         selectedParameter.isNotEmpty &&
                         selectedUserId.isNotEmpty &&
                         selectedHierarchyUser &&
                         selectedStates[0])
                       ref
-                          .watch(userDataFutureProvider(Tuple3(
-                              businessId, selectedUserId, selectedParameter)))
+                          .watch(userDataFutureProvider(Tuple4(
+                              businessId,
+                              selectedUserId,
+                              selectedParameter,
+                              currentMonth.toString())))
                           .when(
                             data: (userData) {
                               // return CustomChart(
@@ -485,8 +541,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         selectedUserId.isNotEmpty &&
                         selectedStates[1])
                       ref
-                          .watch(userDataFutureProvider(Tuple3(
-                              businessId, selectedUserId, selectedParameter)))
+                          .watch(userDataFutureProvider(Tuple4(
+                              businessId,
+                              selectedUserId,
+                              selectedParameter,
+                              currentMonth.toString())))
                           .when(
                             data: (userData) {
                               return Padding(
@@ -542,8 +601,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         selectedUserId.isEmpty &&
                         !selectedHierarchyUser)
                       FutureBuilder<Map<String, List<List<dynamic>>>>(
-                        future: dataAddedController.fetchDataAdded(
-                            businessId, selectedParameter),
+                        future: dataAddedController.fetchDataAdded(businessId,
+                            selectedParameter, currentMonth.toString()),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
@@ -583,8 +642,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         selectedParameter.isNotEmpty &&
                         !selectedHierarchyUser)
                       FutureBuilder(
-                        future: dataAddedController.fetchDataAdded(
-                            businessId, selectedParameter),
+                        future: dataAddedController.fetchDataAdded(businessId,
+                            selectedParameter, currentMonth.toString()),
                         builder: (context,
                             AsyncSnapshot<Map<String, List<List<dynamic>>>>
                                 snapshot) {
@@ -612,8 +671,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         selectedParameter.isNotEmpty &&
                         !selectedHierarchyUser)
                       FutureBuilder(
-                        future: dataAddedController.fetchDataAdded(
-                            businessId, selectedParameter),
+                        future: dataAddedController.fetchDataAdded(businessId,
+                            selectedParameter, currentMonth.toString()),
                         builder: (context,
                             AsyncSnapshot<Map<String, List<List<dynamic>>>>
                                 snapshot) {

@@ -20,7 +20,6 @@ class _MandatoryFieldPageState extends ConsumerState<MandatoryFieldPage> {
   @override
   void initState() {
     super.initState();
-    ref.read(nameControllerProvider.notifier).checkFirstTime();
   }
 
   @override
@@ -35,18 +34,6 @@ class _MandatoryFieldPageState extends ConsumerState<MandatoryFieldPage> {
     double width = MediaQuery.of(context).size.width;
 
     final state = ref.watch(nameControllerProvider);
-
-    if (!state.isFirstTime) {
-      // Navigate to the next screen if not first time
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const RegisterABusinessScreen1()),
-          (route) => false,
-        );
-      });
-    }
 
     return Scaffold(
       appBar: PreferredSize(

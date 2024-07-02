@@ -11,9 +11,9 @@ final dataAddedControllerProvider =
 
 class DataAddedController {
   Future<Map<String, List<List<dynamic>>>> fetchDataAdded(
-      String businessId, String parameterName) async {
+      String businessId, String parameterName,String month) async {
     final String url =
-        '${domain}data/get-param-data/$businessId/$parameterName';
+        '${domain}data/get-param-data/$businessId/$parameterName/$month';
     final authToken = await _getAuthToken(); // Get the auth token
     print('This is business Id :- $businessId');
     print('This is parameterName :- $parameterName');

@@ -652,6 +652,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:targafy/core/utils/print_log.dart';
 
 class CustomChart extends StatelessWidget {
   final String parameter;
@@ -669,6 +670,8 @@ class CustomChart extends StatelessWidget {
   Widget build(BuildContext context) {
     List<List<dynamic>> formattedActualData = _convertDates(actualData);
     List<List<dynamic>> formattedPredictedData = _convertDates(predictedData);
+    print('This is the Achievement Data $formattedActualData');
+    print('This is the Target Data $formattedPredictedData');
 
     // // Filter out zero values from actual data
     formattedActualData = formattedActualData
@@ -679,11 +682,13 @@ class CustomChart extends StatelessWidget {
         _findMinDate(formattedActualData, formattedPredictedData);
     DateTime maxDate =
         _findMaxDate(formattedActualData, formattedPredictedData);
+    print('This is the minDate :- $minDate');
+    print('This is the maxDate :- $maxDate');
 
     return SfCartesianChart(
       primaryXAxis: DateTimeAxis(
         title: AxisTitle(
-          text: 'Days',
+          text: 'Month (${DateFormat('MMMM yyyy').format(maxDate)})',
           textStyle: const TextStyle(fontWeight: FontWeight.bold),
         ),
         minimum: minDate,
@@ -693,7 +698,7 @@ class CustomChart extends StatelessWidget {
         majorGridLines: MajorGridLines(width: 0),
         edgeLabelPlacement: EdgeLabelPlacement.shift,
         // labelIntersectAction: AxisLabelIntersectAction.rotate45,
-        labelFormat: 'd-MMM',
+        labelFormat: 'd',
         axisLabelFormatter: (AxisLabelRenderDetails args) {
           DateTime date =
               DateTime.fromMillisecondsSinceEpoch(args.value.toInt());
@@ -708,7 +713,7 @@ class CustomChart extends StatelessWidget {
                 days: 4 + ((day - 4) ~/ 5) * 5 + (day % 5 == 0 ? 0 : 5)));
           }
 
-          String labelText = DateFormat('d-MMM').format(customDate);
+          String labelText = DateFormat('d').format(customDate);
           return ChartAxisLabel(labelText, TextStyle(color: Colors.black));
         },
       ),
@@ -777,37 +782,53 @@ class CustomChart extends StatelessWidget {
 
   DateTime _findMinDate(
       List<List<dynamic>> actualData, List<List<dynamic>> predictedData) {
-    DateTime minDate = DateTime.now();
+    DateTime? minDate;
+
     for (var data in actualData) {
       DateTime date = DateTime.parse(data[0].toString());
-      if (date.isBefore(minDate)) {
+      if (minDate == null || date.isBefore(minDate)) {
         minDate = date;
       }
     }
+
     for (var data in predictedData) {
       DateTime date = DateTime.parse(data[0].toString());
-      if (date.isBefore(minDate)) {
+      if (minDate == null || date.isBefore(minDate)) {
         minDate = date;
       }
     }
+
+    if (minDate == null) {
+      // Handle the case where no valid date was found, perhaps set a default date
+      minDate = DateTime.now();
+    }
+
     return DateTime(minDate.year, minDate.month, 1); // Start of the month
   }
 
   DateTime _findMaxDate(
       List<List<dynamic>> actualData, List<List<dynamic>> predictedData) {
-    DateTime maxDate = DateTime.now();
+    DateTime? maxDate;
+
     for (var data in actualData) {
       DateTime date = DateTime.parse(data[0].toString());
-      if (date.isAfter(maxDate)) {
+      if (maxDate == null || date.isAfter(maxDate)) {
         maxDate = date;
       }
     }
+
     for (var data in predictedData) {
       DateTime date = DateTime.parse(data[0].toString());
-      if (date.isAfter(maxDate)) {
+      if (maxDate == null || date.isAfter(maxDate)) {
         maxDate = date;
       }
     }
+
+    if (maxDate == null) {
+      // Handle the case where no valid date was found, perhaps set a default date
+      maxDate = DateTime.now();
+    }
+
     int daysInMonth = DateTime(maxDate.year, maxDate.month + 1, 0).day;
     return DateTime(
         maxDate.year, maxDate.month, daysInMonth); // End of the month
