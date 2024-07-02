@@ -27,19 +27,37 @@ final selectedBusinessData = Provider<Map<String, dynamic>?>((ref) {
   return ref.watch(currentBusinessProvider);
 });
 
+// final parameterListProvider =
+//     FutureProvider.autoDispose<List<Parameter2>>((ref) async {
+//   final selectedBusinessData = ref.watch(currentBusinessProvider);
+//   final businessId = selectedBusinessData?['business']?.id;
+
+//   if (businessId != null) {
+//     final notifier = ref.read(parametersProviderHome.notifier);
+//     await notifier.fetchParametersforHome(businessId);
+//     return ref.watch(parametersProviderHome);
+//   } else {
+//     return <Parameter2>[];
+//   }
+// });
+
 final parameterListProvider =
-    FutureProvider.autoDispose<List<Parameter2>>((ref) async {
+    StreamProvider.autoDispose<List<Parameter2>>((ref) async* {
   final selectedBusinessData = ref.watch(currentBusinessProvider);
   final businessId = selectedBusinessData?['business']?.id;
 
   if (businessId != null) {
     final notifier = ref.read(parametersProviderHome.notifier);
-    await notifier.fetchParametersforHome(businessId);
-    return ref.watch(parametersProviderHome);
+
+    // Assuming fetchParametersforHome returns a Stream
+    await for (final parameters in notifier.fetchParametersforHome(businessId)) {
+      yield parameters;
+    }
   } else {
-    return <Parameter2>[];
+    yield <Parameter2>[];
   }
 });
+
 
 final businessHierarchyProvider =
     FutureProvider.autoDispose<BusinessUserHierarchy>((ref) async {
@@ -444,6 +462,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         error: (error, stackTrace) =>
                             Center(child: Text('Error: $error')),
                       ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.05,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

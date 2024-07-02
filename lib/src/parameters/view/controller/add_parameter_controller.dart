@@ -153,26 +153,63 @@ class ParameterNotifier extends StateNotifier<List<Parameter>> {
   }
 }
 
+// // StateNotifier to manage the state of the parameters
+// class ParametersNotifierHome extends StateNotifier<List<Parameter2>> {
+//   ParametersNotifierHome() : super([]);
+
+//   Future<void> fetchParametersforHome(String businessId) async {
+//     final prefs = await SharedPreferences.getInstance();
+//     final token = prefs.getString('authToken');
+
+//     final response = await http.get(
+//       Uri.parse('${domain}params/get-param-id/$businessId'),
+//       headers: {
+//         'Authorization': 'Bearer $token',
+//       },
+//     );
+
+//     if (response.statusCode == 200) {
+//       final data = json.decode(response.body)['data']['params'] as List;
+//       state = data.map((json) => Parameter2.fromJson(json)).toList();
+//     } else {
+//       throw Exception('Failed to load parameters');
+//     }
+//   }
+// }
+
+// // Create a provider for the ParametersNotifier
+// final parametersProviderHome =
+//     StateNotifierProvider<ParametersNotifierHome, List<Parameter2>>((ref) {
+//   return ParametersNotifierHome();
+// });
+
 // StateNotifier to manage the state of the parameters
 class ParametersNotifierHome extends StateNotifier<List<Parameter2>> {
   ParametersNotifierHome() : super([]);
 
-  Future<void> fetchParametersforHome(String businessId) async {
+  Stream<List<Parameter2>> fetchParametersforHome(String businessId) async* {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
-    final response = await http.get(
-      Uri.parse('${domain}params/get-param-id/$businessId'),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
+    while (true) {
+      final response = await http.get(
+        Uri.parse('${domain}params/get-param-id/$businessId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body)['data']['params'] as List;
-      state = data.map((json) => Parameter2.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load parameters');
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body)['data']['params'] as List;
+        state = data.map((json) => Parameter2.fromJson(json)).toList();
+        yield state;
+      } else {
+        throw Exception('Failed to load parameters');
+      }
+
+      // Wait for some time before fetching again, if needed
+      // await Future.delayed(Duration(minutes: 1));
+      await Future.delayed(Duration(seconds: 2));
     }
   }
 }
