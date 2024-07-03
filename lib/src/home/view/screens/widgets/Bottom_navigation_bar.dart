@@ -148,7 +148,7 @@ class _BottomNavigationAndAppBarState
     // print(
     //     'This is the final authToken which will be used for doing all functions :- ${widget.token}');
     final asyncValue = ref.watch(businessAndUserProvider(widget.token!));
-    var selectedBusinessData = ref.read(currentBusinessProvider);
+    var selectedBusinessData = ref.watch(currentBusinessProvider);// made changes read to watch
     // final Map<String, dynamic>? selectedBusinessData1 = {
     //   'business': Business(
     //     id: '',

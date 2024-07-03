@@ -27,37 +27,19 @@ final selectedBusinessData = Provider<Map<String, dynamic>?>((ref) {
   return ref.watch(currentBusinessProvider);
 });
 
-// final parameterListProvider =
-//     FutureProvider.autoDispose<List<Parameter2>>((ref) async {
-//   final selectedBusinessData = ref.watch(currentBusinessProvider);
-//   final businessId = selectedBusinessData?['business']?.id;
-
-//   if (businessId != null) {
-//     final notifier = ref.read(parametersProviderHome.notifier);
-//     await notifier.fetchParametersforHome(businessId);
-//     return ref.watch(parametersProviderHome);
-//   } else {
-//     return <Parameter2>[];
-//   }
-// });
-
 final parameterListProvider =
-    StreamProvider.autoDispose<List<Parameter2>>((ref) async* {
+    FutureProvider.autoDispose<List<Parameter2>>((ref) async {
   final selectedBusinessData = ref.watch(currentBusinessProvider);
   final businessId = selectedBusinessData?['business']?.id;
 
   if (businessId != null) {
     final notifier = ref.read(parametersProviderHome.notifier);
-
-    // Assuming fetchParametersforHome returns a Stream
-    await for (final parameters in notifier.fetchParametersforHome(businessId)) {
-      yield parameters;
-    }
+    await notifier.fetchParametersforHome(businessId);
+    return ref.watch(parametersProviderHome);
   } else {
-    yield <Parameter2>[];
+    return <Parameter2>[];
   }
 });
-
 
 final businessHierarchyProvider =
     FutureProvider.autoDispose<BusinessUserHierarchy>((ref) async {
@@ -147,7 +129,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     selectedUser = '';
     selectedUserId = '';
     selectedHierarchyUser = false;
-
     // _getToken();
   }
 
@@ -339,11 +320,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     parameterListAsync.when(
                       data: (parameterList) {
-                        // if (selectedParameter.isEmpty && parameterList.isNotEmpty) {
-                        //   selectedParameter = parameterList[0].name;
-
-                        //   ref.invalidate(GroupProvider);
-                        // }
+                        if (selectedParameter.isEmpty &&
+                            parameterList.isNotEmpty) {
+                          selectedParameter = parameterList[0].name;
+                        }
                         return Container(
                           height: MediaQuery.of(context).size.height * 0.04,
                           margin: EdgeInsets.symmetric(
