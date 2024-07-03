@@ -58,6 +58,9 @@ class _BottomNavigationAndAppBarState
   // ];
   late final List<Widget> _widgetOptions;
   bool _isRefreshing = false;
+
+  
+
   @override
   void initState() {
     _requestNotificationPermissions();
@@ -431,6 +434,7 @@ class _BottomNavigationAndAppBarState
                           ],
                         ),
                       ),
+
                       if (businesses.isNotEmpty)
                         ExpansionTile(
                           initiallyExpanded: true,
