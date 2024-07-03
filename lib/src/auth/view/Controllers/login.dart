@@ -240,11 +240,13 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
       state = LoginState(); // Reset login state to initial values
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-        (Route<dynamic> route) => false,
-      );
+      // Navigator.pushAndRemoveUntil(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => const LoginScreen()),
+      //   (Route<dynamic> route) => false,
+      // );
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => LoginScreen()));
     } catch (e) {
       debugPrint("Error during logout: $e");
       showSnackBar(context, "Failed to logout. Please try again.", Colors.red);

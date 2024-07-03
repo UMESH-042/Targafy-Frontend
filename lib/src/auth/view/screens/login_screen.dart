@@ -286,7 +286,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                             children: [
                               TextSpan(
-                                text: 'Terms and Conditions \nand Privacy Policy',
+                                text:
+                                    'Terms and Conditions \nand Privacy Policy',
                                 style: TextStyle(
                                   decoration: TextDecoration.underline,
                                   color: Colors.blue, // Adjust color as needed

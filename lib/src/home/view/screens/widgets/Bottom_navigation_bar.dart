@@ -148,7 +148,7 @@ class _BottomNavigationAndAppBarState
     // print(
     //     'This is the final authToken which will be used for doing all functions :- ${widget.token}');
     final asyncValue = ref.watch(businessAndUserProvider(widget.token!));
-    var selectedBusinessData = ref.watch(currentBusinessProvider);// made changes read to watch
+    var selectedBusinessData = ref.read(currentBusinessProvider);
     // final Map<String, dynamic>? selectedBusinessData1 = {
     //   'business': Business(
     //     id: '',
@@ -508,12 +508,12 @@ class _BottomNavigationAndAppBarState
                         leading: const Icon(Icons.logout),
                         title: const Text('Log out'),
                         onTap: () async {
-                          ref.read(currentBusinessProvider.notifier).state =
-                              null;
+                          ref.read(loginProvider.notifier).logout(context);
 
                           final prefs = await SharedPreferences.getInstance();
+                          ref.read(currentBusinessProvider.notifier).state =
+                              null;
                           await prefs.remove('authToken');
-                          ref.read(loginProvider.notifier).logout(context);
 
                           // Navigate to login screen and remove all previous routes
                           // if (context.mounted) {
