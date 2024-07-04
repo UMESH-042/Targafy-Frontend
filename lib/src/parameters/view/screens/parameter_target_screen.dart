@@ -1205,6 +1205,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                             Text('Target added successfully')),
                                   );
                                   widget.onDataAdded();
+                                  _clearFields();
                                 } catch (error) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
