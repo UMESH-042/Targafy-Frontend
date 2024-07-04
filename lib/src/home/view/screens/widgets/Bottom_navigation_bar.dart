@@ -23,6 +23,7 @@ import 'package:targafy/src/home/view/screens/UserProfile.dart';
 import 'package:targafy/src/home/view/screens/controller/user_profile_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
 import 'package:targafy/src/home/view/screens/home_screen.dart';
+import 'package:targafy/src/parameters/view/controller/add_parameter_controller.dart';
 import 'package:targafy/src/parameters/view/screens/add_parameter_target_screen.dart';
 import 'package:targafy/src/users/ui/UsersScreen.dart';
 import 'package:targafy/utils/remote_routes.dart';
@@ -59,8 +60,6 @@ class _BottomNavigationAndAppBarState
   late final List<Widget> _widgetOptions;
   bool _isRefreshing = false;
 
-  
-
   @override
   void initState() {
     _requestNotificationPermissions();
@@ -74,6 +73,18 @@ class _BottomNavigationAndAppBarState
     ];
 
     _getToken();
+    _refreshParameters();
+  }
+
+  void _refreshParameters() {
+    print('Refresh Parameter is called');
+    final selectedBusinessData = ref.read(currentBusinessProvider);
+    final businessId = selectedBusinessData?['business']?.id;
+    if (businessId != null) {
+      ref
+          .read(parametersProviderHome.notifier)
+          .fetchParametersforHome(businessId);
+    }
   }
 
   Future<void> _getToken() async {
@@ -264,15 +275,18 @@ class _BottomNavigationAndAppBarState
                           borderRadius: BorderRadius.circular(15)
                               .copyWith(topRight: const Radius.circular(0)),
                         ),
-                        onSelected: (value) {
+                        onSelected: (value) async {
                           if (value == 1) {
-                            Navigator.push(
+                            final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
                                     const AddParameterTargetScreen(),
                               ),
                             );
+                            if (result == true) {
+                              _refreshParameters();
+                            }
                           } else if (value == 2) {
                             // Handle action for "Add Charts"
                           } else if (value == 3) {
@@ -434,7 +448,6 @@ class _BottomNavigationAndAppBarState
                           ],
                         ),
                       ),
-
                       if (businesses.isNotEmpty)
                         ExpansionTile(
                           initiallyExpanded: true,

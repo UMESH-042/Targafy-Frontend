@@ -626,6 +626,7 @@ import 'package:targafy/src/parameters/view/screens/parameter_screen.dart';
 import 'package:targafy/src/parameters/view/widgets/parameter_tile.dart';
 import 'package:targafy/src/parameters/view/widgets/target_tile.dart';
 import 'package:targafy/src/parameters/view/screens/add_parameter.dart';
+import 'package:targafy/widgets/custom_back_button.dart';
 
 class AddParameterTargetScreen extends ConsumerStatefulWidget {
   const AddParameterTargetScreen({super.key});
@@ -692,7 +693,7 @@ class _AddParameterTargetScreenState
     return Scaffold(
       body: Column(
         children: [
-          const CustomBackButton(),
+          const SpecialBackButton(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
