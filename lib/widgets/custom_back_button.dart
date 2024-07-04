@@ -1,38 +1,43 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:targafy/core/constants/dimensions.dart';
+import 'package:targafy/core/utils/texts.dart';
 
-class CustomBackButton extends StatelessWidget {
-  const CustomBackButton({
+class SpecialBackButton extends StatelessWidget {
+  const SpecialBackButton({
     super.key,
+    this.text,
   });
+
+  final String? text;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x1E000000),
-            blurRadius: 2,
-            offset: Offset(-3, 3),
-            spreadRadius: 0,
-          )
-        ],
-      ),
-      child: InkWell(
-        onTap: () {
-          // GoRouter.of(context).pop();
-          Navigator.pop(context);
-        },
-        child: const Icon(
-          Icons.arrow_back_sharp,
-          color: Colors.black,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: () {
+            Navigator.pop(context, true);
+          },
+          child: Container(
+            margin: EdgeInsets.symmetric(
+                    horizontal: getScreenWidth(context) * 0.04,
+                    vertical: getScreenheight(context) * 0.04)
+                .copyWith(bottom: 0),
+            alignment: Alignment.centerLeft,
+            child: Image.asset('assets/img/back.png'),
+          ),
         ),
-      ),
+        if (text != null)
+          Padding(
+            padding: EdgeInsets.only(top: getScreenheight(context) * 0.04),
+            child: CustomText(
+              text: text!,
+              fontSize: getScreenWidth(context) * 0.055,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+      ],
     );
   }
 }

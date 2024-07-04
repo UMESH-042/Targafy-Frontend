@@ -17,12 +17,14 @@ class Target {
   final String paramName;
   final String comment;
   final List<String> userIds;
+  final String monthIndex;
 
   Target({
     required this.targetValue,
     required this.paramName,
     required this.comment,
     required this.userIds,
+     required this.monthIndex,
   });
 
   Map<String, dynamic> toJson() {
@@ -31,6 +33,7 @@ class Target {
       'paramName': paramName,
       'comment': comment,
       'userIds': userIds,
+       'monthIndex': monthIndex,
     };
   }
 }

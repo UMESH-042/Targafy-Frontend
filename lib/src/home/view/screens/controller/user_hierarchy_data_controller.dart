@@ -151,13 +151,13 @@ class UserPieDataController extends StateNotifier<AsyncValue<UserPieData>> {
   UserPieDataController() : super(const AsyncLoading());
 
   Future<void> fetchUserPieData(
-      String businessId, String userId, String parameter) async {
+      String businessId, String userId, String parameter,String currentMonth) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
     try {
       final url = Uri.parse(
-          '${domain}data/get-pie-chart-data/$businessId/$userId/$parameter');
+          '${domain}data/get-pie-chart-data/$businessId/$userId/$parameter/$currentMonth');
       print(url);
       final response = await http.get(
         url,

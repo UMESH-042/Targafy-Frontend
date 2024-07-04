@@ -82,14 +82,16 @@ final userDataFutureProvider =
 });
 
 final userPieDataFutureProvider =
-    FutureProvider.family<UserPieData, Tuple3<String, String, String>>(
+    FutureProvider.family<UserPieData, Tuple4<String, String, String, String>>(
         (ref, params) async {
   final businessId = params.item1;
   final userId = params.item2;
   final selectedParameter = params.item3;
+  final currentMonth = params.item4;
 
   final controller = ref.read(userPieDataProvider.notifier);
-  await controller.fetchUserPieData(businessId, userId, selectedParameter);
+  await controller.fetchUserPieData(
+      businessId, userId, selectedParameter, currentMonth);
   final result = ref.watch(userPieDataProvider);
 
   if (result is AsyncData<UserPieData>) {
@@ -568,8 +570,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         selectedUserId.isNotEmpty &&
                         selectedStates[3])
                       ref
-                          .watch(userPieDataFutureProvider(Tuple3(
-                              businessId, selectedUserId, selectedParameter)))
+                          .watch(userPieDataFutureProvider(Tuple4(
+                              businessId,
+                              selectedUserId,
+                              selectedParameter,
+                              currentMonth.toString())))
                           .when(
                             data: (userData) {
                               return Padding(

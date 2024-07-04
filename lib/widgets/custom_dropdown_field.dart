@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:targafy/core/constants/colors.dart';
 
-class CustomInputField extends StatelessWidget {
+class CustomDropdownField extends StatelessWidget {
   final String labelText;
-  final TextEditingController controller;
-  final String? Function(String?)? validator;
-  final TextInputType? keyboardType;
+  final List<DropdownMenuItem<String>> items;
+  final ValueChanged<String?> onChanged;
+  final String? value;
 
-  const CustomInputField({
+  const CustomDropdownField({
     Key? key,
     required this.labelText,
-    required this.controller,
-    this.validator,
-    this.keyboardType,
+    required this.items,
+    required this.onChanged,
+    this.value,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
+    return DropdownButtonFormField<String>(
+      value: value,
+      items: items,
+      onChanged: onChanged,
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: TextStyle(color: primaryColor),
@@ -35,8 +37,6 @@ class CustomInputField extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.0),
         ),
       ),
-      validator: validator,
-      keyboardType: keyboardType,
     );
   }
 }
