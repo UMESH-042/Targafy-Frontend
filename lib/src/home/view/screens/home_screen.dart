@@ -1,12 +1,16 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/src/home/view/screens/controller/actual_predicted_data_controller.dart';
+import 'package:targafy/src/home/view/screens/controller/progress_bar_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_hierarchy_data_controller.dart';
 import 'package:targafy/src/home/view/screens/widgets/GraphicalStatistics.dart';
+import 'package:targafy/src/home/view/widgets/progress_bar.dart';
 import 'package:targafy/src/home/view/widgets/selectable_chart.dart';
 import 'package:targafy/src/home/view/widgets/selectable_parameter.dart';
 import 'package:targafy/src/home/view/widgets/selectable_sub_group.dart';
@@ -133,8 +137,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     selectedHierarchyUser = false;
     // _getToken();
   }
-
-  
 
   static const List<String> images = [
     'assets/img/line_chart_invert.png',
@@ -724,27 +726,82 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       ),
                     if (selectedStates[4])
-                      Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Lottie.asset('assets/animations/empty_list.json',
-                                height: 200, width: 200),
-                            const Text(
-                              "Nothing to display",
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                      ref
+                          .watch(progressDataProvider(
+                              Tuple2(businessId!, currentMonth.toString())))
+                          .when(
+                            data: (progressData) {
+                              final List<Color> colors = [
+                                Colors.green,
+                                Colors.blue,
+                                Colors.orange,
+                                Colors.purple,
+                              ];
+                              return Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  children: [
+                                    ...progressData.entries.map((entry) {
+                                      final color = getRandomColor();
+                                      return ProgressBarWidget(
+                                        label: entry.key,
+                                        value: entry.value,
+                                        color: color,
+                                      );
+                                    }).toList(),
+                                    Text(
+                                      getMonthName(currentMonth),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            loading: () => const Center(
+                                child: CircularProgressIndicator()),
+                            error: (error, stackTrace) => Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Lottie.asset(
+                                      'assets/animations/empty_list.json',
+                                      height: 200,
+                                      width: 200),
+                                  const Text(
+                                    "Nothing to display",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      )
+                          ),
                   ],
                 ),
               ),
       ),
     );
+  }
+
+  final List<Color> colors = [
+    Colors.blue,
+    Colors.orange,
+    Colors.purple,
+  ];
+
+  Color getRandomColor() {
+    final random = Random();
+    return colors[random.nextInt(colors.length)];
+  }
+
+  String getMonthName(int month) {
+    DateTime dateTime = DateTime(DateTime.now().year, month);
+    return DateFormat('MMMM').format(dateTime);
   }
 }
