@@ -20,4 +20,12 @@ class ActivityModel {
       createdDate: DateTime.parse(json['createdDate']),
     );
   }
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'content': content,
+      'activityCategory': activityCategory,
+      'createdDate': createdDate.toIso8601String(),
+    };
+  }
 }

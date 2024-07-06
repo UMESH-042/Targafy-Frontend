@@ -22,6 +22,7 @@ class RegisterABusinessScreen2 extends StatefulWidget {
 class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
   final ImagePicker _picker = ImagePicker();
   XFile? _image;
+  String? _imageName;
 
   final TextEditingController _businessNameController = TextEditingController();
   final TextEditingController _industryTypeController = TextEditingController();
@@ -36,6 +37,11 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
         await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
       _image = pickedFile;
+      if (_image != null) {
+        String fileName = _image!.name;
+        _imageName =
+            fileName.length > 10 ? '${fileName.substring(0, 20)}...' : fileName;
+      }
     });
   }
 
@@ -150,6 +156,7 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
                   SizedBox(
                     height: getScreenWidth(context) * 0.1,
                     child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
                       controller: _businessNameController,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.only(
@@ -182,6 +189,7 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
                   SizedBox(
                     height: getScreenWidth(context) * 0.1,
                     child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
                       controller: _industryTypeController,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.only(
@@ -214,6 +222,7 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
                   SizedBox(
                     height: getScreenWidth(context) * 0.1,
                     child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
                       controller: _cityController,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.only(
@@ -249,11 +258,12 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
                       alignment: Alignment.topRight,
                       children: [
                         TextField(
+                          textCapitalization: TextCapitalization.sentences,
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.only(
                                 top: getScreenWidth(context) * 0.0,
                                 left: getScreenWidth(context) * 0.02),
-                            hintText: 'Import your logo',
+                            hintText: _imageName ?? 'Import your logo',
                             hintStyle: TextStyle(
                                 color: const Color(0xff787878),
                                 fontFamily: 'Sofia Pro',
@@ -306,6 +316,7 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
                   SizedBox(
                     height: getScreenWidth(context) * 0.1,
                     child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
                       controller: _countryController,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.only(

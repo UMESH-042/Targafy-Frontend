@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/business_home_page/controller/create_business_controller.dart';
 import 'package:targafy/core/shared/components/back_button.dart';
+import 'package:targafy/widgets/custom_text_field.dart';
 import 'package:targafy/widgets/submit_button.dart';
 
 import '../../core/shared/custom_text_field.dart';
@@ -61,24 +62,23 @@ class _CreateBusinessPageState extends ConsumerState<CreateBusinessPage> {
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(height * .19),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-              vertical: height * 0.02, horizontal: width * .04),
-          child: const Row(
-            children: [
-              CustomBackButton(),
-              SizedBox(width: 20),
-              Text(
-                "Create Business",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontFamily: "Poppins",
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18),
-              ),
-            ],
-          ),
+        preferredSize: Size.fromHeight(height * .1),
+        child: const Row(
+          children: [
+            const CustomBackButton(
+              text: 'Create Business',
+            ),
+            // CustomBackButton(),
+            // SizedBox(width: 20),
+            // Text(
+            //   "Create Business",
+            //   style: TextStyle(
+            //       color: Colors.black,
+            //       fontFamily: "Poppins",
+            //       fontWeight: FontWeight.bold,
+            //       fontSize: 18),
+            // ),
+          ],
         ),
       ),
       body: SingleChildScrollView(
@@ -113,30 +113,51 @@ class _CreateBusinessPageState extends ConsumerState<CreateBusinessPage> {
                   ),
                 ),
               ),
-              CustomTextField(
+              SizedBox(height: height * 0.05),
+              CustomInputField(
                 controller: nameController,
-                onChanged: (p0) => {},
-                labelText: "Name*",
+                labelText: "Name",
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter Name';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: height * 0.02),
-              CustomTextField(
+              CustomInputField(
                 controller: industryTypeController,
-                onChanged: (p0) => {},
                 labelText: "Industry type",
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter Industry Type';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: height * 0.02),
-              CustomTextField(
+              CustomInputField(
                 controller: cityController,
-                onChanged: (p0) => {},
                 labelText: "City",
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter City';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: height * 0.02),
-              CustomTextField(
+              CustomInputField(
                 controller: countryController,
-                onChanged: (p0) => {},
                 labelText: "Country",
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter Country';
+                  }
+                  return null;
+                },
               ),
-              SizedBox(height: height * 0.02),
+              SizedBox(height: height * 0.05),
               SubmitButton(
                 onPressed: () async {
                   if (_selectedImagePath == null) {

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:targafy/core/shared/components/back_button.dart';
 import 'package:targafy/src/parameters/view/controller/add_parameter_controller.dart';
-import 'package:targafy/src/parameters/view/widgets/CustomParameterField.dart';
 import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
+import 'package:targafy/widgets/custom_dropdown_field.dart';
+import 'package:targafy/widgets/custom_text_field.dart';
+import 'package:targafy/widgets/sort_dropdown_list.dart';
 import 'package:targafy/widgets/submit_button.dart';
 
 class AddParameter extends ConsumerStatefulWidget {
@@ -20,8 +22,8 @@ class _AddParameterState extends ConsumerState<AddParameter> {
   final TextEditingController _descriptionController = TextEditingController();
   final List<String> _selectedUserIds = [];
   final List<String> _selectedUsersNames = [];
-  String? _selectedChart;
-  String? _selectedDuration;
+  String _selectedChart = 'Line Chart';
+  String _selectedDuration = '1stTo31st';
 
   @override
   void initState() {
@@ -41,8 +43,6 @@ class _AddParameterState extends ConsumerState<AddParameter> {
     if (businessId != null &&
         _parameterNameController.text.isNotEmpty &&
         _selectedUserIds.isNotEmpty &&
-        _selectedChart != null &&
-        _selectedDuration != null &&
         _descriptionController.text.isNotEmpty) {
       ref
           .read(parameterNotifierProvider.notifier)
@@ -50,8 +50,8 @@ class _AddParameterState extends ConsumerState<AddParameter> {
             businessId,
             _parameterNameController.text,
             _selectedUserIds,
-            _selectedChart!,
-            _selectedDuration!,
+            _selectedChart,
+            _selectedDuration,
             _descriptionController.text,
           )
           .then((success) {
@@ -99,6 +99,8 @@ class _AddParameterState extends ConsumerState<AddParameter> {
   Widget build(BuildContext context) {
     final asyncUsers = ref.watch(businessUsersProvider);
     print(_selectedUserIds);
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: Padding(
@@ -110,91 +112,139 @@ class _AddParameterState extends ConsumerState<AddParameter> {
               const CustomBackButton(
                 text: 'Add Parameter',
               ),
-              const SizedBox(height: 20),
-              CustomFieldParameter(
+              SizedBox(height: height * 0.02),
+              CustomInputField(
+                labelText: 'Enter Parameter Name',
                 controller: _parameterNameController,
-                label: 'Enter Parameter Name',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter Parameter Name';
+                  }
+                  return null;
+                },
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: height * 0.02),
+
+              // asyncUsers.when(
+              //   data: (users) {
+              //     final sortedUsers = sortList(users, (user) => user.name);
+              //     return DropdownButtonFormField<String>(
+              //       decoration: const InputDecoration(labelText: 'Select User'),
+              //       value: null,
+              //       items: sortedUsers.map((user) {
+              //         return DropdownMenuItem<String>(
+              //           value: user.userId,
+              //           child: Text(user.name),
+              //         );
+              //       }).toList(),
+              //       onChanged: (value) {
+              //         if (value != null && !_selectedUserIds.contains(value)) {
+              //           setState(() {
+              //             _selectedUserIds.add(value);
+              //             _selectedUsersNames.add(sortedUsers
+              //                 .firstWhere((user) => user.userId == value)
+              //                 .name);
+              //           });
+              //         }
+              //       },
+              //       selectedItemBuilder: (BuildContext context) {
+              //         return _selectedUsersNames.map<Widget>((String item) {
+              //           return Text(item);
+              //         }).toList();
+              //       },
+              //       isExpanded: true,
+              //       hint: const Text('Select Users'),
+              //       icon: const Icon(Icons.arrow_drop_down),
+              //       iconSize: 24,
+              //       elevation: 16,
+              //       style: const TextStyle(color: Colors.deepPurple),
+              //     );
+              //   },
+              //   loading: () => const Center(child: CircularProgressIndicator()),
+              //   error: (error, stackTrace) =>
+              //       Text('Failed to load users: $error'),
+              // ),
               asyncUsers.when(
-                data: (users) => DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(labelText: 'Select User'),
-                  value: null,
-                  items: users.map((user) {
-                    return DropdownMenuItem<String>(
-                      value: user.userId,
-                      child: Text(user.name),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value != null && !_selectedUserIds.contains(value)) {
-                      setState(() {
-                        _selectedUserIds.add(value);
-                        _selectedUsersNames.add(users
-                            .firstWhere((user) => user.userId == value)
-                            .name);
-                      });
-                    }
-                  },
-                  selectedItemBuilder: (BuildContext context) {
-                    return _selectedUsersNames.map<Widget>((String item) {
-                      return Text(item);
-                    }).toList();
-                  },
-                  isExpanded: true,
-                  hint: const Text('Select Users'),
-                  icon: const Icon(Icons.arrow_drop_down),
-                  iconSize: 24,
-                  elevation: 16,
-                  style: const TextStyle(color: Colors.deepPurple),
-                ),
+                data: (users) {
+                  final sortedUsers = sortList(users, (user) => user.name);
+
+                  return CustomDropdownField(
+                    labelText: 'Select User',
+                    value: null,
+                    items: [
+                      ...sortedUsers.map((user) {
+                        return DropdownMenuItem<String>(
+                          value: user.userId,
+                          child: Text(user.name),
+                        );
+                      }).toList(),
+                    ],
+                    onChanged: (value) {
+                      if (value != null && !_selectedUserIds.contains(value)) {
+                        setState(() {
+                          _selectedUserIds.add(value);
+                          _selectedUsersNames.add(sortedUsers
+                              .firstWhere((user) => user.userId == value)
+                              .name);
+                        });
+                      }
+                    },
+                  );
+                },
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (error, stackTrace) =>
                     Text('Failed to load users: $error'),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: height * 0.01),
               _buildChips(),
-              const SizedBox(height: 20),
-              CustomFieldParameter(
-                label: 'Select charts',
-                dropdownValue: _selectedChart,
-                dropdownItems: const [
-                  DropdownMenuItem(
-                      value: 'Line Chart', child: Text('Line Chart')),
-                  DropdownMenuItem(value: 'Table', child: Text('Table')),
-                  DropdownMenuItem(
-                      value: 'Pie Chart', child: Text('Pie Chart')),
-                  DropdownMenuItem(value: 'Lines', child: Text('Lines')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _selectedChart = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              CustomFieldParameter(
-                label: 'Duration',
-                dropdownValue: _selectedDuration,
-                dropdownItems: const [
-                  DropdownMenuItem(
-                      value: '1stTo31st', child: Text('1stTo31st')),
-                  DropdownMenuItem(
-                      value: 'upto30days', child: Text('upto30days')),
-                  DropdownMenuItem(value: '30days', child: Text('30days')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _selectedDuration = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              CustomFieldParameter(
+              // const SizedBox(height: 20),
+              // CustomFieldParameter(
+              //   label: 'Select charts',
+              //   dropdownValue: _selectedChart,
+              //   dropdownItems: const [
+              //     DropdownMenuItem(
+              //         value: 'Line Chart', child: Text('Line Chart')),
+              //     DropdownMenuItem(value: 'Table', child: Text('Table')),
+              //     DropdownMenuItem(
+              //         value: 'Pie Chart', child: Text('Pie Chart')),
+              //     DropdownMenuItem(value: 'Lines', child: Text('Lines')),
+              //   ],
+              //   onChanged: (value) {
+              //     setState(() {
+              //       _selectedChart = value;
+              //     });
+              //   },
+              // ),
+              // const SizedBox(height: 20),
+              // CustomFieldParameter(
+              //   label: 'Duration',
+              //   dropdownValue: _selectedDuration,
+              //   dropdownItems: const [
+              //     DropdownMenuItem(
+              //         value: '1stTo31st', child: Text('1stTo31st')),
+              //     DropdownMenuItem(
+              //         value: 'upto30days', child: Text('upto30days')),
+              //     DropdownMenuItem(value: '30days', child: Text('30days')),
+              //   ],
+              //   onChanged: (value) {
+              //     setState(() {
+              //       _selectedDuration = value;
+              //     });
+              //   },
+              // ),
+              SizedBox(height: height * 0.02),
+              CustomInputField(
                 controller: _descriptionController,
-                label: 'Enter Description',
+                labelText: 'Enter Description',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter description';
+                  }
+                  return null;
+                },
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: height * 0.05),
+
               // ElevatedButton(
               //   onPressed: _submitParameter,
               //   child: const Text('Submit'),

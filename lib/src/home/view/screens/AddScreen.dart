@@ -253,6 +253,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/mandatory_Filed_name_controller.dart';
 import 'package:targafy/utils/remote_routes.dart';
+import 'package:targafy/widgets/custom_dropdown_field.dart';
+import 'package:targafy/widgets/custom_text_field.dart';
+import 'package:targafy/widgets/sort_dropdown_list.dart';
 import 'package:targafy/widgets/submit_button.dart';
 
 String domain = AppRemoteRoutes.baseUrl;
@@ -321,6 +324,8 @@ class _AddscreenState extends ConsumerState<Addscreen> {
     final parametersAsyncValue = ref.watch(parametersProvider);
     final selectedBusinessData = ref.watch(currentBusinessProvider);
     final businessId = selectedBusinessData?['business']?.id;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: businessId == null
@@ -357,6 +362,8 @@ class _AddscreenState extends ConsumerState<Addscreen> {
                       ),
                     );
                   }
+                  final sortedParameters =
+                      sortList(parameters, (parameter) => parameter);
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -369,22 +376,16 @@ class _AddscreenState extends ConsumerState<Addscreen> {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 20),
-                      DropdownButtonFormField<String>(
-                        hint: const Text('Select Parameter'),
+                      SizedBox(height: height * 0.03),
+                      CustomDropdownField(
+                        labelText: 'Select Parameter',
                         value: selectedParameter,
                         onChanged: (value) {
                           setState(() {
                             selectedParameter = value;
                           });
                         },
-                        decoration: InputDecoration(
-                          labelText: 'Select Parameter',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                        items: parameters
+                        items: sortedParameters
                             .map<DropdownMenuItem<String>>((String parameter) {
                           return DropdownMenuItem<String>(
                             value: parameter,
@@ -392,28 +393,30 @@ class _AddscreenState extends ConsumerState<Addscreen> {
                           );
                         }).toList(),
                       ),
-                      const SizedBox(height: 20),
-                      TextField(
+                      SizedBox(height: height * 0.03),
+                      CustomInputField(
+                        labelText: 'Today\'s Data',
                         controller: todayDataController,
-                        decoration: InputDecoration(
-                          labelText: 'Today\'s Data',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
                         keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please add data for given Selected Parameter';
+                          }
+                          return null;
+                        },
                       ),
-                      const SizedBox(height: 20),
-                      TextField(
+                      SizedBox(height: height * 0.03),
+                      CustomInputField(
+                        labelText: 'Comment',
                         controller: commentController,
-                        decoration: InputDecoration(
-                          labelText: 'Comment',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please add comments';
+                          }
+                          return null;
+                        },
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: height * 0.05),
                       SubmitButton(
                         onPressed: () {
                           if (selectedParameter != null && businessId != null) {

@@ -984,9 +984,11 @@ import 'package:targafy/src/parameters/view/model/target_data_model.dart';
 import 'package:targafy/src/parameters/view/model/user_target_model.dart';
 import 'package:targafy/src/parameters/view/widgets/TargetCard.dart';
 import 'package:targafy/src/parameters/view/widgets/small_button.dart';
+import 'package:targafy/widgets/Special_back_button.dart';
 import 'package:targafy/widgets/custom_back_button.dart';
 import 'package:targafy/widgets/custom_dropdown_field.dart';
 import 'package:targafy/widgets/custom_text_field.dart';
+import 'package:targafy/widgets/sort_dropdown_list.dart';
 import 'package:targafy/widgets/submit_button.dart';
 import '../controller/Add_target_controller.dart';
 
@@ -1076,7 +1078,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
           child: Column(
             children: [
               SpecialBackButton(text: '${widget.parameterName} Target'),
-              const SizedBox(height: 16),
+              SizedBox(height: height * 0.05),
               Form(
                 key: _formKey,
                 child: Column(
@@ -1092,7 +1094,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: height * 0.02),
                     CustomInputField(
                       labelText: 'Comment',
                       controller: _commentController,
@@ -1103,9 +1105,11 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: height * 0.02),
                     users.when(
                       data: (userList) {
+                        final sortedUserList =
+                            sortList(userList, (user) => user.name);
                         return Column(
                           children: [
                             CustomDropdownField(
@@ -1115,7 +1119,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                   value: 'select_all',
                                   child: const Text('Select All'),
                                 ),
-                                ...userList.map((user) {
+                                ...sortedUserList.map((user) {
                                   return DropdownMenuItem<String>(
                                     value: user.userId,
                                     child: Text(user.name),
@@ -1125,7 +1129,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                               onChanged: (value) {
                                 if (value == 'select_all') {
                                   setState(() {
-                                    AssingSelectedUserIds = userList
+                                    AssingSelectedUserIds = sortedUserList
                                         .map((user) => user.userId)
                                         .toList();
                                     additionalAllSelected = true;
@@ -1139,7 +1143,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                 }
                               },
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: height * 0.02),
                             Wrap(
                               children: additionalAllSelected
                                   ? [
@@ -1155,14 +1159,10 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                     ]
                                   : AssingSelectedUserIds.map((userId) {
                                       return Chip(
-                                        label: Text(users.when(
-                                          data: (userList) => userList
-                                              .firstWhere((user) =>
-                                                  user.userId == userId)
-                                              .name,
-                                          loading: () => '',
-                                          error: (error, stackTrace) => '',
-                                        )),
+                                        label: Text(userList
+                                            .firstWhere(
+                                                (user) => user.userId == userId)
+                                            .name),
                                         onDeleted: () {
                                           setState(() {
                                             AssingSelectedUserIds.remove(
@@ -1179,7 +1179,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                       error: (error, stackTrace) =>
                           Text('Failed to load users: $error'),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: height * 0.05),
                     isLoading
                         ? const CircularProgressIndicator()
                         : SubmitButton(
@@ -1224,6 +1224,8 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                     SizedBox(height: height * 0.1),
                     users.when(
                       data: (userList) {
+                        final sortedUserList =
+                            sortList(userList, (user) => user.name);
                         return Column(
                           children: [
                             CustomDropdownField(
@@ -1233,7 +1235,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                   value: 'select_all',
                                   child: const Text('Select All'),
                                 ),
-                                ...userList.map((user) {
+                                ...sortedUserList.map((user) {
                                   return DropdownMenuItem<String>(
                                     value: user.userId,
                                     child: Text(user.name),
@@ -1243,7 +1245,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                               onChanged: (value) {
                                 if (value == 'select_all') {
                                   setState(() {
-                                    selectedUserIds = userList
+                                    selectedUserIds = sortedUserList
                                         .map((user) => user.userId)
                                         .toList();
                                     allSelected = true;
@@ -1257,7 +1259,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                 }
                               },
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: height * 0.02),
                             Wrap(
                               children: allSelected
                                   ? [
@@ -1296,7 +1298,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                       error: (error, stackTrace) =>
                           Text('Failed to load users: $error'),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: height * 0.02),
                     CustomSmallButton(
                       title: 'Get Targets',
                       onPressed: () {
@@ -1308,7 +1310,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                         });
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: height * 0.02),
                     if (showTargets)
                       ...selectedUserIds.map((userId) {
                         return users.when(
