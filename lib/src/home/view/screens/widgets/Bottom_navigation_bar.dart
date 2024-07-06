@@ -23,6 +23,7 @@ import 'package:targafy/src/home/view/screens/UserProfile.dart';
 import 'package:targafy/src/home/view/screens/controller/user_profile_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
 import 'package:targafy/src/home/view/screens/home_screen.dart';
+import 'package:targafy/src/home/view/screens/widgets/AddCharts.dart';
 import 'package:targafy/src/parameters/view/controller/add_parameter_controller.dart';
 import 'package:targafy/src/parameters/view/screens/add_parameter_target_screen.dart';
 import 'package:targafy/src/users/ui/UsersScreen.dart';
@@ -288,6 +289,14 @@ class _BottomNavigationAndAppBarState
                             }
                           } else if (value == 2) {
                             // Handle action for "Add Charts"
+                             final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const AddCharts(),
+                              ),
+                            );
+
                           } else if (value == 3) {
                             // Handle action for "Refresh"
                             Restart.restartApp();
