@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/core/constants/colors.dart';
+import 'package:targafy/src/home/view/screens/controller/Comment_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/actual_predicted_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/progress_bar_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_hierarchy_data_controller.dart';
@@ -140,10 +141,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   static const List<String> images = [
     'assets/img/line_chart_invert.png',
+    'assets/img/pie_invert.png',
+    'assets/img/line_invert.png',
     'assets/img/table_invert.png',
     'assets/img/chat_invert.png',
-    'assets/img/pie_invert.png',
-    'assets/img/line_invert.png'
   ];
 
   void handleTapForCharts(int index) {
@@ -287,7 +288,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     // Convert JSON data to List<UserEntry>
     List<UserEntry> userEntries = parseUserEntries(userData);
-
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _handleRefresh,
@@ -451,27 +451,68 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.05,
                     ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     ElevatedButton(
+                    //       onPressed: _handlePrevTap,
+                    //       style: ElevatedButton.styleFrom(
+                    //         backgroundColor: Color.fromARGB(
+                    //             255, 145, 173, 216), // Background color
+                    //         minimumSize:
+                    //             Size(30, 35), // Width and height of the button
+                    //         padding: EdgeInsets.symmetric(
+                    //             horizontal: 16), // Horizontal padding
+                    //       ),
+                    //       child: Text(
+                    //         'Prev',
+                    //         style: TextStyle(
+                    //           color: Colors
+                    //               .black, // Change text color based on isSelected
+                    //           fontSize: 14,
+                    //           fontWeight: FontWeight.w500,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     SizedBox(width: 5),
+                    //     ElevatedButton(
+                    //       onPressed: currentMonth == DateTime.now().month
+                    //           ? null
+                    //           : _handleNextTap,
+                    //       style: ElevatedButton.styleFrom(
+                    //         backgroundColor: Color.fromARGB(
+                    //             255, 145, 173, 216), // Background color
+                    //         minimumSize:
+                    //             Size(30, 35), // Width and height of the button
+                    //         padding: EdgeInsets.symmetric(
+                    //             horizontal: 16), // Horizontal padding
+                    //       ),
+                    //       child: Text(
+                    //         'Next',
+                    //         style: TextStyle(
+                    //           color: Colors
+                    //               .black, // Change text color based on isSelected
+                    //           fontSize: 14,
+                    //           fontWeight: FontWeight.w500,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ElevatedButton(
                           onPressed: _handlePrevTap,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color.fromARGB(
-                                255, 145, 173, 216), // Background color
-                            minimumSize:
-                                Size(30, 35), // Width and height of the button
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 16), // Horizontal padding
+                            backgroundColor: Color.fromARGB(255, 145, 173, 216),
+                            shape: CircleBorder(),
+                            padding: EdgeInsets.all(8),
                           ),
-                          child: Text(
-                            'Prev',
-                            style: TextStyle(
-                              color: Colors
-                                  .black, // Change text color based on isSelected
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          child: Icon(
+                            Icons.chevron_left,
+                            color: Colors.black,
+                            size: 24,
                           ),
                         ),
                         SizedBox(width: 5),
@@ -480,21 +521,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               ? null
                               : _handleNextTap,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color.fromARGB(
-                                255, 145, 173, 216), // Background color
-                            minimumSize:
-                                Size(30, 35), // Width and height of the button
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 16), // Horizontal padding
+                            backgroundColor: Color.fromARGB(255, 145, 173, 216),
+                            shape: CircleBorder(),
+                            padding: EdgeInsets.all(8),
                           ),
-                          child: Text(
-                            'Next',
-                            style: TextStyle(
-                              color: Colors
-                                  .black, // Change text color based on isSelected
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          child: Icon(
+                            Icons.chevron_right,
+                            color: Colors.black,
+                            size: 24,
                           ),
                         ),
                       ],
@@ -517,6 +551,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               //   predictedData: userData.userEntries,
                               //   actualData: userData.dailyTarget,
                               // );
+
                               return Column(
                                 children: [
                                   Padding(
@@ -524,7 +559,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     child: CustomChart(
                                       parameter: selectedParameter,
                                       actualData: userData.userEntries,
-                                      predictedData: userData.dailyTarget,
+                                      predictedData:
+                                          userData.dailyTargetAccumulated,
                                     ),
                                   ),
                                   Padding(
@@ -532,7 +568,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     child: Graphicalstatistics(
                                       parameter: selectedParameter,
                                       actualData: userData.userEntries,
-                                      predictedData: userData.dailyTarget,
+                                      predictedData:
+                                          userData.dailyTargetAccumulated,
                                     ),
                                   ),
                                 ],
@@ -546,7 +583,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     if (selectedHierarchyUser &&
                         selectedParameter.isNotEmpty &&
                         selectedUserId.isNotEmpty &&
-                        selectedStates[1])
+                        selectedStates[3])
                       ref
                           .watch(userDataFutureProvider(Tuple4(
                               businessId,
@@ -560,7 +597,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 child: DataTableWidget(
                                   parameter: selectedParameter,
                                   actualData: userData.userEntries,
-                                  predictedData: userData.dailyTarget,
+                                  predictedData:
+                                      userData.dailyTargetAccumulated,
                                 ),
                               );
                             },
@@ -572,7 +610,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     if (selectedHierarchyUser &&
                         selectedParameter.isNotEmpty &&
                         selectedUserId.isNotEmpty &&
-                        selectedStates[3])
+                        selectedStates[1])
                       ref
                           .watch(userPieDataFutureProvider(Tuple4(
                               businessId,
@@ -610,7 +648,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         selectedParameter.isNotEmpty &&
                         selectedUserId.isEmpty &&
                         !selectedHierarchyUser)
-                      FutureBuilder<Map<String, List<List<dynamic>>>>(
+                      FutureBuilder<UserDataModel>(
                         future: dataAddedController.fetchDataAdded(businessId,
                             selectedParameter, currentMonth.toString()),
                         builder: (context, snapshot) {
@@ -620,26 +658,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           } else if (!snapshot.hasData) {
                             return Center(child: Text('No data available'));
                           } else {
-                            Map<String, List<List<dynamic>>> data =
-                                snapshot.data!;
+                            UserDataModel data = snapshot.data!;
                             return Column(
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: CustomChart(
                                     parameter: selectedParameter,
-                                    actualData: data['userEntries'] ?? [],
-                                    predictedData:
-                                        data['dailyTargetAccumulated'] ?? [],
+                                    actualData: data.userEntries,
+                                    predictedData: data.dailyTargetAccumulated,
                                   ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Graphicalstatistics(
                                     parameter: selectedParameter,
-                                    actualData: data['userEntries'] ?? [],
-                                    predictedData:
-                                        data['dailyTargetAccumulated'] ?? [],
+                                    actualData: data.userEntries,
+                                    predictedData: data.dailyTargetAccumulated,
                                   ),
                                 ),
                               ],
@@ -648,44 +683,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         },
                       ),
                     if (selectedStates.isNotEmpty &&
-                        selectedStates[3] &&
-                        selectedParameter.isNotEmpty &&
-                        !selectedHierarchyUser)
-                      FutureBuilder(
-                        future: dataAddedController.fetchDataAdded(businessId,
-                            selectedParameter, currentMonth.toString()),
-                        builder: (context,
-                            AsyncSnapshot<Map<String, List<List<dynamic>>>>
-                                snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(
-                                child: Text('Error: ${snapshot.error}'));
-                          } else {
-                            final data = snapshot.data!;
-                            print(data);
-                            return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: PiechartGraph1(
-                                  parameter: selectedParameter,
-                                  actualData: userEntries,
-                                ));
-                          }
-                        },
-                      ),
-                    if (selectedStates.isNotEmpty &&
                         selectedStates[1] &&
                         selectedParameter.isNotEmpty &&
                         !selectedHierarchyUser)
-                      FutureBuilder(
+                      FutureBuilder<UserDataModel>(
                         future: dataAddedController.fetchDataAdded(businessId,
                             selectedParameter, currentMonth.toString()),
-                        builder: (context,
-                            AsyncSnapshot<Map<String, List<List<dynamic>>>>
-                                snapshot) {
+                        builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return const Center(
@@ -694,61 +698,175 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             return Center(
                                 child: Text('Error: ${snapshot.error}'));
                           } else {
-                            final data = snapshot.data!;
+                            UserDataModel data = snapshot.data!;
                             print(data);
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: DataTableWidget(
-                                  parameter: selectedParameter,
-                                  actualData: data['userEntries'] ?? [],
-                                  predictedData:
-                                      data['dailyTargetAccumulated'] ?? []),
+                              child: PiechartGraph1(
+                                parameter: selectedParameter,
+                                actualData: userEntries,
+                              ),
                             );
                           }
                         },
                       ),
-                    if (selectedStates[2])
-                      Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Lottie.asset('assets/animations/empty_list.json',
-                                height: 200, width: 200),
-                            const Text(
-                              "Nothing to display",
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[3] &&
+                        selectedParameter.isNotEmpty &&
+                        !selectedHierarchyUser)
+                      FutureBuilder<UserDataModel>(
+                        future: dataAddedController.fetchDataAdded(businessId,
+                            selectedParameter, currentMonth.toString()),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else {
+                            UserDataModel data = snapshot.data!;
+                            print(data);
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DataTableWidget(
+                                parameter: selectedParameter,
+                                actualData: data.userEntries,
+                                predictedData: data.dailyTargetAccumulated,
                               ),
-                            ),
-                          ],
-                        ),
+                            );
+                          }
+                        },
                       ),
-                    if (selectedStates[4])
+                    
+                     if (selectedStates[4] && selectedParameter.isNotEmpty)
+                    FutureBuilder<CommentsDataModel>(
+                      future: ref
+                          .read(commentsDataControllerProvider)
+                          .fetchCommentsData(businessId, selectedParameter, currentMonth.toString()),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
+                        } else if (!snapshot.hasData || snapshot.data!.comments.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Lottie.asset('assets/animations/empty_list.json',
+                                    height: 200, width: 200),
+                                const Text(
+                                  "Nothing to display",
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          final commentsData = snapshot.data!;
+                          return Column(
+                            children: commentsData.comments.map((entry) {
+                              return Card(
+                                margin: EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                  horizontal: 16.0,
+                                ),
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                      title: Text(entry.date),
+                                    ),
+                                    ...entry.comments.map((commentDetail) {
+                                      return ListTile(
+                                        title: Text(commentDetail.todaysComment),
+                                        subtitle: Text('Added by: ${commentDetail.addedBy} on ${commentDetail.date}'),
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        }
+                      },
+                    ),
+
+                    // for displaying progress bar if only parameter and states is selected
+
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[2] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedUserId.isEmpty &&
+                        !selectedHierarchyUser)
+                      FutureBuilder<UserDataModel>(
+                        future: dataAddedController.fetchDataAdded(businessId,
+                            selectedParameter, currentMonth.toString()),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData) {
+                            return Center(child: Text('No data available'));
+                          } else {
+                            UserDataModel data = snapshot.data!;
+                            return Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  ProgressBarWidget(
+                                    label: selectedParameter,
+                                    Targetvalue: data.actualTotalTarget,
+                                    AchievedValue: data.totalTargetAchieved,
+                                    color: getRandomColor(),
+                                  ),
+                                  Text(
+                                    getMonthName(currentMonth),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                      ),
+
+                    // for displaying progress bar if user and parameter is selected
+                    if (selectedHierarchyUser &&
+                        selectedParameter.isNotEmpty &&
+                        selectedUserId.isNotEmpty &&
+                        selectedHierarchyUser &&
+                        selectedStates[2])
                       ref
-                          .watch(progressDataProvider(
-                              Tuple2(businessId!, currentMonth.toString())))
+                          .watch(userDataFutureProvider(Tuple4(
+                              businessId,
+                              selectedUserId,
+                              selectedParameter,
+                              currentMonth.toString())))
                           .when(
-                            data: (progressData) {
-                              final List<Color> colors = [
-                                Colors.green,
-                                Colors.blue,
-                                Colors.orange,
-                                Colors.purple,
-                              ];
+                            data: (userData) {
                               return Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Column(
                                   children: [
-                                    ...progressData.entries.map((entry) {
-                                      final color = getRandomColor();
-                                      return ProgressBarWidget(
-                                        label: entry.key,
-                                        value: entry.value,
-                                        color: color,
-                                      );
-                                    }).toList(),
+                                    ProgressBarWidget(
+                                      label: selectedParameter,
+                                      Targetvalue: userData.actualTotalTarget,
+                                      AchievedValue:
+                                          userData.totalTargetAchieved,
+                                      color: getRandomColor(),
+                                    ),
                                     Text(
                                       getMonthName(currentMonth),
                                       style: TextStyle(

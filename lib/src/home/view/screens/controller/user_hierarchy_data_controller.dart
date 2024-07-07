@@ -6,6 +6,87 @@ import 'package:targafy/utils/remote_routes.dart';
 
 String domain = AppRemoteRoutes.baseUrl;
 
+// final userDataProvider =
+//     StateNotifierProvider<UserDataController, AsyncValue<UserData>>((ref) {
+//   return UserDataController();
+// });
+
+// class UserDataController extends StateNotifier<AsyncValue<UserData>> {
+//   UserDataController() : super(const AsyncLoading());
+
+//   Future<void> fetchUserData(
+//       String businessId, String userId, String parameter, String month) async {
+//     final prefs = await SharedPreferences.getInstance();
+//     final token = prefs.getString('authToken');
+
+//     try {
+//       final url = Uri.parse(
+//           '${domain}data/get-level-data/$businessId/$userId/$parameter/$month');
+//       print(url);
+//       final response = await http.get(
+//         url,
+//         headers: {
+//           'Authorization': 'Bearer $token',
+//         },
+//       );
+//       print('This is the businessId :- $businessId');
+//       print('This is userId :-$userId');
+//       print('This is Parameter :- $parameter');
+//       if (response.statusCode == 200) {
+//         final data = json.decode(response.body)['data']['data'];
+//         final userData = UserData.fromJson(data);
+//         print('This is userData :- $userData');
+//         state = AsyncValue.data(userData);
+//       } else {
+//         state = AsyncValue.data(UserData(
+//           userEntries: [],
+//           dailyTarget: [],
+//           totalTargetAchieved: 0,
+//           actualTotalTarget: 0,
+//           percentage: 0,
+//         ));
+//         // AsyncValue.error('Failed to fetch user data', StackTrace.current);
+//       }
+//     } catch (e) {
+//       // state = AsyncValue.error('Error: $e', stackTrace);
+//       state = AsyncValue.data(UserData(
+//           userEntries: [],
+//           dailyTarget: [],
+//           totalTargetAchieved: 0,
+//           actualTotalTarget: 0,
+//           percentage: 0));
+//     }
+//   }
+// }
+
+// class UserData {
+//   final List<List<dynamic>> userEntries;
+//   final List<List<dynamic>> dailyTarget;
+//   final int totalTargetAchieved;
+//   final int actualTotalTarget;
+//   final int percentage;
+
+//   UserData({
+//     required this.userEntries,
+//     required this.dailyTarget,
+//     required this.totalTargetAchieved,
+//     required this.actualTotalTarget,
+//     required this.percentage,
+//   });
+
+//   factory UserData.fromJson(Map<String, dynamic> json) {
+//     return UserData(
+//       userEntries: List<List<dynamic>>.from(
+//           json['userEntries'].map((x) => List<dynamic>.from(x))),
+//       dailyTarget: List<List<dynamic>>.from(
+//           json['dailyTargetAccumulated'].map((x) => List<dynamic>.from(x))),
+//       totalTargetAchieved: json['totalTargetAchieved'],
+//       actualTotalTarget: json['actualTotalTarget'],
+//       percentage: json['percentage'],
+//     );
+//   }
+// }
+
 final userDataProvider =
     StateNotifierProvider<UserDataController, AsyncValue<UserData>>((ref) {
   return UserDataController();
@@ -16,50 +97,72 @@ class UserDataController extends StateNotifier<AsyncValue<UserData>> {
 
   Future<void> fetchUserData(
       String businessId, String userId, String parameter, String month) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('authToken');
-
+    final String url =
+        '${domain}data/get-level-data/$businessId/$userId/$parameter/$month';
+    final authToken = await _getAuthToken(); // Get the auth token
+    print('This is business Id :- $businessId');
+    print('This is userId :- $userId');
+    print('This is Parameter :- $parameter');
     try {
-      final url = Uri.parse(
-          '${domain}data/get-level-data/$businessId/$userId/$parameter/$month');
-      print(url);
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-      print('This is the businessId :- $businessId');
-      print('This is userId :-$userId');
-      print('This is Parameter :- $parameter');
-      print(response.body);
+      final response = await http
+          .get(Uri.parse(url), headers: {'Authorization': 'Bearer $authToken'});
+
       if (response.statusCode == 200) {
-        final data = json.decode(response.body)['data'];
-        final userData = UserData.fromJson(data);
-        state = AsyncValue.data(userData);
-      } else {
-        state = AsyncValue.data(UserData(userEntries: [], dailyTarget: []));
-        // AsyncValue.error('Failed to fetch user data', StackTrace.current);
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        if (responseData.containsKey('data')) {
+          final Map<String, dynamic> data = responseData['data']['data'];
+          state = AsyncValue.data(
+              UserData.fromJson(data, responseData['data']));
+          return;
+        }
       }
     } catch (e) {
-      // state = AsyncValue.error('Error: $e', stackTrace);
-      state = AsyncValue.data(UserData(userEntries: [], dailyTarget: []));
+      print('Error fetching user data: $e');
     }
+    state = AsyncValue.data(UserData.empty());
   }
+}
+
+// Function to get the auth token
+Future<String> _getAuthToken() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('authToken') ?? '';
 }
 
 class UserData {
   final List<List<dynamic>> userEntries;
-  final List<List<dynamic>> dailyTarget;
+  final List<List<dynamic>> dailyTargetAccumulated;
+  final int totalTargetAchieved;
+  final int actualTotalTarget;
+  final int percentage;
 
-  UserData({required this.userEntries, required this.dailyTarget});
+  UserData({
+    required this.userEntries,
+    required this.dailyTargetAccumulated,
+    required this.totalTargetAchieved,
+    required this.actualTotalTarget,
+    required this.percentage,
+  });
 
-  factory UserData.fromJson(Map<String, dynamic> json) {
+  factory UserData.fromJson(
+      Map<String, dynamic> data, Map<String, dynamic> responseData) {
     return UserData(
-      userEntries: List<List<dynamic>>.from(
-          json['userEntries'].map((x) => List<dynamic>.from(x))),
-      dailyTarget: List<List<dynamic>>.from(
-          json['dailyTargetAccumulated'].map((x) => List<dynamic>.from(x))),
+      userEntries: List<List<dynamic>>.from(data['userEntries'] ?? []),
+      dailyTargetAccumulated:
+          List<List<dynamic>>.from(data['dailyTargetAccumulated'] ?? []),
+      totalTargetAchieved: responseData['totalTargetAchieved'] ?? 0,
+      actualTotalTarget: responseData['actualTotalTarget'] ?? 0,
+      percentage: responseData['percentage'] ?? 0,
+    );
+  }
+
+  factory UserData.empty() {
+    return UserData(
+      userEntries: [],
+      dailyTargetAccumulated: [],
+      totalTargetAchieved: 0,
+      actualTotalTarget: 0,
+      percentage: 0,
     );
   }
 }
@@ -150,8 +253,8 @@ final userPieDataProvider =
 class UserPieDataController extends StateNotifier<AsyncValue<UserPieData>> {
   UserPieDataController() : super(const AsyncLoading());
 
-  Future<void> fetchUserPieData(
-      String businessId, String userId, String parameter,String currentMonth) async {
+  Future<void> fetchUserPieData(String businessId, String userId,
+      String parameter, String currentMonth) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
