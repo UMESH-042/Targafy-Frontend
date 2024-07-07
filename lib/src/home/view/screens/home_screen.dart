@@ -8,7 +8,7 @@ import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/src/home/view/screens/controller/Comment_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/actual_predicted_data_controller.dart';
-import 'package:targafy/src/home/view/screens/controller/progress_bar_controller.dart';
+import 'package:targafy/src/home/view/screens/controller/user_hierarchy_comments_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_hierarchy_data_controller.dart';
 import 'package:targafy/src/home/view/screens/widgets/GraphicalStatistics.dart';
 import 'package:targafy/src/home/view/widgets/progress_bar.dart';
@@ -80,6 +80,24 @@ final userDataFutureProvider =
   final result = ref.watch(userDataProvider);
 
   if (result is AsyncData<UserData>) {
+    return result.value; // Return the fetched UserData
+  } else {
+    throw StateError('Failed to fetch user data');
+  }
+});
+
+final userCommentsFutureProvider = FutureProvider.family<List<Comment>,
+    Tuple4<String, String, String, String>>((ref, params) async {
+  final businessId = params.item1;
+  final userId = params.item2;
+  final selectedParameter = params.item3;
+  final month = params.item4;
+
+  final controller = ref.read(commentsDataProvider.notifier);
+  await controller.fetchComments(businessId, userId, selectedParameter, month);
+  final result = ref.watch(commentsDataProvider);
+
+  if (result is AsyncData<List<Comment>>) {
     return result.value; // Return the fetched UserData
   } else {
     throw StateError('Failed to fetch user data');
@@ -632,6 +650,71 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             error: (error, stackTrace) =>
                                 Center(child: Text('Error: $error')),
                           ),
+
+                    if (selectedHierarchyUser &&
+                        selectedParameter.isNotEmpty &&
+                        selectedUserId.isNotEmpty &&
+                        selectedStates[4])
+                      ref
+                          .watch(userCommentsFutureProvider(Tuple4(
+                              businessId,
+                              selectedUserId,
+                              selectedParameter,
+                              currentMonth.toString())))
+                          .when(
+                            data: (commentsData) {
+                              return Column(
+                                children: commentsData.map((entry) {
+                                  return Card(
+                                    margin: EdgeInsets.symmetric(
+                                      vertical: 8.0,
+                                      horizontal: 16.0,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ListTile(
+                                          title: Text(entry.date),
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: entry.comments
+                                              .map((commentDetail) {
+                                            return Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 16.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  ListTile(
+                                                    title: Text(commentDetail
+                                                        .todaysComment),
+                                                    subtitle: Text(
+                                                      'Added by: ${commentDetail.addedBy} on ${commentDetail.date}',
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                      height:
+                                                          8.0), // Adjust spacing as needed
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              );
+                            },
+                            loading: () =>
+                                Center(child: CircularProgressIndicator()),
+                            error: (error, stackTrace) =>
+                                Center(child: Text('Error: $error')),
+                          ),
                     if (selectedStates.isNotEmpty &&
                         selectedStates[0] &&
                         selectedParameter.isEmpty)
@@ -643,6 +726,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           predictedData: [],
                         ),
                       ),
+
+// after these are only parameter selected --- checkpoint
+
                     if (selectedStates.isNotEmpty &&
                         selectedStates[0] &&
                         selectedParameter.isNotEmpty &&
@@ -739,66 +825,72 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           }
                         },
                       ),
-                    
-                     if (selectedStates[4] && selectedParameter.isNotEmpty)
-                    FutureBuilder<CommentsDataModel>(
-                      future: ref
-                          .read(commentsDataControllerProvider)
-                          .fetchCommentsData(businessId, selectedParameter, currentMonth.toString()),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(
-                              child: Text('Error: ${snapshot.error}'));
-                        } else if (!snapshot.hasData || snapshot.data!.comments.isEmpty) {
-                          return Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Lottie.asset('assets/animations/empty_list.json',
-                                    height: 200, width: 200),
-                                const Text(
-                                  "Nothing to display",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          final commentsData = snapshot.data!;
-                          return Column(
-                            children: commentsData.comments.map((entry) {
-                              return Card(
-                                margin: EdgeInsets.symmetric(
-                                  vertical: 8.0,
-                                  horizontal: 16.0,
-                                ),
-                                child: Column(
-                                  children: [
-                                    ListTile(
-                                      title: Text(entry.date),
+
+                    if (selectedStates[4] && selectedParameter.isNotEmpty)
+                      FutureBuilder<CommentsDataModel>(
+                        future: ref
+                            .read(commentsDataControllerProvider)
+                            .fetchCommentsData(businessId, selectedParameter,
+                                currentMonth.toString()),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.comments.isEmpty) {
+                            return Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Lottie.asset(
+                                      'assets/animations/empty_list.json',
+                                      height: 200,
+                                      width: 200),
+                                  const Text(
+                                    "Nothing to display",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                    ...entry.comments.map((commentDetail) {
-                                      return ListTile(
-                                        title: Text(commentDetail.todaysComment),
-                                        subtitle: Text('Added by: ${commentDetail.addedBy} on ${commentDetail.date}'),
-                                      );
-                                    }).toList(),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          );
-                        }
-                      },
-                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            final commentsData = snapshot.data!;
+                            return Column(
+                              children: commentsData.comments.map((entry) {
+                                return Card(
+                                  margin: EdgeInsets.symmetric(
+                                    vertical: 8.0,
+                                    horizontal: 16.0,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text(entry.date),
+                                      ),
+                                      ...entry.comments.map((commentDetail) {
+                                        return ListTile(
+                                          title:
+                                              Text(commentDetail.todaysComment),
+                                          subtitle: Text(
+                                              'Added by: ${commentDetail.addedBy} on ${commentDetail.date}'),
+                                        );
+                                      }).toList(),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            );
+                          }
+                        },
+                      ),
 
                     // for displaying progress bar if only parameter and states is selected
 
