@@ -200,7 +200,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   static const List<String> images = [
     'assets/img/line_chart_invert.png',
     'assets/img/pie_invert.png',
-    'assets/img/line_invert.png',
     'assets/img/table_invert.png',
     'assets/img/chat_invert.png',
   ];
@@ -665,7 +664,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     if (selectedHierarchyUser &&
                         selectedParameter.isNotEmpty &&
                         selectedUserId.isNotEmpty &&
-                        selectedStates[3])
+                        selectedStates[2])
                       ref
                           .watch(userDataFutureProvider(Tuple4(
                               businessId,
@@ -752,7 +751,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     if (selectedHierarchyUser &&
                         selectedParameter.isNotEmpty &&
                         selectedUserId.isNotEmpty &&
-                        selectedStates[4])
+                        selectedStates[3])
                       ref
                           .watch(userCommentsFutureProvider(Tuple4(
                               businessId,
@@ -946,7 +945,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         },
                       ),
                     if (selectedStates.isNotEmpty &&
-                        selectedStates[3] &&
+                        selectedStates[2] &&
                         selectedParameter.isNotEmpty &&
                         !selectedHierarchyUser)
                       FutureBuilder<UserDataModel>(
@@ -992,7 +991,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         },
                       ),
 
-                    if (selectedStates[4] && selectedParameter.isNotEmpty)
+                    if (selectedStates[3] && selectedParameter.isNotEmpty)
                       FutureBuilder<CommentsDataModel>(
                         future: ref
                             .read(commentsDataControllerProvider)
