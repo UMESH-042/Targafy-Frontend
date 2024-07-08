@@ -314,6 +314,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final businessId = selectedBusinessData?['business']?.id;
     final hierarchyAsync = ref.watch(businessHierarchyProvider);
+
     String jsonData = '''
   {
     "statusCode": 200,
@@ -415,8 +416,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       },
                       loading: () =>
                           const Center(child: CircularProgressIndicator()),
-                      error: (error, stackTrace) => Center(child: Text('')),
-                      // Center(child: Text('Error: $error')),
+                      error: (error, stackTrace) => Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Lottie.asset('assets/animations/empty_list.json',
+                                height: 200, width: 200),
+                            const Text(
+                              "Nothing to display",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                     if (selectedParameter.isNotEmpty)
                       hierarchyAsync.when(
@@ -503,59 +519,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         },
                         loading: () =>
                             const Center(child: CircularProgressIndicator()),
-                        error: (error, stackTrace) =>
-                            Center(child: Text('Error: $error')),
+                        error: (error, stackTrace) => Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Lottie.asset('assets/animations/empty_list.json',
+                                  height: 200, width: 200),
+                              const Text(
+                                "Nothing to display",
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.05,
-                    ),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   children: [
-                    //     ElevatedButton(
-                    //       onPressed: _handlePrevTap,
-                    //       style: ElevatedButton.styleFrom(
-                    //         backgroundColor: Color.fromARGB(
-                    //             255, 145, 173, 216), // Background color
-                    //         minimumSize:
-                    //             Size(30, 35), // Width and height of the button
-                    //         padding: EdgeInsets.symmetric(
-                    //             horizontal: 16), // Horizontal padding
-                    //       ),
-                    //       child: Text(
-                    //         'Prev',
-                    //         style: TextStyle(
-                    //           color: Colors
-                    //               .black, // Change text color based on isSelected
-                    //           fontSize: 14,
-                    //           fontWeight: FontWeight.w500,
-                    //         ),
-                    //       ),
-                    //     ),
-                    //     SizedBox(width: 5),
-                    //     ElevatedButton(
-                    //       onPressed: currentMonth == DateTime.now().month
-                    //           ? null
-                    //           : _handleNextTap,
-                    //       style: ElevatedButton.styleFrom(
-                    //         backgroundColor: Color.fromARGB(
-                    //             255, 145, 173, 216), // Background color
-                    //         minimumSize:
-                    //             Size(30, 35), // Width and height of the button
-                    //         padding: EdgeInsets.symmetric(
-                    //             horizontal: 16), // Horizontal padding
-                    //       ),
-                    //       child: Text(
-                    //         'Next',
-                    //         style: TextStyle(
-                    //           color: Colors
-                    //               .black, // Change text color based on isSelected
-                    //           fontSize: 14,
-                    //           fontWeight: FontWeight.w500,
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ],
+                    // SizedBox(
+                    //   height: MediaQuery.of(context).size.height * 0.05,
                     // ),
                     Container(
                       height: MediaQuery.of(context).size.height * 0.04,
@@ -659,8 +642,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             },
                             loading: () => const Center(
                                 child: CircularProgressIndicator()),
-                            error: (error, stackTrace) =>
-                                Center(child: Text('Error: $error')),
+                            error: (error, stackTrace) => Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Lottie.asset(
+                                      'assets/animations/empty_list.json',
+                                      height: 200,
+                                      width: 200),
+                                  const Text(
+                                    "Nothing to display",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                     if (selectedHierarchyUser &&
                         selectedParameter.isNotEmpty &&
@@ -686,8 +686,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             },
                             loading: () => const Center(
                                 child: CircularProgressIndicator()),
-                            error: (error, stackTrace) =>
-                                Center(child: Text('Error: $error')),
+                            error: (error, stackTrace) => Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Lottie.asset(
+                                      'assets/animations/empty_list.json',
+                                      height: 200,
+                                      width: 200),
+                                  const Text(
+                                    "Nothing to display",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                     if (selectedHierarchyUser &&
                         selectedParameter.isNotEmpty &&
@@ -711,8 +728,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             },
                             loading: () => const Center(
                                 child: CircularProgressIndicator()),
-                            error: (error, stackTrace) =>
-                                Center(child: Text('Error: $error')),
+                            error: (error, stackTrace) => Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Lottie.asset(
+                                      'assets/animations/empty_list.json',
+                                      height: 200,
+                                      width: 200),
+                                  const Text(
+                                    "Nothing to display",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
 
                     if (selectedHierarchyUser &&
@@ -776,8 +810,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             },
                             loading: () =>
                                 Center(child: CircularProgressIndicator()),
-                            error: (error, stackTrace) =>
-                                Center(child: Text('Error: $error')),
+                            error: (error, stackTrace) => Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Lottie.asset(
+                                      'assets/animations/empty_list.json',
+                                      height: 200,
+                                      width: 200),
+                                  const Text(
+                                    "Nothing to display",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                     if (selectedStates.isNotEmpty &&
                         selectedStates[0] &&
@@ -804,7 +855,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
-                                child: Text('Error: ${snapshot.error}'));
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Lottie.asset(
+                                      'assets/animations/empty_list.json',
+                                      height: 200,
+                                      width: 200),
+                                  const Text(
+                                    "Nothing to display",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
                           } else if (!snapshot.hasData) {
                             return Center(child: Text('No data available'));
                           } else {
@@ -846,7 +914,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 child: CircularProgressIndicator());
                           } else if (snapshot.hasError) {
                             return Center(
-                                child: Text('Error: ${snapshot.error}'));
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Lottie.asset(
+                                      'assets/animations/empty_list.json',
+                                      height: 200,
+                                      width: 200),
+                                  const Text(
+                                    "Nothing to display",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
                           } else {
                             UserDataModel data = snapshot.data!;
                             print(data);
@@ -874,7 +959,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 child: CircularProgressIndicator());
                           } else if (snapshot.hasError) {
                             return Center(
-                                child: Text('Error: ${snapshot.error}'));
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Lottie.asset(
+                                      'assets/animations/empty_list.json',
+                                      height: 200,
+                                      width: 200),
+                                  const Text(
+                                    "Nothing to display",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
                           } else {
                             UserDataModel data = snapshot.data!;
                             print(data);
@@ -903,7 +1005,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 child: CircularProgressIndicator());
                           } else if (snapshot.hasError) {
                             return Center(
-                                child: Text('Error: ${snapshot.error}'));
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Lottie.asset(
+                                      'assets/animations/empty_list.json',
+                                      height: 200,
+                                      width: 200),
+                                  const Text(
+                                    "Nothing to display",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
                           } else if (!snapshot.hasData ||
                               snapshot.data!.comments.isEmpty) {
                             return Center(

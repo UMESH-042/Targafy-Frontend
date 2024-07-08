@@ -269,7 +269,7 @@ class Graphicalstatistics extends StatelessWidget {
     return SfCartesianChart(
       primaryXAxis: DateTimeAxis(
         title: AxisTitle(
-          text: '(${DateFormat('MMMM yyyy').format(maxDate)})',
+          text: '${DateFormat('MMMM yyyy').format(maxDate)}',
           textStyle: const TextStyle(fontWeight: FontWeight.bold),
         ),
         minimum: minDate,

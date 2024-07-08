@@ -22,9 +22,12 @@ class SelectableChartWidget extends StatelessWidget {
             const EdgeInsets.symmetric(horizontal: 4.0), // Space between items
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
+          // color: isSelected
+          //     ? primaryColor
+          //     : const Color.fromARGB(255, 145, 173, 216),
           color: isSelected
-              ? primaryColor
-              : const Color.fromARGB(255, 145, 173, 216),
+              ? Colors.black
+              : Colors.grey[500],
           borderRadius: BorderRadius.circular(20), // Circular rectangle
         ),
         child: Image.asset(

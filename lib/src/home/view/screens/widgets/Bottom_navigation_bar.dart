@@ -251,6 +251,180 @@ class _BottomNavigationAndAppBarState
     print(selectedbusinessCode);
 
     return Scaffold(
+      // appBar: PreferredSize(
+      //   preferredSize: Size.fromHeight(getScreenheight(context) * 0.08),
+      //   child: Container(
+      //     alignment: Alignment.center,
+      //     padding: const EdgeInsets.only(
+      //       top: 5,
+      //       bottom: 5,
+      //       left: 5,
+      //     ),
+      //     child: AppBar(
+      //       title: Column(
+      //         mainAxisAlignment: MainAxisAlignment.center,
+      //         crossAxisAlignment: CrossAxisAlignment.center,
+      //         children: <Widget>[
+      //           Text(
+      //             'Targafy',
+      //             style: TextStyle(
+      //               fontSize: getScreenWidth(context) *
+      //                   0.066, // Adjust size as needed
+      //               fontWeight: FontWeight.bold,
+      //             ),
+      //           ),
+      //           Text(
+      //             selectedBusiness != null && selectedUserType != null
+      //                 ? selectedBusiness.name
+      //                 : 'Hi User',
+      //             style: TextStyle(
+      //               fontSize: getScreenWidth(context) *
+      //                   0.038, // Adjust size as needed
+      //             ),
+      //             textAlign: TextAlign.center,
+      //           ),
+      //         ],
+      //       ),
+      //       centerTitle: false,
+      //       actions: [
+      //         // Padding(
+      //         //   padding: const EdgeInsets.symmetric(horizontal: 5),
+      //         //   child: GestureDetector(
+      //         //     child: Image.asset('assets/img/search.png'),
+      //         //   ),
+      //         // ),
+      //         // Padding(
+      //         //   padding: const EdgeInsets.symmetric(horizontal: 15),
+      //         //   child: GestureDetector(
+      //         //     child: Image.asset('assets/img/filter.png'),
+      //         //   ),
+      //         // ),
+      //         Padding(
+      //           padding: const EdgeInsets.symmetric(horizontal: 0),
+      //           child: GestureDetector(
+      //             onTap: () async {
+      //               final result = await Navigator.push(
+      //                 context,
+      //                 MaterialPageRoute(
+      //                   builder: (context) => const AddParameterTargetScreen(),
+      //                 ),
+      //               );
+      //               if (result == true) {
+      //                 _refreshParameters();
+      //               }
+      //             },
+      //             child: CircleAvatar(
+      //               backgroundImage:
+      //                   AssetImage('assets/img/Targafy_app_icon.png'),
+      //               radius: 20, // Adjust size as needed
+      //             ),
+      //           ),
+      //         ),
+      //         Consumer(
+      //           builder: (context, ref, _) {
+      //             final userRoleAsyncValue = ref.watch(userRoleProvider);
+
+      //             if (userRoleAsyncValue == null) {
+      //               return const SizedBox.shrink();
+      //             }
+
+      //             return userRoleAsyncValue.when(
+      //               data: (role) {
+      //                 return PopupMenuButton<int>(
+      //                   icon: const Icon(Icons.more_vert),
+      //                   color: Colors.white,
+      //                   surfaceTintColor: Colors.white,
+      //                   position: PopupMenuPosition.under,
+      //                   shape: RoundedRectangleBorder(
+      //                     borderRadius: BorderRadius.circular(15)
+      //                         .copyWith(topRight: const Radius.circular(0)),
+      //                   ),
+      //                   onSelected: (value) async {
+      //                     if (value == 1) {
+      //                       final result = await Navigator.push(
+      //                         context,
+      //                         MaterialPageRoute(
+      //                           builder: (context) =>
+      //                               const AddParameterTargetScreen(),
+      //                         ),
+      //                       );
+      //                       if (result == true) {
+      //                         _refreshParameters();
+      //                       }
+      //                     } else if (value == 2) {
+      //                       // Handle action for "Add Charts"
+      //                       final result = await Navigator.push(
+      //                         context,
+      //                         MaterialPageRoute(
+      //                           builder: (context) => const AddCharts(),
+      //                         ),
+      //                       );
+      //                     } else if (value == 3) {
+      //                       // Handle action for "Refresh"
+      //                       Restart.restartApp();
+      //                     } else if (value == 4) {
+      //                       Navigator.push(
+      //                         context,
+      //                         MaterialPageRoute(
+      //                           builder: (context) => BusinessProfile(
+      //                             token: widget.token,
+      //                           ),
+      //                         ),
+      //                       );
+      //                     }
+      //                   },
+      //                   itemBuilder: (BuildContext context) =>
+      //                       <PopupMenuEntry<int>>[
+      //                     if (role != 'User' && role != 'MiniAdmin')
+      //                       PopupMenuItem<int>(
+      //                         value: 1,
+      //                         child: CustomText(
+      //                           text: 'Add Parameters/Target',
+      //                           fontSize: getScreenWidth(context) * 0.04,
+      //                           fontWeight: FontWeight.w600,
+      //                           color: primaryColor,
+      //                         ),
+      //                       ),
+      //                     if (role != 'User' && role != 'MiniAdmin')
+      //                       PopupMenuItem<int>(
+      //                         value: 2,
+      //                         child: CustomText(
+      //                           text: 'Add Charts',
+      //                           fontSize: getScreenWidth(context) * 0.04,
+      //                           fontWeight: FontWeight.w600,
+      //                           color: primaryColor,
+      //                         ),
+      //                       ),
+      //                     PopupMenuItem<int>(
+      //                       value: 3,
+      //                       child: CustomText(
+      //                         text: 'Refresh',
+      //                         fontSize: getScreenWidth(context) * 0.04,
+      //                         fontWeight: FontWeight.w600,
+      //                         color: primaryColor,
+      //                       ),
+      //                     ),
+      //                     PopupMenuItem<int>(
+      //                       value: 4,
+      //                       child: CustomText(
+      //                         text: 'Business Profile',
+      //                         fontSize: getScreenWidth(context) * 0.04,
+      //                         fontWeight: FontWeight.w600,
+      //                         color: primaryColor,
+      //                       ),
+      //                     ),
+      //                   ],
+      //                 );
+      //               },
+      //               loading: () => const SizedBox.shrink(),
+      //               error: (error, stack) => const SizedBox.shrink(),
+      //             );
+      //           },
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      // ),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(getScreenheight(context) * 0.08),
         child: Container(
@@ -287,106 +461,127 @@ class _BottomNavigationAndAppBarState
             ),
             centerTitle: false,
             actions: [
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(horizontal: 5),
-              //   child: GestureDetector(
-              //     child: Image.asset('assets/img/search.png'),
-              //   ),
-              // ),
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(horizontal: 15),
-              //   child: GestureDetector(
-              //     child: Image.asset('assets/img/filter.png'),
-              //   ),
-              // ),
               Consumer(
                 builder: (context, ref, _) {
                   final userRoleAsyncValue = ref.watch(userRoleProvider);
 
+                  if (userRoleAsyncValue == null) {
+                    return const SizedBox.shrink();
+                  }
+
                   return userRoleAsyncValue.when(
                     data: (role) {
-                      return PopupMenuButton<int>(
-                        icon: const Icon(Icons.more_vert),
-                        color: Colors.white,
-                        surfaceTintColor: Colors.white,
-                        position: PopupMenuPosition.under,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)
-                              .copyWith(topRight: const Radius.circular(0)),
-                        ),
-                        onSelected: (value) async {
-                          if (value == 1) {
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const AddParameterTargetScreen(),
-                              ),
-                            );
-                            if (result == true) {
-                              _refreshParameters();
-                            }
-                          } else if (value == 2) {
-                            // Handle action for "Add Charts"
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AddCharts(),
-                              ),
-                            );
-                          } else if (value == 3) {
-                            // Handle action for "Refresh"
-                            Restart.restartApp();
-                          } else if (value == 4) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BusinessProfile(
-                                  token: widget.token,
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                        itemBuilder: (BuildContext context) =>
-                            <PopupMenuEntry<int>>[
-                          if (role != 'User' && role != 'MiniAdmin')
-                            PopupMenuItem<int>(
-                              value: 1,
-                              child: CustomText(
-                                text: 'Add Parameters/Target',
-                                fontSize: getScreenWidth(context) * 0.04,
-                                fontWeight: FontWeight.w600,
-                                color: primaryColor,
-                              ),
-                            ),
-                          if (role != 'User' && role != 'MiniAdmin')
-                            PopupMenuItem<int>(
-                              value: 2,
-                              child: CustomText(
-                                text: 'Add Charts',
-                                fontSize: getScreenWidth(context) * 0.04,
-                                fontWeight: FontWeight.w600,
-                                color: primaryColor,
-                              ),
-                            ),
-                          PopupMenuItem<int>(
-                            value: 3,
-                            child: CustomText(
-                              text: 'Refresh',
-                              fontSize: getScreenWidth(context) * 0.04,
-                              fontWeight: FontWeight.w600,
-                              color: primaryColor,
+                      return Row(
+                        children: [
+                          if (role == 'Admin' || role == 'MiniAdmin')
+                            GestureDetector(
+                              onTap: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AddParameterTargetScreen(),
+                                  ),
+                                );
+                                if (result == true) {
+                                  _refreshParameters();
+                                }
+                              },
+                              child: CircleAvatar(
+                            backgroundColor: Colors.grey[300], 
+                            radius: 20, 
+                            child: Icon(
+                              Icons.my_location, 
+                              color: Colors.grey[800], 
+                              size: 24, 
                             ),
                           ),
-                          PopupMenuItem<int>(
-                            value: 4,
-                            child: CustomText(
-                              text: 'Business Profile',
-                              fontSize: getScreenWidth(context) * 0.04,
-                              fontWeight: FontWeight.w600,
-                              color: primaryColor,
                             ),
+                          PopupMenuButton<int>(
+                            icon: const Icon(Icons.more_vert),
+                            color: Colors.white,
+                            surfaceTintColor: Colors.white,
+                            position: PopupMenuPosition.under,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)
+                                  .copyWith(topRight: const Radius.circular(0)),
+                            ),
+                            onSelected: (value) async {
+                              // if (value == 1) {
+                              //   final result = await Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //       builder: (context) =>
+                              //           const AddParameterTargetScreen(),
+                              //     ),
+                              //   );
+                              //   if (result == true) {
+                              //     _refreshParameters();
+                              //   }
+                              // } else
+                              if (value == 1) {
+                                // Handle action for "Add Charts"
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const AddCharts(),
+                                  ),
+                                );
+                              } else if (value == 2) {
+                                // Handle action for "Refresh"
+                                Restart.restartApp();
+                              } else if (value == 3) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => BusinessProfile(
+                                      token: widget.token,
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                            itemBuilder: (BuildContext context) =>
+                                <PopupMenuEntry<int>>[
+                              // if (role != 'User' && role != 'MiniAdmin')
+                              //   PopupMenuItem<int>(
+                              //     value: 1,
+                              //     child: CustomText(
+                              //       text: 'Add Parameters/Target',
+                              //       fontSize: getScreenWidth(context) * 0.04,
+                              //       fontWeight: FontWeight.w600,
+                              //       color: primaryColor,
+                              //     ),
+                              //   ),
+                              if (role != 'User' && role != 'MiniAdmin')
+                                PopupMenuItem<int>(
+                                  value: 1,
+                                  child: CustomText(
+                                    text: 'Add Charts',
+                                    fontSize: getScreenWidth(context) * 0.04,
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                  ),
+                                ),
+                              PopupMenuItem<int>(
+                                value: 2,
+                                child: CustomText(
+                                  text: 'Refresh',
+                                  fontSize: getScreenWidth(context) * 0.04,
+                                  fontWeight: FontWeight.w600,
+                                  color: primaryColor,
+                                ),
+                              ),
+                              PopupMenuItem<int>(
+                                value: 3,
+                                child: CustomText(
+                                  text: 'Business Profile',
+                                  fontSize: getScreenWidth(context) * 0.04,
+                                  fontWeight: FontWeight.w600,
+                                  color: primaryColor,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       );
@@ -400,11 +595,16 @@ class _BottomNavigationAndAppBarState
           ),
         ),
       ),
+
       drawer: Drawer(
         child: SingleChildScrollView(
           child: Consumer(
             builder: (context, ref, _) {
               final userRoleAsyncValue = ref.watch(userRoleProvider);
+
+              if (userRoleAsyncValue == null) {
+                return const CircularProgressIndicator();
+              }
               return asyncValue.when(
                 data: (data) {
                   print('this is the :-$data');
