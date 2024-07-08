@@ -1077,91 +1077,94 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                     // for displaying progress bar if only parameter and states is selected
 
-                    if (selectedStates.isNotEmpty &&
-                        selectedStates[2] &&
-                        selectedParameter.isNotEmpty &&
-                        selectedUserId.isEmpty &&
-                        !selectedHierarchyUser)
-                      FutureBuilder<UserDataModel>(
-                        future: dataAddedController.fetchDataAdded(businessId,
-                            selectedParameter, currentMonth.toString()),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Lottie.asset(
-                                      'assets/animations/empty_list.json',
-                                      height: 200,
-                                      width: 200),
-                                  const Text(
-                                    "Nothing to display",
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else if (!snapshot.hasData) {
-                            return Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Lottie.asset(
-                                      'assets/animations/empty_list.json',
-                                      height: 200,
-                                      width: 200),
-                                  const Text(
-                                    "Nothing to display",
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else {
-                            UserDataModel data = snapshot.data!;
-                            return Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                children: [
-                                  ProgressBarWidget(
-                                    label: selectedParameter,
-                                    TargetValue: data.actualTotalTarget,
-                                    AchievedValue: data.totalTargetAchieved,
-                                    color: getRandomColor(),
-                                  ),
-                                  Text(
-                                    getMonthName(currentMonth),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        },
-                      ),
+                    // if (selectedStates.isNotEmpty &&
+                    //     selectedStates[2] &&
+                    //     selectedParameter.isNotEmpty &&
+                    //     selectedUserId.isEmpty &&
+                    //     !selectedHierarchyUser)
+                    //   FutureBuilder<UserDataModel>(
+                    //     future: dataAddedController.fetchDataAdded(businessId,
+                    //         selectedParameter, currentMonth.toString()),
+                    //     builder: (context, snapshot) {
+                    //       if (snapshot.hasError) {
+                    //         return Center(
+                    //           child: Column(
+                    //             mainAxisSize: MainAxisSize.min,
+                    //             children: [
+                    //               Lottie.asset(
+                    //                   'assets/animations/empty_list.json',
+                    //                   height: 200,
+                    //                   width: 200),
+                    //               const Text(
+                    //                 "Nothing to display",
+                    //                 style: TextStyle(
+                    //                   color: Colors.grey,
+                    //                   fontSize: 14,
+                    //                   fontWeight: FontWeight.w600,
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         );
+                    //       } else if (!snapshot.hasData) {
+                    //         return Center(
+                    //           child: Column(
+                    //             mainAxisSize: MainAxisSize.min,
+                    //             children: [
+                    //               Lottie.asset(
+                    //                   'assets/animations/empty_list.json',
+                    //                   height: 200,
+                    //                   width: 200),
+                    //               const Text(
+                    //                 "Nothing to display",
+                    //                 style: TextStyle(
+                    //                   color: Colors.grey,
+                    //                   fontSize: 14,
+                    //                   fontWeight: FontWeight.w600,
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         );
+                    //       } else {
+                    //         UserDataModel data = snapshot.data!;
+                    //         return Padding(
+                    //           padding: const EdgeInsets.all(16.0),
+                    //           child: Column(
+                    //             children: [
+                    //               ProgressBarWidget(
+                    //                 label: selectedParameter,
+                    //                 TargetValue: data.actualTotalTarget,
+                    //                 AchievedValue: data.totalTargetAchieved,
+                    //                 color: getRandomColor(),
+                    //               ),
+                    //               Text(
+                    //                 getMonthName(currentMonth),
+                    //                 style: TextStyle(
+                    //                   fontSize: 14,
+                    //                   fontWeight: FontWeight.bold,
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         );
+                    //       }
+                    //     },
+                    //   ),
 
                     // for displaying the custom ratio charts just below the progress bar indicator if parameter is selected and no user is selected
 
                     if (selectedStates.isNotEmpty &&
-                        selectedStates[2] &&
+                        selectedStates[0] &&
                         selectedParameter.isNotEmpty &&
                         selectedUserId.isEmpty &&
                         !selectedHierarchyUser)
                       Column(
                         children: [
-                          for (var pair in dropdownPairs) ...[
+                          for (var pair in dropdownPairs.where((pair) =>
+                              pair.firstSelectedItem == selectedParameter ||
+                              pair.secondSelectedItem ==
+                                  selectedParameter)) ...[
                             if (pair.firstSelectedItem != null &&
                                 pair.secondSelectedItem != null)
                               FutureBuilder<List<dynamic>>(
@@ -1226,7 +1229,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                                     List<List<dynamic>> firstData =
                                         firstDataModel.userEntries;
-
                                     List<List<dynamic>> secondData =
                                         secondDataModel.userEntries;
 
@@ -1248,74 +1250,76 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
 
                     // for displaying progress bar if user and parameter is selected
-                    if (selectedHierarchyUser &&
-                        selectedParameter.isNotEmpty &&
-                        selectedUserId.isNotEmpty &&
-                        selectedHierarchyUser &&
-                        selectedStates[2])
-                      ref
-                          .watch(userDataFutureProvider(Tuple4(
-                              businessId,
-                              selectedUserId,
-                              selectedParameter,
-                              currentMonth.toString())))
-                          .when(
-                            data: (userData) {
-                              return Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  children: [
-                                    ProgressBarWidget(
-                                      label: selectedParameter,
-                                      TargetValue: userData.actualTotalTarget,
-                                      AchievedValue:
-                                          userData.totalTargetAchieved,
-                                      color: getRandomColor(),
-                                    ),
-                                    Text(
-                                      getMonthName(currentMonth),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            loading: () => const Center(
-                                child: CircularProgressIndicator()),
-                            error: (error, stackTrace) => Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Lottie.asset(
-                                      'assets/animations/empty_list.json',
-                                      height: 200,
-                                      width: 200),
-                                  const Text(
-                                    "Nothing to display",
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                    // if (selectedHierarchyUser &&
+                    //     selectedParameter.isNotEmpty &&
+                    //     selectedUserId.isNotEmpty &&
+                    //     selectedHierarchyUser &&
+                    //     selectedStates[2])
+                    //   ref
+                    //       .watch(userDataFutureProvider(Tuple4(
+                    //           businessId,
+                    //           selectedUserId,
+                    //           selectedParameter,
+                    //           currentMonth.toString())))
+                    //       .when(
+                    //         data: (userData) {
+                    //           return Padding(
+                    //             padding: const EdgeInsets.all(16.0),
+                    //             child: Column(
+                    //               children: [
+                    //                 ProgressBarWidget(
+                    //                   label: selectedParameter,
+                    //                   TargetValue: userData.actualTotalTarget,
+                    //                   AchievedValue:
+                    //                       userData.totalTargetAchieved,
+                    //                   color: getRandomColor(),
+                    //                 ),
+                    //                 Text(
+                    //                   getMonthName(currentMonth),
+                    //                   style: TextStyle(
+                    //                     fontSize: 14,
+                    //                     fontWeight: FontWeight.bold,
+                    //                   ),
+                    //                 ),
+                    //               ],
+                    //             ),
+                    //           );
+                    //         },
+                    //         loading: () => const Center(
+                    //             child: CircularProgressIndicator()),
+                    //         error: (error, stackTrace) => Center(
+                    //           child: Column(
+                    //             mainAxisSize: MainAxisSize.min,
+                    //             children: [
+                    //               Lottie.asset(
+                    //                   'assets/animations/empty_list.json',
+                    //                   height: 200,
+                    //                   width: 200),
+                    //               const Text(
+                    //                 "Nothing to display",
+                    //                 style: TextStyle(
+                    //                   color: Colors.grey,
+                    //                   fontSize: 14,
+                    //                   fontWeight: FontWeight.w600,
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ),
 
 // displaying the Customratio graph for Added Charts by the user if parameter is selected and User is also selected
-
                     if (selectedHierarchyUser &&
                         selectedParameter.isNotEmpty &&
                         selectedUserId.isNotEmpty &&
                         selectedHierarchyUser &&
-                        selectedStates[2])
+                        selectedStates[0])
                       Column(
                         children: [
-                          for (var pair in dropdownPairs) ...[
+                          for (var pair in dropdownPairs.where((pair) =>
+                              pair.firstSelectedItem == selectedParameter ||
+                              pair.secondSelectedItem ==
+                                  selectedParameter)) ...[
                             if (pair.firstSelectedItem != null &&
                                 pair.secondSelectedItem != null)
                               ref
