@@ -969,9 +969,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
-                                child: Text('Error: ${snapshot.error}'));
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Lottie.asset(
+                                      'assets/animations/empty_list.json',
+                                      height: 200,
+                                      width: 200),
+                                  const Text(
+                                    "Nothing to display",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
                           } else if (!snapshot.hasData) {
-                            return Center(child: Text('No data available'));
+                            return Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Lottie.asset(
+                                      'assets/animations/empty_list.json',
+                                      height: 200,
+                                      width: 200),
+                                  const Text(
+                                    "Nothing to display",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
                           } else {
                             UserDataModel data = snapshot.data!;
                             return Padding(
@@ -980,7 +1015,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 children: [
                                   ProgressBarWidget(
                                     label: selectedParameter,
-                                    Targetvalue: data.actualTotalTarget,
+                                    TargetValue: data.actualTotalTarget,
                                     AchievedValue: data.totalTargetAchieved,
                                     color: getRandomColor(),
                                   ),
@@ -1026,11 +1061,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 builder: (context, snapshot) {
                                   if (snapshot.hasError) {
                                     return Center(
-                                        child:
-                                            Text('Error: ${snapshot.error}'));
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Lottie.asset(
+                                              'assets/animations/empty_list.json',
+                                              height: 200,
+                                              width: 200),
+                                          const Text(
+                                            "Nothing to display",
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
                                   } else if (!snapshot.hasData) {
                                     return Center(
-                                        child: Text('No data available'));
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Lottie.asset(
+                                              'assets/animations/empty_list.json',
+                                              height: 200,
+                                              width: 200),
+                                          const Text(
+                                            "Nothing to display",
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
                                   } else {
                                     var firstDataModel =
                                         snapshot.data![0] as UserDataModel;
@@ -1080,7 +1148,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   children: [
                                     ProgressBarWidget(
                                       label: selectedParameter,
-                                      Targetvalue: userData.actualTotalTarget,
+                                      TargetValue: userData.actualTotalTarget,
                                       AchievedValue:
                                           userData.totalTargetAchieved,
                                       color: getRandomColor(),

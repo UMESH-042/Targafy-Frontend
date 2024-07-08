@@ -404,6 +404,7 @@ class _BottomNavigationAndAppBarState
         child: SingleChildScrollView(
           child: Consumer(
             builder: (context, ref, _) {
+              final userRoleAsyncValue = ref.watch(userRoleProvider);
               return asyncValue.when(
                 data: (data) {
                   print('this is the :-$data');
@@ -491,16 +492,30 @@ class _BottomNavigationAndAppBarState
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                  if (user != null)
-                                    Center(
+                                  // if (user != null)
+                                  //   Center(
+                                  //     child: CustomText(
+                                  //       text: 'Admin',
+                                  //       fontSize:
+                                  //           getScreenWidth(context) * 0.04,
+                                  //       color: primaryColor,
+                                  //       fontWeight: FontWeight.w400,
+                                  //     ),
+                                  //   ),
+                                  userRoleAsyncValue.when(
+                                    data: (role) => Center(
                                       child: CustomText(
-                                        text: 'Admin',
+                                        text: role ?? 'No Role',
                                         fontSize:
                                             getScreenWidth(context) * 0.04,
                                         color: primaryColor,
                                         fontWeight: FontWeight.w400,
                                       ),
                                     ),
+                                    loading: () => const SizedBox.shrink(),
+                                    error: (error, stack) =>
+                                        const SizedBox.shrink(),
+                                  ),
                                 ],
                               ),
                             ),

@@ -218,72 +218,168 @@
 //   }
 // }
 
+// import 'package:flutter/material.dart';
+
+// class ProgressBarWidget extends StatelessWidget {
+//   final String label;
+//   final int Targetvalue;
+//   final int AchievedValue;
+//   final Color color;
+
+//   const ProgressBarWidget({
+//     Key? key,
+//     required this.label,
+//     required this.Targetvalue,
+//     required this.AchievedValue,
+//     required this.color,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     print('This is Target Value $Targetvalue');
+//     print('This is Achieved Value $AchievedValue');
+//     final percentage = (AchievedValue / Targetvalue) * 100;
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(vertical: 8.0), // Added margin
+//       child: Row(
+//         children: [
+//           Text(
+//             label,
+//             style: TextStyle(
+//               fontWeight: FontWeight.bold,
+//               fontSize: 16,
+//             ),
+//           ),
+//           SizedBox(width: 8.0),
+//           Expanded(
+//             child: LinearProgressIndicator(
+//               value: percentage / 100,
+//               backgroundColor: Colors.grey[300],
+//               valueColor: AlwaysStoppedAnimation<Color>(color),
+//               minHeight: 20, // Increased thickness
+//             ),
+//           ),
+//           SizedBox(width: 8.0),
+//           Column(
+//             crossAxisAlignment: CrossAxisAlignment.end,
+//             children: [
+//               Text(
+//                 '${percentage.toStringAsFixed(1)}%',
+//                 style: TextStyle(
+//                   fontWeight: FontWeight.bold,
+//                   fontSize: 16,
+//                 ),
+//               ),
+//               SizedBox(
+//                 height: 8,
+//               ),
+//               Text(
+//                 '$AchievedValue / $Targetvalue',
+//                 style: TextStyle(
+//                   fontWeight: FontWeight.bold,
+//                   fontSize: 12,
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class ProgressBarWidget extends StatelessWidget {
   final String label;
-  final int Targetvalue;
+  final int TargetValue;
   final int AchievedValue;
   final Color color;
 
   const ProgressBarWidget({
     Key? key,
     required this.label,
-    required this.Targetvalue,
+    required this.TargetValue,
     required this.AchievedValue,
     required this.color,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    print('This is Target Value $Targetvalue');
-    print('This is Achieved Value $AchievedValue');
-    final percentage = (AchievedValue / Targetvalue) * 100;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0), // Added margin
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
+    try {
+      if (TargetValue == 0) {
+        throw Exception("Target value cannot be zero.");
+      }
+      
+      final percentage = (AchievedValue / TargetValue) * 100;
+      
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0), // Added margin
+        child: Row(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
-          ),
-          SizedBox(width: 8.0),
-          Expanded(
-            child: LinearProgressIndicator(
-              value: percentage / 100,
-              backgroundColor: Colors.grey[300],
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-              minHeight: 20, // Increased thickness
+            SizedBox(width: 8.0),
+            Expanded(
+              child: LinearProgressIndicator(
+                value: percentage / 100,
+                backgroundColor: Colors.grey[300],
+                valueColor: AlwaysStoppedAnimation<Color>(color),
+                minHeight: 20, // Increased thickness
+              ),
             ),
-          ),
-          SizedBox(width: 8.0),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${percentage.toStringAsFixed(1)}%',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+            SizedBox(width: 8.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '${percentage.toStringAsFixed(1)}%',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              Text(
-                '$AchievedValue / $Targetvalue',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
+                SizedBox(height: 8),
+                Text(
+                  '$AchievedValue / $TargetValue',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
+              ],
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Lottie.asset(
+              'assets/animations/empty_list.json',
+              height: 200,
+              width: 200,
+            ),
+            const Text(
+              "Nothing to display",
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
               ),
-            ],
-          ),
-        ],
-      ),
-    );
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
