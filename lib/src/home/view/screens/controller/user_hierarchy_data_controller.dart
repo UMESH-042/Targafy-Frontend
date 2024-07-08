@@ -87,47 +87,47 @@ String domain = AppRemoteRoutes.baseUrl;
 //   }
 // }
 
-final userDataProvider =
-    StateNotifierProvider<UserDataController, AsyncValue<UserData>>((ref) {
-  return UserDataController();
-});
+  final userDataProvider =
+      StateNotifierProvider<UserDataController, AsyncValue<UserData>>((ref) {
+    return UserDataController();
+  });
 
-class UserDataController extends StateNotifier<AsyncValue<UserData>> {
-  UserDataController() : super(const AsyncLoading());
+  class UserDataController extends StateNotifier<AsyncValue<UserData>> {
+    UserDataController() : super(const AsyncLoading());
 
-  Future<void> fetchUserData(
-      String businessId, String userId, String parameter, String month) async {
-    final String url =
-        '${domain}data/get-level-data/$businessId/$userId/$parameter/$month';
-    final authToken = await _getAuthToken(); // Get the auth token
-    print('This is business Id :- $businessId');
-    print('This is userId :- $userId');
-    print('This is Parameter :- $parameter');
-    try {
-      final response = await http
-          .get(Uri.parse(url), headers: {'Authorization': 'Bearer $authToken'});
+    Future<void> fetchUserData(
+        String businessId, String userId, String parameter, String month) async {
+      final String url =
+          '${domain}data/get-level-data/$businessId/$userId/$parameter/$month';
+      final authToken = await _getAuthToken(); // Get the auth token
+      print('This is business Id :- $businessId');
+      print('This is userId :- $userId');
+      print('This is Parameter :- $parameter');
+      try {
+        final response = await http
+            .get(Uri.parse(url), headers: {'Authorization': 'Bearer $authToken'});
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-        if (responseData.containsKey('data')) {
-          final Map<String, dynamic> data = responseData['data']['data'];
-          state = AsyncValue.data(
-              UserData.fromJson(data, responseData['data']));
-          return;
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> responseData = json.decode(response.body);
+          if (responseData.containsKey('data')) {
+            final Map<String, dynamic> data = responseData['data']['data'];
+            state = AsyncValue.data(
+                UserData.fromJson(data, responseData['data']));
+            return;
+          }
         }
+      } catch (e) {
+        print('Error fetching user data: $e');
       }
-    } catch (e) {
-      print('Error fetching user data: $e');
+      state = AsyncValue.data(UserData.empty());
     }
-    state = AsyncValue.data(UserData.empty());
   }
-}
 
-// Function to get the auth token
-Future<String> _getAuthToken() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getString('authToken') ?? '';
-}
+  // Function to get the auth token
+  Future<String> _getAuthToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('authToken') ?? '';
+  }
 
 class UserData {
   final List<List<dynamic>> userEntries;
@@ -271,7 +271,7 @@ class UserPieDataController extends StateNotifier<AsyncValue<UserPieData>> {
       print('This is the businessId :- $businessId');
       print('This is userId :-$userId');
       print('This is Parameter :- $parameter');
-      print(response.body);
+      // print(response.body);
 
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);

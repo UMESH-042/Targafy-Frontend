@@ -656,8 +656,8 @@ import 'package:targafy/core/utils/print_log.dart';
 
 class CustomChart extends StatelessWidget {
   final String parameter;
-  final List<List<dynamic>> actualData;
-  final List<List<dynamic>> predictedData;
+    final List<List<dynamic>> actualData;
+    final List<List<dynamic>> predictedData;
 
   const CustomChart({
     Key? key,
@@ -670,8 +670,6 @@ class CustomChart extends StatelessWidget {
   Widget build(BuildContext context) {
     List<List<dynamic>> formattedActualData = _convertDates(actualData);
     List<List<dynamic>> formattedPredictedData = _convertDates(predictedData);
-    print('This is the Achievement Data $formattedActualData');
-    print('This is the Target Data $formattedPredictedData');
 
     // // Filter out zero values from actual data
     formattedActualData = formattedActualData
@@ -682,13 +680,11 @@ class CustomChart extends StatelessWidget {
         _findMinDate(formattedActualData, formattedPredictedData);
     DateTime maxDate =
         _findMaxDate(formattedActualData, formattedPredictedData);
-    print('This is the minDate :- $minDate');
-    print('This is the maxDate :- $maxDate');
 
     return SfCartesianChart(
       primaryXAxis: DateTimeAxis(
         title: AxisTitle(
-          text: 'Month (${DateFormat('MMMM yyyy').format(maxDate)})',
+          text: '(${DateFormat('MMMM yyyy').format(maxDate)})',
           textStyle: const TextStyle(fontWeight: FontWeight.bold),
         ),
         minimum: minDate,

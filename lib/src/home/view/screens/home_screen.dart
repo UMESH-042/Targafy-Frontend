@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/src/home/view/screens/controller/Comment_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/actual_predicted_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_hierarchy_comments_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_hierarchy_data_controller.dart';
+import 'package:targafy/src/home/view/screens/widgets/AddCharts.dart';
+import 'package:targafy/src/home/view/screens/widgets/CustomRatioChart.dart';
 import 'package:targafy/src/home/view/screens/widgets/GraphicalStatistics.dart';
 import 'package:targafy/src/home/view/widgets/progress_bar.dart';
 import 'package:targafy/src/home/view/widgets/selectable_chart.dart';
@@ -86,6 +89,26 @@ final userDataFutureProvider =
   }
 });
 
+final combinedUserDataFutureProvider = FutureProvider.family<List<UserData>,
+    Tuple5<String, String, String, String, String>>((ref, tuple) async {
+  final businessId = tuple.item1;
+  final selectedUserId = tuple.item2;
+  final firstSelectedItem = tuple.item3;
+  final secondSelectedItem = tuple.item4;
+  final currentMonth = tuple.item5;
+
+  final futures = [
+    ref.read(userDataFutureProvider(
+            Tuple4(businessId, selectedUserId, firstSelectedItem, currentMonth))
+        .future),
+    ref.read(userDataFutureProvider(Tuple4(
+            businessId, selectedUserId, secondSelectedItem, currentMonth))
+        .future),
+  ];
+
+  return Future.wait(futures);
+});
+
 final userCommentsFutureProvider = FutureProvider.family<List<Comment>,
     Tuple4<String, String, String, String>>((ref, params) async {
   final businessId = params.item1;
@@ -143,18 +166,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Map<int, String> selectedItemsByRow = {};
 
+  List<DropdownFieldPair> dropdownPairs =
+      []; // for fetching the parameters for custom Charts
+
   bool _isRefreshing = false;
   late bool selectedHierarchyUser;
 
   @override
   void initState() {
     super.initState();
+    loadSavedPairs();
     selectedStates = List<bool>.filled(images.length, false);
     selectedParameter = '';
     selectedUser = '';
     selectedUserId = '';
     selectedHierarchyUser = false;
     // _getToken();
+  }
+
+  void loadSavedPairs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedPairs = prefs.getStringList('savedPairs');
+
+    if (savedPairs != null) {
+      setState(() {
+        dropdownPairs = savedPairs
+            .map((pairJson) => DropdownFieldPair.fromJson(pairJson))
+            .toList();
+      });
+    }
   }
 
   static const List<String> images = [
@@ -266,7 +306,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(currentMonth);
+    // print(currentMonth);
 
     final parameterListAsync = ref.watch(parameterListProvider);
     final selectedBusinessData = ref.watch(currentBusinessProvider);
@@ -934,6 +974,68 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         },
                       ),
 
+                    // for displaying the custom ratio charts just below the progress bar indicator if parameter is selected and no user is selected
+
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[2] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedUserId.isEmpty &&
+                        !selectedHierarchyUser)
+                      Column(
+                        children: [
+                          for (var pair in dropdownPairs) ...[
+                            if (pair.firstSelectedItem != null &&
+                                pair.secondSelectedItem != null)
+                              FutureBuilder<List<dynamic>>(
+                                future: Future.wait([
+                                  dataAddedController.fetchDataAdded(
+                                    businessId,
+                                    pair.firstSelectedItem!,
+                                    currentMonth.toString(),
+                                  ),
+                                  dataAddedController.fetchDataAdded(
+                                    businessId,
+                                    pair.secondSelectedItem!,
+                                    currentMonth.toString(),
+                                  ),
+                                ]),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                        child:
+                                            Text('Error: ${snapshot.error}'));
+                                  } else if (!snapshot.hasData) {
+                                    return Center(
+                                        child: Text('No data available'));
+                                  } else {
+                                    var firstDataModel =
+                                        snapshot.data![0] as UserDataModel;
+                                    var secondDataModel =
+                                        snapshot.data![1] as UserDataModel;
+
+                                    List<List<dynamic>> firstData =
+                                        firstDataModel.userEntries;
+
+                                    List<List<dynamic>> secondData =
+                                        secondDataModel.userEntries;
+
+                                    return Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: CustomRatioChart(
+                                        firstParameter: pair.firstSelectedItem!,
+                                        secondParameter:
+                                            pair.secondSelectedItem!,
+                                        firstData: firstData,
+                                        SecondData: secondData,
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                          ],
+                        ],
+                      ),
+
                     // for displaying progress bar if user and parameter is selected
                     if (selectedHierarchyUser &&
                         selectedParameter.isNotEmpty &&
@@ -992,6 +1094,74 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               ),
                             ),
                           ),
+
+// displaying the Customratio graph for Added Charts by the user if parameter is selected and User is also selected
+
+                    if (selectedHierarchyUser &&
+                        selectedParameter.isNotEmpty &&
+                        selectedUserId.isNotEmpty &&
+                        selectedHierarchyUser &&
+                        selectedStates[2])
+                      Column(
+                        children: [
+                          for (var pair in dropdownPairs) ...[
+                            if (pair.firstSelectedItem != null &&
+                                pair.secondSelectedItem != null)
+                              ref
+                                  .watch(combinedUserDataFutureProvider(Tuple5(
+                                    businessId,
+                                    selectedUserId,
+                                    pair.firstSelectedItem!,
+                                    pair.secondSelectedItem!,
+                                    currentMonth.toString(),
+                                  )))
+                                  .when(
+                                    data: (data) {
+                                      final firstDataModel = data[0];
+                                      final secondDataModel = data[1];
+
+                                      final firstData =
+                                          firstDataModel.userEntries;
+                                      final secondData =
+                                          secondDataModel.userEntries;
+
+                                      return Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: CustomRatioChart(
+                                          firstParameter:
+                                              pair.firstSelectedItem!,
+                                          secondParameter:
+                                              pair.secondSelectedItem!,
+                                          firstData: firstData,
+                                          SecondData: secondData,
+                                        ),
+                                      );
+                                    },
+                                    loading: () =>
+                                        const Center(child: Text('')),
+                                    error: (error, stackTrace) => Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Lottie.asset(
+                                              'assets/animations/empty_list.json',
+                                              height: 200,
+                                              width: 200),
+                                          const Text(
+                                            "Nothing to display",
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                          ],
+                        ],
+                      ),
                   ],
                 ),
               ),
