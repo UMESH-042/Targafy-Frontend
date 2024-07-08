@@ -73,6 +73,7 @@ class _BottomNavigationAndAppBarState
     ];
 
     _getToken();
+    _getToken1();
     _refreshParameters();
   }
 
@@ -105,6 +106,21 @@ class _BottomNavigationAndAppBarState
     }
   }
 
+  Future<void> _getToken1() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? bearerToken = prefs.getString('authToken');
+
+      if (bearerToken != null) {
+        await _sendSessionHistoryToServer(bearerToken);
+      } else {
+        print('Failed to retrieve bearer token.');
+      }
+    } catch (e) {
+      print('Error fetching token: $e');
+    }
+  }
+
   Future<void> _sendTokenToServer(String fcmToken, String bearerToken) async {
     try {
       final url = Uri.parse('${domain}user/update/fcmToken?fcmToken=$fcmToken');
@@ -124,6 +140,29 @@ class _BottomNavigationAndAppBarState
       }
     } catch (e) {
       print('Error sending token to server: $e');
+    }
+  }
+
+  Future<void> _sendSessionHistoryToServer(String bearerToken) async {
+    try {
+      final url = Uri.parse('${domain}user/add-lastseenhistory');
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $bearerToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Session history updated successfully.');
+      } else {
+        print(
+            'Failed to send Session history ${response.statusCode} ${response.body}');
+      }
+    } catch (e) {
+      print('Error sending Session history: $e');
     }
   }
 
@@ -289,14 +328,12 @@ class _BottomNavigationAndAppBarState
                             }
                           } else if (value == 2) {
                             // Handle action for "Add Charts"
-                             final result = await Navigator.push(
+                            final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AddCharts(),
+                                builder: (context) => const AddCharts(),
                               ),
                             );
-
                           } else if (value == 3) {
                             // Handle action for "Refresh"
                             Restart.restartApp();
