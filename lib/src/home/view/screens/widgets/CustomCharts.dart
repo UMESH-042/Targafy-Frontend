@@ -865,7 +865,8 @@ class CustomChart extends StatelessWidget {
     return SfCartesianChart(
       primaryXAxis: DateTimeAxis(
         title: AxisTitle(
-          text: '${DateFormat('MMMM yyyy').format(maxDate)}',
+          text:
+              '${DateFormat("MMMM").format(maxDate)} \'${DateFormat("yy").format(maxDate)}',
           textStyle: const TextStyle(fontWeight: FontWeight.bold),
         ),
         minimum: minDate,

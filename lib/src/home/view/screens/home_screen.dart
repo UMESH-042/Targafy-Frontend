@@ -13,6 +13,7 @@ import 'package:targafy/src/home/view/screens/controller/user_hierarchy_comments
 import 'package:targafy/src/home/view/screens/controller/user_hierarchy_data_controller.dart';
 import 'package:targafy/src/home/view/screens/widgets/AddCharts.dart';
 import 'package:targafy/src/home/view/screens/widgets/CustomRatioChart.dart';
+import 'package:targafy/src/home/view/screens/widgets/DataTableForRatio.dart';
 import 'package:targafy/src/home/view/screens/widgets/GraphicalStatistics.dart';
 import 'package:targafy/src/home/view/widgets/progress_bar.dart';
 import 'package:targafy/src/home/view/widgets/selectable_chart.dart';
@@ -705,6 +706,75 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               ),
                             ),
                           ),
+
+// here adding Ratio Data Table for users selected
+                    if (selectedHierarchyUser &&
+                        selectedParameter.isNotEmpty &&
+                        selectedUserId.isNotEmpty &&
+                        selectedHierarchyUser &&
+                        selectedStates[2])
+                      Column(
+                        children: [
+                          for (var pair in dropdownPairs.where((pair) =>
+                              pair.firstSelectedItem == selectedParameter ||
+                              pair.secondSelectedItem ==
+                                  selectedParameter)) ...[
+                            if (pair.firstSelectedItem != null &&
+                                pair.secondSelectedItem != null)
+                              ref
+                                  .watch(combinedUserDataFutureProvider(Tuple5(
+                                    businessId,
+                                    selectedUserId,
+                                    pair.firstSelectedItem!,
+                                    pair.secondSelectedItem!,
+                                    currentMonth.toString(),
+                                  )))
+                                  .when(
+                                    data: (data) {
+                                      final firstDataModel = data[0];
+                                      final secondDataModel = data[1];
+
+                                      final firstData =
+                                          firstDataModel.userEntries;
+                                      final secondData =
+                                          secondDataModel.userEntries;
+
+                                      return Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: DataTableForRatioWidget(
+                                              firstitem:
+                                                  pair.firstSelectedItem!,
+                                              seconditem:
+                                                  pair.secondSelectedItem!,
+                                              actualData: firstData,
+                                              predictedData: secondData));
+                                    },
+                                    loading: () =>
+                                        const Center(child: Text('')),
+                                    error: (error, stackTrace) => Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Lottie.asset(
+                                              'assets/animations/empty_list.json',
+                                              height: 200,
+                                              width: 200),
+                                          const Text(
+                                            "Nothing to display",
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                          ],
+                        ],
+                      ),
+
                     if (selectedHierarchyUser &&
                         selectedParameter.isNotEmpty &&
                         selectedUserId.isNotEmpty &&
@@ -761,7 +831,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           .when(
                             data: (commentsData) {
                               return Column(
-                                children: commentsData.map((entry) {
+                                children: commentsData.reversed.map((entry) {
                                   return Card(
                                     margin: EdgeInsets.symmetric(
                                       vertical: 8.0,
@@ -990,8 +1060,103 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           }
                         },
                       ),
+                    if (selectedStates.isNotEmpty &&
+                        selectedStates[2] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedUserId.isEmpty &&
+                        !selectedHierarchyUser)
+                      Column(
+                        children: [
+                          for (var pair in dropdownPairs.where((pair) =>
+                              pair.firstSelectedItem == selectedParameter ||
+                              pair.secondSelectedItem ==
+                                  selectedParameter)) ...[
+                            if (pair.firstSelectedItem != null &&
+                                pair.secondSelectedItem != null)
+                              FutureBuilder<List<dynamic>>(
+                                future: Future.wait([
+                                  dataAddedController.fetchDataAdded(
+                                    businessId,
+                                    pair.firstSelectedItem!,
+                                    currentMonth.toString(),
+                                  ),
+                                  dataAddedController.fetchDataAdded(
+                                    businessId,
+                                    pair.secondSelectedItem!,
+                                    currentMonth.toString(),
+                                  ),
+                                ]),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Lottie.asset(
+                                              'assets/animations/empty_list.json',
+                                              height: 200,
+                                              width: 200),
+                                          const Text(
+                                            "Nothing to display",
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } else if (!snapshot.hasData) {
+                                    return Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Lottie.asset(
+                                              'assets/animations/empty_list.json',
+                                              height: 200,
+                                              width: 200),
+                                          const Text(
+                                            "Nothing to display",
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    var firstDataModel =
+                                        snapshot.data![0] as UserDataModel;
+                                    var secondDataModel =
+                                        snapshot.data![1] as UserDataModel;
 
-                    if (selectedStates[3] && selectedParameter.isNotEmpty)
+                                    List<List<dynamic>> firstData =
+                                        firstDataModel.userEntries;
+                                    List<List<dynamic>> secondData =
+                                        secondDataModel.userEntries;
+
+                                    return Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: DataTableForRatioWidget(
+                                            firstitem: pair.firstSelectedItem!,
+                                            seconditem:
+                                                pair.secondSelectedItem!,
+                                            actualData: firstData,
+                                            predictedData: secondData));
+                                  }
+                                },
+                              ),
+                          ],
+                        ],
+                      ),
+
+                    if (selectedStates[3] &&
+                        selectedParameter.isNotEmpty &&
+                        selectedUserId.isEmpty &&
+                        !selectedHierarchyUser)
                       FutureBuilder<CommentsDataModel>(
                         future: ref
                             .read(commentsDataControllerProvider)
@@ -1046,7 +1211,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           } else {
                             final commentsData = snapshot.data!;
                             return Column(
-                              children: commentsData.comments.map((entry) {
+                              children: commentsData.comments.reversed.map((entry) {
                                 return Card(
                                   margin: EdgeInsets.symmetric(
                                     vertical: 8.0,
@@ -1238,7 +1403,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         secondParameter:
                                             pair.secondSelectedItem!,
                                         firstData: firstData,
-                                        SecondData: secondData,
+                                        secondData: secondData,
                                       ),
                                     );
                                   }
@@ -1347,7 +1512,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           secondParameter:
                                               pair.secondSelectedItem!,
                                           firstData: firstData,
-                                          SecondData: secondData,
+                                          secondData: secondData,
                                         ),
                                       );
                                     },

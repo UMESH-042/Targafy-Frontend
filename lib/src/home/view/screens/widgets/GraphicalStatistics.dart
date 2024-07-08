@@ -269,7 +269,8 @@ class Graphicalstatistics extends StatelessWidget {
     return SfCartesianChart(
       primaryXAxis: DateTimeAxis(
         title: AxisTitle(
-          text: '${DateFormat('MMMM yyyy').format(maxDate)}',
+          text:
+              '${DateFormat("MMMM").format(maxDate)} \'${DateFormat("yy").format(maxDate)}',
           textStyle: const TextStyle(fontWeight: FontWeight.bold),
         ),
         minimum: minDate,
@@ -324,7 +325,7 @@ class Graphicalstatistics extends StatelessWidget {
           dataSource: ratioData,
           xValueMapper: (data, _) => DateTime.parse(data[0].toString()),
           yValueMapper: (data, _) => double.parse(data[1].toString()),
-          name: 'Ratio of Achievement/Target $parameter',
+          name: 'Ratio of Achievement/Target $parameter (%)',
           dataLabelSettings: const DataLabelSettings(isVisible: true),
           color: Colors.green,
         )
@@ -341,7 +342,7 @@ class Graphicalstatistics extends StatelessWidget {
       final double predictedValue =
           double.parse(predictedData[i][1].toString());
       final double ratio = (actualValue / predictedValue) * 100;
-      final formattedRatio = double.parse(ratio.toStringAsFixed(2));
+      final formattedRatio = double.parse(ratio.toStringAsFixed(1));
       ratioData.add([month, formattedRatio]);
     }
     ratioData = ratioData

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class DataTableWidget extends StatelessWidget {
   final String parameter;
@@ -55,7 +56,7 @@ class DataTableWidget extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(actualData[index][0]),
+                    child: Text(_formatDate(actualData[index][0])),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -72,5 +73,10 @@ class DataTableWidget extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _formatDate(String dateString) {
+    DateTime date = DateFormat('yyyy-MM-dd').parse(dateString);
+    return DateFormat('dd-MM-yyyy').format(date);
   }
 }

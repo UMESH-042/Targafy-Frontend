@@ -6,20 +6,20 @@ class CustomRatioChart extends StatelessWidget {
   final String firstParameter;
   final String secondParameter;
   final List<List<dynamic>> firstData;
-  final List<List<dynamic>> SecondData;
+  final List<List<dynamic>> secondData;
 
   const CustomRatioChart({
     Key? key,
     required this.firstParameter,
     required this.secondParameter,
     required this.firstData,
-    required this.SecondData,
+    required this.secondData,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     List<List<dynamic>> formattedfirstData = _convertDates(firstData);
-    List<List<dynamic>> formattedSecondData = _convertDates(SecondData);
+    List<List<dynamic>> formattedSecondData = _convertDates(secondData);
 
     List<List<dynamic>> ratioData =
         _calculateRatio(formattedfirstData, formattedSecondData);
@@ -30,7 +30,8 @@ class CustomRatioChart extends StatelessWidget {
     return SfCartesianChart(
       primaryXAxis: DateTimeAxis(
         title: AxisTitle(
-          text: '${DateFormat('MMMM yyyy').format(maxDate)}',
+          text:
+              '${DateFormat("MMMM").format(maxDate)} \'${DateFormat("yy").format(maxDate)}',
           textStyle: const TextStyle(fontWeight: FontWeight.bold),
         ),
         minimum: minDate,
@@ -68,13 +69,13 @@ class CustomRatioChart extends StatelessWidget {
         ),
         axisLabelFormatter: (AxisLabelRenderDetails details) {
           num value = details.value;
-          if (value < 1.0) {
-            return ChartAxisLabel('${(value * 100).toStringAsFixed(2)}%',
-                TextStyle(color: Colors.black));
-          } else {
+          // if (value < 1.0) {
+            // return ChartAxisLabel('${(value * 100).toStringAsFixed(2)}%',
+                // TextStyle(color: Colors.black));
+          // } else {
             return ChartAxisLabel(
-                value.toStringAsFixed(2), TextStyle(color: Colors.black));
-          }
+                value.toStringAsFixed(1), TextStyle(color: Colors.black));
+          // }
         },
         axisLine: const AxisLine(width: 1),
       ),
@@ -93,7 +94,7 @@ class CustomRatioChart extends StatelessWidget {
           dataSource: ratioData,
           xValueMapper: (data, _) => DateTime.parse(data[0].toString()),
           yValueMapper: (data, _) => double.parse(data[1].toString()),
-          name: '$firstParameter/$secondParameter Ratio',
+          name: '$firstParameter/$secondParameter Ratio (%)',
           dataLabelSettings: const DataLabelSettings(isVisible: true),
           color: Colors.green,
         ),
@@ -130,7 +131,7 @@ class CustomRatioChart extends StatelessWidget {
     for (var date in actualMap.keys) {
       if (predictedMap.containsKey(date)) {
         double ratio = actualMap[date]! / predictedMap[date]!;
-        ratioData.add([date, ratio]);
+        ratioData.add([date, ratio.toStringAsFixed(1)]);
       }
     }
     return ratioData;
