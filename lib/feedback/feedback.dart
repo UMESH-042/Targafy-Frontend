@@ -4,14 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:lottie/lottie.dart';
 import 'package:remixicon/remixicon.dart';
-import 'package:targafy/business_home_page/controller/business_controller.dart'; // Adjust imports as per your project structure
-import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart'; // Adjust imports as per your project structure
-import 'package:targafy/core/constants/colors.dart'; // Adjust imports as per your project structure
+import 'package:targafy/business_home_page/controller/business_controller.dart';
+import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
+import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/feedback/controller/feedback_list_controller.dart';
-import 'package:targafy/src/users/ui/controller/business_users_controller.dart'; // Adjust imports as per your project structure
-import 'package:targafy/widgets/rate_user_dialog.dart'; // Adjust imports as per your project structure
+import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
+import 'package:targafy/widgets/rate_user_dialog.dart';
 import 'package:targafy/widgets/rating_list_display.dart';
-import 'package:targafy/widgets/sort_dropdown_list.dart'; // Adjust imports as per your project structure
+import 'package:targafy/widgets/sort_dropdown_list.dart';
 
 class FeedbackScreen extends ConsumerStatefulWidget {
   final String? token;
@@ -26,7 +26,6 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -227,7 +226,24 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
                           child: CircularProgressIndicator(),
                         ),
                         error: (error, stackTrace) => Center(
-                          child: Text('Error: $error'),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Lottie.asset(
+                                'assets/animations/empty_list.json',
+                                height: 200,
+                                width: 200,
+                              ),
+                              Text(
+                                "No feedback is found!",
+                                style: TextStyle(
+                                  color: Colors.grey[500],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -235,8 +251,26 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stackTrace) =>
-                  Center(child: Text('Error: $error')),
+              error: (error, stackTrace) => Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Lottie.asset(
+                      'assets/animations/empty_list.json',
+                      height: 200,
+                      width: 200,
+                    ),
+                    Text(
+                      "No feedback is found!",
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
     );
   }

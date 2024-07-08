@@ -358,30 +358,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             : SingleChildScrollView(
                 child: Column(
                   children: [
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.04,
-                      margin: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.02,
-                      ).copyWith(
-                        top: MediaQuery.of(context).size.height * 0.01,
-                      ),
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: images.length,
-                        itemBuilder: (context, index) {
-                          if (!selectedStates.contains(true) &&
-                              images.isNotEmpty) {
-                            selectedStates[0] = true;
-                          }
+                    // Container(
+                    //   height: MediaQuery.of(context).size.height * 0.04,
+                    //   margin: EdgeInsets.symmetric(
+                    //     horizontal: MediaQuery.of(context).size.width * 0.02,
+                    //   ).copyWith(
+                    //     top: MediaQuery.of(context).size.height * 0.01,
+                    //   ),
+                    //   child: ListView.builder(
+                    //     scrollDirection: Axis.horizontal,
+                    //     itemCount: images.length,
+                    //     itemBuilder: (context, index) {
+                    //       if (!selectedStates.contains(true) &&
+                    //           images.isNotEmpty) {
+                    //         selectedStates[0] = true;
+                    //       }
 
-                          return SelectableChartWidget(
-                            imagePath: images[index],
-                            isSelected: selectedStates[index],
-                            onTap: () => handleTapForCharts(index),
-                          );
-                        },
-                      ),
-                    ),
+                    //       return SelectableChartWidget(
+                    //         imagePath: images[index],
+                    //         isSelected: selectedStates[index],
+                    //         onTap: () => handleTapForCharts(index),
+                    //       );
+                    //     },
+                    //   ),
+                    // ),
                     parameterListAsync.when(
                       data: (parameterList) {
                         if (selectedParameter.isEmpty &&
@@ -557,6 +557,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     //     ),
                     //   ],
                     // ),
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                      margin: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.02,
+                      ).copyWith(
+                        top: MediaQuery.of(context).size.height * 0.01,
+                      ),
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: images.length,
+                        itemBuilder: (context, index) {
+                          if (!selectedStates.contains(true) &&
+                              images.isNotEmpty) {
+                            selectedStates[0] = true;
+                          }
+
+                          return SelectableChartWidget(
+                            imagePath: images[index],
+                            isSelected: selectedStates[index],
+                            onTap: () => handleTapForCharts(index),
+                          );
+                        },
+                      ),
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

@@ -30,7 +30,7 @@ class CustomRatioChart extends StatelessWidget {
     return SfCartesianChart(
       primaryXAxis: DateTimeAxis(
         title: AxisTitle(
-          text: 'Date',
+          text: '(${DateFormat('MMMM yyyy').format(maxDate)})',
           textStyle: const TextStyle(fontWeight: FontWeight.bold),
         ),
         minimum: minDate,
@@ -43,8 +43,22 @@ class CustomRatioChart extends StatelessWidget {
         axisLabelFormatter: (AxisLabelRenderDetails args) {
           DateTime date =
               DateTime.fromMillisecondsSinceEpoch(args.value.toInt());
-          return ChartAxisLabel(
-              DateFormat('d').format(date), TextStyle(color: Colors.black));
+          if (date == minDate) {
+            return ChartAxisLabel('', TextStyle(color: Colors.transparent));
+          }
+          int day = date.difference(minDate).inDays;
+
+          // Calculate the new date based on the custom interval logic
+          DateTime customDate;
+          if (day < 4) {
+            customDate = minDate.add(Duration(days: day));
+          } else {
+            customDate = minDate.add(Duration(
+                days: 4 + ((day - 4) ~/ 5) * 5 + (day % 5 == 0 ? 0 : 5)));
+          }
+
+          String labelText = DateFormat('d').format(customDate);
+          return ChartAxisLabel(labelText, TextStyle(color: Colors.black));
         },
       ),
       primaryYAxis: NumericAxis(
@@ -65,7 +79,8 @@ class CustomRatioChart extends StatelessWidget {
         axisLine: const AxisLine(width: 1),
       ),
       title:
-          ChartTitle(text: '$firstParameter/$secondParameter Ratio Analysis'),
+          // ChartTitle(text: '$firstParameter/$secondParameter Ratio Analysis'),
+          ChartTitle(text: ''),
       legend: const Legend(isVisible: true),
       tooltipBehavior: TooltipBehavior(enable: true),
       zoomPanBehavior: ZoomPanBehavior(
