@@ -12,6 +12,7 @@ import 'package:targafy/src/home/view/screens/controller/actual_predicted_data_c
 import 'package:targafy/src/home/view/screens/controller/user_hierarchy_comments_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_hierarchy_data_controller.dart';
 import 'package:targafy/src/home/view/screens/widgets/AddCharts.dart';
+import 'package:targafy/src/home/view/screens/widgets/CommentBubbleWidget.dart';
 import 'package:targafy/src/home/view/screens/widgets/CustomRatioChart.dart';
 import 'package:targafy/src/home/view/screens/widgets/DataTableForRatio.dart';
 import 'package:targafy/src/home/view/screens/widgets/GraphicalStatistics.dart';
@@ -842,6 +843,87 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                           ),
 
+                    // if (selectedHierarchyUser &&
+                    //     selectedParameter.isNotEmpty &&
+                    //     selectedUserId.isNotEmpty &&
+                    //     selectedStates[3])
+                    //   ref
+                    //       .watch(userCommentsFutureProvider(Tuple4(
+                    //           businessId,
+                    //           selectedUserId,
+                    //           selectedParameter,
+                    //           currentMonth.toString())))
+                    //       .when(
+                    //         data: (commentsData) {
+                    //           return Column(
+                    //             children: commentsData.reversed.map((entry) {
+                    //               return Card(
+                    //                 margin: EdgeInsets.symmetric(
+                    //                   vertical: 8.0,
+                    //                   horizontal: 16.0,
+                    //                 ),
+                    //                 child: Column(
+                    //                   crossAxisAlignment:
+                    //                       CrossAxisAlignment.start,
+                    //                   children: [
+                    //                     ListTile(
+                    //                       title: Text(entry.date),
+                    //                     ),
+                    //                     Column(
+                    //                       crossAxisAlignment:
+                    //                           CrossAxisAlignment.start,
+                    //                       children: entry.comments
+                    //                           .map((commentDetail) {
+                    //                         return Padding(
+                    //                           padding: EdgeInsets.symmetric(
+                    //                               horizontal: 16.0),
+                    //                           child: Column(
+                    //                             crossAxisAlignment:
+                    //                                 CrossAxisAlignment.start,
+                    //                             children: [
+                    //                               ListTile(
+                    //                                 title: Text(commentDetail
+                    //                                     .todaysComment),
+                    //                                 subtitle: Text(
+                    //                                   'Added by: ${commentDetail.addedBy} on ${commentDetail.date}',
+                    //                                 ),
+                    //                               ),
+                    //                               SizedBox(
+                    //                                   height:
+                    //                                       8.0), // Adjust spacing as needed
+                    //                             ],
+                    //                           ),
+                    //                         );
+                    //                       }).toList(),
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //               );
+                    //             }).toList(),
+                    //           );
+                    //         },
+                    //         loading: () =>
+                    //             Center(child: CircularProgressIndicator()),
+                    //         error: (error, stackTrace) => Center(
+                    //           child: Column(
+                    //             mainAxisSize: MainAxisSize.min,
+                    //             children: [
+                    //               Lottie.asset(
+                    //                   'assets/animations/empty_list.json',
+                    //                   height: 200,
+                    //                   width: 200),
+                    //               const Text(
+                    //                 "Nothing to display",
+                    //                 style: TextStyle(
+                    //                   color: Colors.grey,
+                    //                   fontSize: 14,
+                    //                   fontWeight: FontWeight.w600,
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ),
                     if (selectedHierarchyUser &&
                         selectedParameter.isNotEmpty &&
                         selectedUserId.isNotEmpty &&
@@ -854,51 +936,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               currentMonth.toString())))
                           .when(
                             data: (commentsData) {
-                              return Column(
-                                children: commentsData.reversed.map((entry) {
-                                  return Card(
-                                    margin: EdgeInsets.symmetric(
-                                      vertical: 8.0,
-                                      horizontal: 16.0,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        ListTile(
-                                          title: Text(entry.date),
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: entry.comments
-                                              .map((commentDetail) {
-                                            return Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 16.0),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  ListTile(
-                                                    title: Text(commentDetail
-                                                        .todaysComment),
-                                                    subtitle: Text(
-                                                      'Added by: ${commentDetail.addedBy} on ${commentDetail.date}',
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                      height:
-                                                          8.0), // Adjust spacing as needed
-                                                ],
-                                              ),
-                                            );
-                                          }).toList(),
-                                        ),
-                                      ],
-                                    ),
+                              final reversedCommentsData =
+                                  commentsData.reversed.toList();
+
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: reversedCommentsData.length,
+                                itemBuilder: (context, index) {
+                                  final entry = reversedCommentsData[index];
+                                  return Column(
+                                    children:
+                                        entry.comments.map((commentDetail) {
+                                      return CommentBubble(
+                                        profileImage:
+                                            'https://randomuser.me/api/portraits/lego/2.jpg', // Replace with actual profile image URL
+                                        message: commentDetail.todaysComment,
+                                        sender: commentDetail.addedBy,
+                                        timestamp:
+                                            DateTime.parse(commentDetail.date),
+                                      );
+                                    }).toList(),
                                   );
-                                }).toList(),
+                                },
                               );
                             },
                             loading: () =>
@@ -1177,6 +1237,92 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ],
                       ),
 
+                    // if (selectedStates[3] &&
+                    //     selectedParameter.isNotEmpty &&
+                    //     selectedUserId.isEmpty &&
+                    //     !selectedHierarchyUser)
+                    //   FutureBuilder<CommentsDataModel>(
+                    //     future: ref
+                    //         .read(commentsDataControllerProvider)
+                    //         .fetchCommentsData(businessId, selectedParameter,
+                    //             currentMonth.toString()),
+                    //     builder: (context, snapshot) {
+                    //       if (snapshot.connectionState ==
+                    //           ConnectionState.waiting) {
+                    //         return const Center(
+                    //             child: CircularProgressIndicator());
+                    //       } else if (snapshot.hasError) {
+                    //         return Center(
+                    //           child: Column(
+                    //             mainAxisSize: MainAxisSize.min,
+                    //             children: [
+                    //               Lottie.asset(
+                    //                   'assets/animations/empty_list.json',
+                    //                   height: 200,
+                    //                   width: 200),
+                    //               const Text(
+                    //                 "Nothing to display",
+                    //                 style: TextStyle(
+                    //                   color: Colors.grey,
+                    //                   fontSize: 14,
+                    //                   fontWeight: FontWeight.w600,
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         );
+                    //       } else if (!snapshot.hasData ||
+                    //           snapshot.data!.comments.isEmpty) {
+                    //         return Center(
+                    //           child: Column(
+                    //             mainAxisSize: MainAxisSize.min,
+                    //             children: [
+                    //               Lottie.asset(
+                    //                   'assets/animations/empty_list.json',
+                    //                   height: 200,
+                    //                   width: 200),
+                    //               const Text(
+                    //                 "Nothing to display",
+                    //                 style: TextStyle(
+                    //                   color: Colors.grey,
+                    //                   fontSize: 14,
+                    //                   fontWeight: FontWeight.w600,
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         );
+                    //       } else {
+                    //         final commentsData = snapshot.data!;
+                    //         return Column(
+                    //           children:
+                    //               commentsData.comments.reversed.map((entry) {
+                    //             return Card(
+                    //               margin: EdgeInsets.symmetric(
+                    //                 vertical: 8.0,
+                    //                 horizontal: 16.0,
+                    //               ),
+                    //               child: Column(
+                    //                 children: [
+                    //                   ListTile(
+                    //                     title: Text(entry.date),
+                    //                   ),
+                    //                   ...entry.comments.map((commentDetail) {
+                    //                     return ListTile(
+                    //                       title:
+                    //                           Text(commentDetail.todaysComment),
+                    //                       subtitle: Text(
+                    //                           'Added by: ${commentDetail.addedBy} on ${commentDetail.date}'),
+                    //                     );
+                    //                   }).toList(),
+                    //                 ],
+                    //               ),
+                    //             );
+                    //           }).toList(),
+                    //         );
+                    //       }
+                    //     },
+                    //   ),
                     if (selectedStates[3] &&
                         selectedParameter.isNotEmpty &&
                         selectedUserId.isEmpty &&
@@ -1234,31 +1380,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             );
                           } else {
                             final commentsData = snapshot.data!;
-                            return Column(
-                              children:
-                                  commentsData.comments.reversed.map((entry) {
-                                return Card(
-                                  margin: EdgeInsets.symmetric(
-                                    vertical: 8.0,
-                                    horizontal: 16.0,
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      ListTile(
-                                        title: Text(entry.date),
-                                      ),
-                                      ...entry.comments.map((commentDetail) {
-                                        return ListTile(
-                                          title:
-                                              Text(commentDetail.todaysComment),
-                                          subtitle: Text(
-                                              'Added by: ${commentDetail.addedBy} on ${commentDetail.date}'),
-                                        );
-                                      }).toList(),
-                                    ],
-                                  ),
+                            // Reverse the comments list
+                            final reversedCommentsData =
+                                commentsData.comments.reversed.toList();
+
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: reversedCommentsData.length,
+                              itemBuilder: (context, index) {
+                                final entry = reversedCommentsData[index];
+                                return Column(
+                                  children: entry.comments.map((commentDetail) {
+                                    return CommentBubble(
+                                      profileImage:
+                                          'https://randomuser.me/api/portraits/lego/2.jpg', // Replace with actual profile image URL
+                                      message: commentDetail.todaysComment,
+                                      sender: commentDetail.addedBy,
+                                      timestamp:
+                                          DateTime.parse(commentDetail.date),
+                                    );
+                                  }).toList(),
                                 );
-                              }).toList(),
+                              },
                             );
                           }
                         },
