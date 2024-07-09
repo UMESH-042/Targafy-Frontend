@@ -955,6 +955,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         sender: commentDetail.addedBy,
                                         timestamp:
                                             DateTime.parse(commentDetail.date),
+                                        dateAdded: DateTime.parse(entry.date),
                                       );
                                     }).toList(),
                                   );
@@ -1399,6 +1400,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       sender: commentDetail.addedBy,
                                       timestamp:
                                           DateTime.parse(commentDetail.date),
+                                      dateAdded: DateTime.parse(entry.date),
                                     );
                                   }).toList(),
                                 );
