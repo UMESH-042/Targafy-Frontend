@@ -244,11 +244,16 @@ class _BottomNavigationAndAppBarState
     }
 
     final selectedBusiness = selectedBusinessData?['business'] as Business?;
+
     final selectedUserType = selectedBusinessData?['userType'] as String?;
     final selectedbusinessCode =
         selectedBusinessData?['businessCode'] as String?;
     final selectedRole = selectedBusinessData?['role'] as String?;
     print(selectedbusinessCode);
+
+    final businessName = selectedBusiness?.name;
+    String? businessId = selectedBusiness?.id;
+    print(businessId);
 
     return Scaffold(
       // appBar: PreferredSize(
@@ -488,14 +493,14 @@ class _BottomNavigationAndAppBarState
                                 }
                               },
                               child: CircleAvatar(
-                            backgroundColor: Colors.grey[300], 
-                            radius: 20, 
-                            child: Icon(
-                              Icons.my_location, 
-                              color: Colors.grey[800], 
-                              size: 24, 
-                            ),
-                          ),
+                                backgroundColor: Colors.grey[300],
+                                radius: 20,
+                                child: Icon(
+                                  Icons.my_location,
+                                  color: Colors.grey[800],
+                                  size: 24,
+                                ),
+                              ),
                             ),
                           PopupMenuButton<int>(
                             icon: const Icon(Icons.more_vert),
@@ -524,7 +529,9 @@ class _BottomNavigationAndAppBarState
                                 final result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const AddCharts(),
+                                    builder: (context) => AddCharts(
+                                      businessId: businessId,
+                                    ),
                                   ),
                                 );
                               } else if (value == 2) {
@@ -805,6 +812,7 @@ class _BottomNavigationAndAppBarState
                           ref.read(currentBusinessProvider.notifier).state =
                               null;
                           await prefs.remove('authToken');
+                          await prefs.remove('savedPairs');
 
                           // Navigate to login screen and remove all previous routes
                           // if (context.mounted) {

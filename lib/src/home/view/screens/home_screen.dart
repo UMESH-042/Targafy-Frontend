@@ -176,12 +176,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    loadSavedPairs();
     selectedStates = List<bool>.filled(images.length, false);
     selectedParameter = '';
     selectedUser = '';
     selectedUserId = '';
     selectedHierarchyUser = false;
+    loadSavedPairs();
     // _getToken();
   }
 
@@ -314,6 +314,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final businessId = selectedBusinessData?['business']?.id;
     final hierarchyAsync = ref.watch(businessHierarchyProvider);
+
+    if (parameterListAsync == null ||
+        selectedBusinessData == null ||
+        dataAddedController == null ||
+        businessId == null ||
+        hierarchyAsync == null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Lottie.asset('assets/animations/empty_list.json',
+                height: 200, width: 200),
+            const Text(
+              "Nothing to display",
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     String jsonData = '''
   {
@@ -1211,7 +1235,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           } else {
                             final commentsData = snapshot.data!;
                             return Column(
-                              children: commentsData.comments.reversed.map((entry) {
+                              children:
+                                  commentsData.comments.reversed.map((entry) {
                                 return Card(
                                   margin: EdgeInsets.symmetric(
                                     vertical: 8.0,

@@ -424,6 +424,7 @@ import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
 import 'package:targafy/src/users/ui/controller/demote_user.dart';
 import 'package:targafy/src/users/ui/controller/promote_to_MiniAdmin.dart';
 import 'package:targafy/src/users/ui/controller/promote_to_admin.dart';
+import 'package:targafy/src/users/ui/controller/remove_user_controller.dart';
 import 'package:targafy/src/users/ui/widget/user_hierarchy_view.dart';
 
 class UsersScreen extends ConsumerStatefulWidget {
@@ -697,6 +698,15 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                                                   ref
                                                       .read(demoteUserProvider)
                                                       .demoteUser(
+                                                        businessId,
+                                                        user.userId,
+                                                      );
+                                                  break;
+                                                case 4:
+                                                  // Call the remove user function
+                                                  ref
+                                                      .read(removeUserProvider)
+                                                      .removeUser(
                                                         businessId,
                                                         user.userId,
                                                       );

@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 // import 'package:flutter/material.dart';
 // import 'package:targafy/core/shared/components/back_button.dart';
 
@@ -438,16 +439,22 @@
 // }
 
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:targafy/src/home/view/screens/home_screen.dart';
 
 import '../../../../../core/shared/components/back_button.dart';
 import '../../../../parameters/view/controller/add_parameter_controller.dart';
 
 class AddCharts extends ConsumerStatefulWidget {
-  const AddCharts({Key? key}) : super(key: key);
+  final String? businessId;
+  const AddCharts({
+    Key? key,
+    required this.businessId,
+  }) : super(key: key);
 
   @override
   ConsumerState<AddCharts> createState() => _AddChartsState();
@@ -511,6 +518,7 @@ class _AddChartsState extends ConsumerState<AddCharts> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.businessId);
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
