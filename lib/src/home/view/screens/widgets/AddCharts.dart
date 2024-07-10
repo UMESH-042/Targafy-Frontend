@@ -471,7 +471,7 @@ class _AddChartsState extends ConsumerState<AddCharts> {
 
   void loadSavedPairs() async {
     final prefs = await SharedPreferences.getInstance();
-    final savedPairs = prefs.getStringList('savedPairs');
+    final savedPairs = prefs.getStringList('savedPairs_${widget.businessId}');
 
     if (savedPairs != null) {
       setState(() {
@@ -486,7 +486,7 @@ class _AddChartsState extends ConsumerState<AddCharts> {
     final prefs = await SharedPreferences.getInstance();
     final List<String> pairsJson =
         dropdownPairs.map((pair) => json.encode(pair.toJson())).toList();
-    prefs.setStringList('savedPairs', pairsJson);
+    prefs.setStringList('savedPairs_${widget.businessId}', pairsJson);
   }
 
   void addNewDropdownPair() {
@@ -518,7 +518,6 @@ class _AddChartsState extends ConsumerState<AddCharts> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.businessId);
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -992,6 +992,355 @@ import 'package:targafy/widgets/sort_dropdown_list.dart';
 import 'package:targafy/widgets/submit_button.dart';
 import '../controller/Add_target_controller.dart';
 
+// class ParameterTargetScreen extends ConsumerStatefulWidget {
+//   final String parameterName;
+//   final String businessId;
+//   final VoidCallback onDataAdded;
+
+//   const ParameterTargetScreen({
+//     super.key,
+//     required this.parameterName,
+//     required this.businessId,
+//     required this.onDataAdded,
+//   });
+
+//   @override
+//   ConsumerState<ParameterTargetScreen> createState() =>
+//       _ParameterTargetScreenState();
+// }
+
+// class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
+//   final _formKey = GlobalKey<FormState>();
+//   final TextEditingController _targetValueController = TextEditingController();
+//   final TextEditingController _commentController = TextEditingController();
+//   List<String> selectedUserIds = [];
+//   List<String> AssingSelectedUserIds = [];
+//   bool isLoading = false;
+//   bool allSelected = false;
+//   bool additionalAllSelected = false;
+//   bool showTargets = false;
+
+//   Map<String, List<TargetData>> userTargetData = {};
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     ref
+//         .read(userProvider.notifier)
+//         .fetchUsers(widget.parameterName, widget.businessId);
+//   }
+
+//   void _clearFields() {
+//     _formKey.currentState?.reset();
+//     _targetValueController.clear();
+//     _commentController.clear();
+//     setState(() {
+//       selectedUserIds.clear();
+//       AssingSelectedUserIds.clear();
+//       allSelected = false;
+//       additionalAllSelected = false;
+//     });
+//   }
+
+//   Future<void> _fetchTargetDataForUser(String userId) async {
+//     try {
+//       final targets = await ref
+//           .read(targetDataControllerProvider.notifier)
+//           .fetchThreeMonthsData(
+//               userId, widget.businessId, widget.parameterName);
+//       // Store fetched targets in userTargetData map
+//       setState(() {
+//         userTargetData[userId] = targets;
+//       });
+//       print('Fetched targets for user $userId: $targets');
+//     } catch (error) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(
+//           content: Text('Failed to fetch targets for user $userId: $error'),
+//         ),
+//       );
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final users = ref.watch(userProvider);
+//     double height = MediaQuery.of(context).size.height;
+//     double width = MediaQuery.of(context).size.width;
+//     // print(AssingSelectedUserIds);
+//     print(selectedUserIds);
+//     print('This is the  map:- $userTargetData');
+
+//     return Scaffold(
+//       body: SingleChildScrollView(
+//         child: Padding(
+//           padding: const EdgeInsets.all(16.0),
+//           child: Column(
+//             children: [
+//               SpecialBackButton(text: '${widget.parameterName} Target'),
+//               SizedBox(height: height * 0.05),
+//               Form(
+//                 key: _formKey,
+//                 child: Column(
+//                   children: [
+//                     CustomInputField(
+//                       labelText: 'Target Value',
+//                       controller: _targetValueController,
+//                       keyboardType: TextInputType.number,
+//                       validator: (value) {
+//                         if (value == null || value.isEmpty) {
+//                           return 'Please enter a target value';
+//                         }
+//                         return null;
+//                       },
+//                     ),
+//                     SizedBox(height: height * 0.02),
+//                     CustomInputField(
+//                       labelText: 'Comment',
+//                       controller: _commentController,
+//                       validator: (value) {
+//                         if (value == null || value.isEmpty) {
+//                           return 'Please enter a comment';
+//                         }
+//                         return null;
+//                       },
+//                     ),
+//                     SizedBox(height: height * 0.02),
+//                     users.when(
+//                       data: (userList) {
+//                         final sortedUserList =
+//                             sortList(userList, (user) => user.name);
+//                         return Column(
+//                           children: [
+//                             CustomDropdownField(
+//                               labelText: 'Assign Users',
+//                               items: [
+//                                 DropdownMenuItem<String>(
+//                                   value: 'select_all',
+//                                   child: const Text('Select All'),
+//                                 ),
+//                                 ...sortedUserList.map((user) {
+//                                   return DropdownMenuItem<String>(
+//                                     value: user.userId,
+//                                     child: Text(user.name),
+//                                   );
+//                                 }).toList(),
+//                               ],
+//                               onChanged: (value) {
+//                                 if (value == 'select_all') {
+//                                   setState(() {
+//                                     AssingSelectedUserIds = sortedUserList
+//                                         .map((user) => user.userId)
+//                                         .toList();
+//                                     additionalAllSelected = true;
+//                                   });
+//                                 } else if (value != null &&
+//                                     !AssingSelectedUserIds.contains(value)) {
+//                                   setState(() {
+//                                     AssingSelectedUserIds.add(value);
+//                                     additionalAllSelected = false;
+//                                   });
+//                                 }
+//                               },
+//                             ),
+//                             SizedBox(height: height * 0.02),
+//                             Wrap(
+//                               children: additionalAllSelected
+//                                   ? [
+//                                       Chip(
+//                                         label: const Text('All Selected'),
+//                                         onDeleted: () {
+//                                           setState(() {
+//                                             AssingSelectedUserIds.clear();
+//                                             additionalAllSelected = false;
+//                                           });
+//                                         },
+//                                       ),
+//                                     ]
+//                                   : AssingSelectedUserIds.map((userId) {
+//                                       return Chip(
+//                                         label: Text(userList
+//                                             .firstWhere(
+//                                                 (user) => user.userId == userId)
+//                                             .name),
+//                                         onDeleted: () {
+//                                           setState(() {
+//                                             AssingSelectedUserIds.remove(
+//                                                 userId);
+//                                           });
+//                                         },
+//                                       );
+//                                     }).toList(),
+//                             ),
+//                           ],
+//                         );
+//                       },
+//                       loading: () => const CircularProgressIndicator(),
+//                       error: (error, stackTrace) =>
+//                           Text('Failed to load users: $error'),
+//                     ),
+//                     SizedBox(height: height * 0.05),
+//                     isLoading
+//                         ? const CircularProgressIndicator()
+//                         : SubmitButton(
+//                             onPressed: () async {
+//                               if (_formKey.currentState!.validate()) {
+//                                 setState(() {
+//                                   isLoading = true;
+//                                 });
+//                                 final target = Target(
+//                                   targetValue: _targetValueController.text,
+//                                   paramName: widget.parameterName,
+//                                   comment: _commentController.text,
+//                                   userIds: AssingSelectedUserIds,
+//                                   monthIndex: DateTime.now().month.toString(),
+//                                 );
+//                                 try {
+//                                   await ref
+//                                       .read(targetProvider.notifier)
+//                                       .addTarget(target, widget.businessId);
+//                                   ScaffoldMessenger.of(context).showSnackBar(
+//                                     const SnackBar(
+//                                         content:
+//                                             Text('Target added successfully')),
+//                                   );
+//                                   widget.onDataAdded();
+//                                   _clearFields();
+//                                 } catch (error) {
+//                                   ScaffoldMessenger.of(context).showSnackBar(
+//                                     SnackBar(
+//                                         content: Text(
+//                                             'Failed to add target: $error')),
+//                                   );
+//                                   _clearFields();
+//                                 } finally {
+//                                   setState(() {
+//                                     isLoading = false;
+//                                   });
+//                                 }
+//                               }
+//                             },
+//                           ),
+//                     SizedBox(height: height * 0.1),
+//                     users.when(
+//                       data: (userList) {
+//                         final sortedUserList =
+//                             sortList(userList, (user) => user.name);
+//                         return Column(
+//                           children: [
+//                             CustomDropdownField(
+//                               labelText: 'Select Users',
+//                               items: [
+//                                 DropdownMenuItem<String>(
+//                                   value: 'select_all',
+//                                   child: const Text('Select All'),
+//                                 ),
+//                                 ...sortedUserList.map((user) {
+//                                   return DropdownMenuItem<String>(
+//                                     value: user.userId,
+//                                     child: Text(user.name),
+//                                   );
+//                                 }).toList(),
+//                               ],
+//                               onChanged: (value) {
+//                                 if (value == 'select_all') {
+//                                   setState(() {
+//                                     selectedUserIds = sortedUserList
+//                                         .map((user) => user.userId)
+//                                         .toList();
+//                                     allSelected = true;
+//                                   });
+//                                 } else if (value != null &&
+//                                     !selectedUserIds.contains(value)) {
+//                                   setState(() {
+//                                     selectedUserIds.add(value);
+//                                     allSelected = false;
+//                                   });
+//                                 }
+//                               },
+//                             ),
+//                             SizedBox(height: height * 0.02),
+//                             Wrap(
+//                               children: allSelected
+//                                   ? [
+//                                       Chip(
+//                                         label: const Text('All Selected'),
+//                                         onDeleted: () {
+//                                           setState(() {
+//                                             selectedUserIds.clear();
+//                                             allSelected = false;
+//                                           });
+//                                         },
+//                                       ),
+//                                     ]
+//                                   : selectedUserIds.map((userId) {
+//                                       return Chip(
+//                                         label: Text(users.when(
+//                                           data: (userList) => userList
+//                                               .firstWhere((user) =>
+//                                                   user.userId == userId)
+//                                               .name,
+//                                           loading: () => '',
+//                                           error: (error, stackTrace) => '',
+//                                         )),
+//                                         onDeleted: () {
+//                                           setState(() {
+//                                             selectedUserIds.remove(userId);
+//                                           });
+//                                         },
+//                                       );
+//                                     }).toList(),
+//                             ),
+//                           ],
+//                         );
+//                       },
+//                       loading: () => const CircularProgressIndicator(),
+//                       error: (error, stackTrace) =>
+//                           Text('Failed to load users: $error'),
+//                     ),
+//                     SizedBox(height: height * 0.02),
+//                     CustomSmallButton(
+//                       title: 'Get Targets',
+//                       onPressed: () {
+//                         for (final userId in selectedUserIds) {
+//                           _fetchTargetDataForUser(userId);
+//                         }
+//                         setState(() {
+//                           showTargets = true;
+//                         });
+//                       },
+//                     ),
+//                     SizedBox(height: height * 0.02),
+//                     if (showTargets)
+//                       ...selectedUserIds.map((userId) {
+//                         return users.when(
+//                           data: (userList) {
+//                             final user = userList
+//                                 .firstWhere((user) => user.userId == userId);
+//                             final targets = userTargetData[userId] ?? [];
+//                             return TargetCard(
+//                               user: user,
+//                               targets: targets,
+//                               parameterName: widget.parameterName,
+//                               businessId: widget.businessId,
+//                             );
+//                           },
+//                           loading: () => const CircularProgressIndicator(),
+//                           error: (error, stackTrace) =>
+//                               Text('Failed to load users: $error'),
+//                         );
+//                       }).toList(),
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 class ParameterTargetScreen extends ConsumerStatefulWidget {
   final String parameterName;
   final String businessId;
@@ -1019,8 +1368,10 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
   bool allSelected = false;
   bool additionalAllSelected = false;
   bool showTargets = false;
-
   Map<String, List<TargetData>> userTargetData = {};
+
+  // Controllers for benchmarks
+  List<TextEditingController> _benchMarkControllers = [];
 
   @override
   void initState() {
@@ -1039,6 +1390,19 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
       AssingSelectedUserIds.clear();
       allSelected = false;
       additionalAllSelected = false;
+      _benchMarkControllers.forEach((controller) => controller.clear());
+    });
+  }
+
+  void _addBenchMarkField() {
+    setState(() {
+      _benchMarkControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeBenchMarkField(int index) {
+    setState(() {
+      _benchMarkControllers.removeAt(index);
     });
   }
 
@@ -1104,6 +1468,45 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                         }
                         return null;
                       },
+                    ),
+                    SizedBox(height: height * 0.02),
+                    Column(
+                      children: [
+                        ..._benchMarkControllers.asMap().entries.map((entry) {
+                          int index = entry.key;
+                          TextEditingController controller = entry.value;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: CustomInputField(
+                                    labelText: 'Benchmark',
+                                    controller: controller,
+                                    keyboardType: TextInputType.number,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter a benchmark';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.cancel),
+                                  onPressed: () {
+                                    _removeBenchMarkField(index);
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        CustomSmallButton(
+                          title: 'Add Benchmark',
+                          onPressed: _addBenchMarkField,
+                        ),
+                      ],
                     ),
                     SizedBox(height: height * 0.02),
                     users.when(
@@ -1188,13 +1591,20 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                 setState(() {
                                   isLoading = true;
                                 });
+                                final benchMarks = _benchMarkControllers
+                                    .map((controller) => controller.text)
+                                    .toList();
+                                print('This is $benchMarks');
+
                                 final target = Target(
                                   targetValue: _targetValueController.text,
                                   paramName: widget.parameterName,
                                   comment: _commentController.text,
                                   userIds: AssingSelectedUserIds,
                                   monthIndex: DateTime.now().month.toString(),
+                                  benchMarks: benchMarks,
                                 );
+                                print(benchMarks);
                                 try {
                                   await ref
                                       .read(targetProvider.notifier)
