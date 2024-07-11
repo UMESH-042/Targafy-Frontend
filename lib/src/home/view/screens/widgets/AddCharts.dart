@@ -441,9 +441,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/src/home/view/screens/controller/add_charts_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/get_drop_downfield_pair.dart';
 import 'package:targafy/src/home/view/screens/home_screen.dart';
+import 'package:targafy/src/parameters/view/widgets/small_button.dart';
 import '../../../../../core/shared/components/back_button.dart';
 import '../../../../parameters/view/controller/add_parameter_controller.dart';
 
@@ -559,16 +561,6 @@ class _AddChartsState extends ConsumerState<AddCharts> {
           const CustomBackButton(
             text: 'Add Charts',
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: fetchedDropdownPairs.length,
-              itemBuilder: (context, index) {
-                return ParamPairWidget(
-                  paramPair: fetchedDropdownPairs[index],
-                );
-              },
-            ),
-          ),
           const SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
@@ -587,19 +579,39 @@ class _AddChartsState extends ConsumerState<AddCharts> {
               },
             ),
           ),
+          Center(
+            child: Text(
+              'Previous Added Data',
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: fetchedDropdownPairs.length,
+              itemBuilder: (context, index) {
+                return ParamPairWidget(
+                  paramPair: fetchedDropdownPairs[index],
+                );
+              },
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryColor,
         onPressed: addNewDropdownPair,
         tooltip: 'Add New Pair',
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton(
+        child: CustomSmallButton(
           onPressed: savePairs,
-          child: const Text('Save'),
+          title: 'Save',
         ),
       ),
     );
@@ -793,24 +805,24 @@ class ParamPairWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'First Selected Item: ${paramPair.firstSelectedItem}',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              '${paramPair.firstSelectedItem} VS ${paramPair.secondSelectedItem}',
+              style: TextStyle(fontSize: 18),
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 4),
             Text(
-              'Second Selected Item: ${paramPair.secondSelectedItem}',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              'Benchmark Values:',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[600],
+              ),
             ),
-            SizedBox(height: 8),
-            Text(
-              'Values:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            SizedBox(height: 4),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: paramPair.values
                   .map((value) => Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4),
+                        padding: EdgeInsets.symmetric(vertical: 2),
                         child: Text('- $value'),
                       ))
                   .toList(),
