@@ -439,13 +439,11 @@
 // }
 
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:targafy/src/home/view/screens/controller/add_charts_controller.dart';
+import 'package:targafy/src/home/view/screens/controller/get_drop_downfield_pair.dart';
 import 'package:targafy/src/home/view/screens/home_screen.dart';
-
 import '../../../../../core/shared/components/back_button.dart';
 import '../../../../parameters/view/controller/add_parameter_controller.dart';
 
@@ -462,31 +460,32 @@ class AddCharts extends ConsumerStatefulWidget {
 
 class _AddChartsState extends ConsumerState<AddCharts> {
   List<DropdownFieldPair> dropdownPairs = [];
+  List<ParamPair> fetchedDropdownPairs = [];
 
   @override
   void initState() {
     super.initState();
-    loadSavedPairs(); // Load saved pairs when the widget initializes
+    fetchParamPairs();
   }
 
-  void loadSavedPairs() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedPairs = prefs.getStringList('savedPairs_${widget.businessId}');
+  Future<void> fetchParamPairs() async {
+    try {
+      final paramPairs = await ref.read(paramPairsProvider.future);
 
-    if (savedPairs != null) {
       setState(() {
-        dropdownPairs = savedPairs
-            .map((pairJson) => DropdownFieldPair.fromJson(pairJson))
+        fetchedDropdownPairs = paramPairs
+            .map((paramPair) => ParamPair(
+                  firstSelectedItem: paramPair.firstSelectedItem,
+                  secondSelectedItem: paramPair.secondSelectedItem,
+                  values: paramPair.values,
+                ))
             .toList();
       });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to fetch param pairs: $e')),
+      );
     }
-  }
-
-  void savePairs() async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> pairsJson =
-        dropdownPairs.map((pair) => json.encode(pair.toJson())).toList();
-    prefs.setStringList('savedPairs_${widget.businessId}', pairsJson);
   }
 
   void addNewDropdownPair() {
@@ -498,22 +497,57 @@ class _AddChartsState extends ConsumerState<AddCharts> {
   void deleteDropdownPair(int index) {
     setState(() {
       dropdownPairs.removeAt(index);
-      savePairs(); // Save pairs after deletion
     });
   }
 
   void onFirstItemSelected(int index, String selectedItem) {
     setState(() {
       dropdownPairs[index].firstSelectedItem = selectedItem;
-      savePairs(); // Save pairs after selection changes
     });
   }
 
   void onSecondItemSelected(int index, String selectedItem) {
     setState(() {
       dropdownPairs[index].secondSelectedItem = selectedItem;
-      savePairs(); // Save pairs after selection changes
     });
+  }
+
+  void onBenchmarkChanged(int index, int benchmarkIndex, String value) {
+    setState(() {
+      dropdownPairs[index].benchMarks[benchmarkIndex] = value;
+    });
+  }
+
+  void addBenchmark(int index) {
+    setState(() {
+      dropdownPairs[index].benchMarks.add('');
+      dropdownPairs[index].controllers.add(TextEditingController());
+    });
+  }
+
+  void removeBenchmark(int index, int benchmarkIndex) {
+    setState(() {
+      dropdownPairs[index].benchMarks.removeAt(benchmarkIndex);
+      dropdownPairs[index].controllers.removeAt(benchmarkIndex);
+    });
+  }
+
+  Future<void> savePairs() async {
+    try {
+      await ref
+          .read(addChartsControllerProvider)
+          .savePairs(widget.businessId!, dropdownPairs);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Pairs saved successfully')),
+      );
+      setState(() {
+        dropdownPairs.clear();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save pairs: $e')),
+      );
+    }
   }
 
   @override
@@ -525,6 +559,16 @@ class _AddChartsState extends ConsumerState<AddCharts> {
           const CustomBackButton(
             text: 'Add Charts',
           ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: fetchedDropdownPairs.length,
+              itemBuilder: (context, index) {
+                return ParamPairWidget(
+                  paramPair: fetchedDropdownPairs[index],
+                );
+              },
+            ),
+          ),
           const SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
@@ -535,6 +579,9 @@ class _AddChartsState extends ConsumerState<AddCharts> {
                   index: index,
                   onFirstItemSelected: onFirstItemSelected,
                   onSecondItemSelected: onSecondItemSelected,
+                  onBenchmarkChanged: onBenchmarkChanged,
+                  onAddBenchmark: addBenchmark,
+                  onRemoveBenchmark: removeBenchmark,
                   onDeletePressed: () => deleteDropdownPair(index),
                 );
               },
@@ -548,6 +595,13 @@ class _AddChartsState extends ConsumerState<AddCharts> {
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ElevatedButton(
+          onPressed: savePairs,
+          child: const Text('Save'),
+        ),
+      ),
     );
   }
 }
@@ -555,14 +609,23 @@ class _AddChartsState extends ConsumerState<AddCharts> {
 class DropdownFieldPair {
   String? firstSelectedItem;
   String? secondSelectedItem;
+  List<String> benchMarks;
+  List<TextEditingController> controllers;
 
-  DropdownFieldPair({this.firstSelectedItem, this.secondSelectedItem});
+  DropdownFieldPair(
+      {this.firstSelectedItem,
+      this.secondSelectedItem,
+      List<String>? benchMarks})
+      : benchMarks = benchMarks ?? [],
+        controllers = List.generate(
+            benchMarks?.length ?? 0, (index) => TextEditingController());
 
   factory DropdownFieldPair.fromJson(String jsonStr) {
     final Map<String, dynamic> json = jsonDecode(jsonStr);
     return DropdownFieldPair(
       firstSelectedItem: json['firstSelectedItem'],
       secondSelectedItem: json['secondSelectedItem'],
+      benchMarks: List<String>.from(json['benchMarks']),
     );
   }
 
@@ -570,6 +633,7 @@ class DropdownFieldPair {
     return {
       'firstSelectedItem': firstSelectedItem,
       'secondSelectedItem': secondSelectedItem,
+      'benchMarks': benchMarks,
     };
   }
 }
@@ -579,6 +643,9 @@ class DropdownPairWidget extends ConsumerWidget {
   final int index;
   final void Function(int, String) onFirstItemSelected;
   final void Function(int, String) onSecondItemSelected;
+  final void Function(int, int, String) onBenchmarkChanged;
+  final void Function(int) onAddBenchmark;
+  final void Function(int, int) onRemoveBenchmark;
   final VoidCallback onDeletePressed;
 
   DropdownPairWidget({
@@ -586,6 +653,9 @@ class DropdownPairWidget extends ConsumerWidget {
     required this.index,
     required this.onFirstItemSelected,
     required this.onSecondItemSelected,
+    required this.onBenchmarkChanged,
+    required this.onAddBenchmark,
+    required this.onRemoveBenchmark,
     required this.onDeletePressed,
   });
 
@@ -593,13 +663,11 @@ class DropdownPairWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final parameterList = ref.watch(parametersProviderHome);
 
-    // Filter items for the first dropdown
     List<String> firstDropdownItems = parameterList
         .where((item) => item.name != pair.secondSelectedItem)
         .map((item) => item.name)
         .toList();
 
-    // Filter items for the second dropdown
     List<String> secondDropdownItems = parameterList
         .where((item) => item.name != pair.firstSelectedItem)
         .map((item) => item.name)
@@ -607,67 +675,148 @@ class DropdownPairWidget extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  hint: const Text("Select"),
-                  value: pair.firstSelectedItem,
-                  items: firstDropdownItems.map((item) {
-                    return DropdownMenuItem<String>(
-                      value: item,
-                      child: Text(item),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    onFirstItemSelected(index, value!);
-                  },
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 4.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      hint: const Text("Select"),
+                      value: pair.firstSelectedItem,
+                      items: firstDropdownItems.map((item) {
+                        return DropdownMenuItem<String>(
+                          value: item,
+                          child: Text(item),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        onFirstItemSelected(index, value!);
+                      },
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text('VS'),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  hint: const Text("Select"),
-                  value: pair.secondSelectedItem,
-                  items: secondDropdownItems.map((item) {
-                    return DropdownMenuItem<String>(
-                      value: item,
-                      child: Text(item),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    onSecondItemSelected(index, value!);
-                  },
+              const SizedBox(width: 8),
+              Text('VS'),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 4.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      hint: const Text("Select"),
+                      value: pair.secondSelectedItem,
+                      items: secondDropdownItems.map((item) {
+                        return DropdownMenuItem<String>(
+                          value: item,
+                          child: Text(item),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        onSecondItemSelected(index, value!);
+                      },
+                    ),
+                  ),
                 ),
               ),
-            ),
+              IconButton(
+                onPressed: onDeletePressed,
+                icon: Icon(Icons.delete),
+                tooltip: 'Delete Pair',
+              ),
+            ],
           ),
-          IconButton(
-            onPressed: onDeletePressed,
-            icon: Icon(Icons.delete),
-            tooltip: 'Delete Pair',
+          const SizedBox(height: 8),
+          Column(
+            children: List.generate(pair.benchMarks.length, (benchmarkIndex) {
+              return Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: pair.controllers[benchmarkIndex],
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Benchmark ${benchmarkIndex + 1}',
+                      ),
+                      onChanged: (value) {
+                        onBenchmarkChanged(index, benchmarkIndex, value);
+                      },
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.remove_circle),
+                    onPressed: () => onRemoveBenchmark(index, benchmarkIndex),
+                  ),
+                ],
+              );
+            }),
+          ),
+          TextButton(
+            onPressed: () => onAddBenchmark(index),
+            child: Text('Add Benchmark'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ParamPairWidget extends StatelessWidget {
+  final ParamPair paramPair;
+
+  const ParamPairWidget({
+    Key? key,
+    required this.paramPair,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      elevation: 2,
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'First Selected Item: ${paramPair.firstSelectedItem}',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Second Selected Item: ${paramPair.secondSelectedItem}',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Values:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: paramPair.values
+                  .map((value) => Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                        child: Text('- $value'),
+                      ))
+                  .toList(),
+            ),
+          ],
+        ),
       ),
     );
   }

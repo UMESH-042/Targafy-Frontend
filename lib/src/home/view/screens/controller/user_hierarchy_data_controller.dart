@@ -135,7 +135,6 @@ class UserData {
   final int totalTargetAchieved;
   final int actualTotalTarget;
   final int percentage;
-  final List<dynamic> benchmarkValues;
 
   UserData({
     required this.userEntries,
@@ -143,7 +142,6 @@ class UserData {
     required this.totalTargetAchieved,
     required this.actualTotalTarget,
     required this.percentage,
-     required this.benchmarkValues,
   });
 
   factory UserData.fromJson(
@@ -155,7 +153,6 @@ class UserData {
       totalTargetAchieved: responseData['totalTargetAchieved'] ?? 0,
       actualTotalTarget: responseData['actualTotalTarget'] ?? 0,
       percentage: responseData['percentage'] ?? 0,
-      benchmarkValues: List<dynamic>.from(data['benchmarkValues'] ?? []),
     );
   }
 
@@ -166,7 +163,6 @@ class UserData {
       totalTargetAchieved: 0,
       actualTotalTarget: 0,
       percentage: 0,
-       benchmarkValues: [],
     );
   }
 }

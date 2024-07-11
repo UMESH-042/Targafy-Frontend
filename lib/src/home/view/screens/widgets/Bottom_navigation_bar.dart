@@ -304,27 +304,27 @@ class _BottomNavigationAndAppBarState
       //         //     child: Image.asset('assets/img/filter.png'),
       //         //   ),
       //         // ),
-      //         Padding(
-      //           padding: const EdgeInsets.symmetric(horizontal: 0),
-      //           child: GestureDetector(
-      //             onTap: () async {
-      //               final result = await Navigator.push(
-      //                 context,
-      //                 MaterialPageRoute(
-      //                   builder: (context) => const AddParameterTargetScreen(),
-      //                 ),
-      //               );
-      //               if (result == true) {
-      //                 _refreshParameters();
-      //               }
-      //             },
-      //             child: CircleAvatar(
-      //               backgroundImage:
-      //                   AssetImage('assets/img/Targafy_app_icon.png'),
-      //               radius: 20, // Adjust size as needed
-      //             ),
-      //           ),
+      // Padding(
+      //   padding: const EdgeInsets.symmetric(horizontal: 0),
+      //   child: GestureDetector(
+      //     onTap: () async {
+      //       final result = await Navigator.push(
+      //         context,
+      //         MaterialPageRoute(
+      //           builder: (context) => const AddParameterTargetScreen(),
       //         ),
+      //       );
+      //       if (result == true) {
+      //         _refreshParameters();
+      //       }
+      //     },
+      //     child: CircleAvatar(
+      //       backgroundImage:
+      //           AssetImage('assets/img/Targafy_app_icon.png'),
+      //       radius: 20, // Adjust size as needed
+      //     ),
+      //   ),
+      // ),
       //         Consumer(
       //           builder: (context, ref, _) {
       //             final userRoleAsyncValue = ref.watch(userRoleProvider);
@@ -492,14 +492,19 @@ class _BottomNavigationAndAppBarState
                                   _refreshParameters();
                                 }
                               },
+                              // child: CircleAvatar(
+                              //   backgroundColor: Colors.grey[300],
+                              //   radius: 20,
+                              //   child: Icon(
+                              //     Icons.my_location,
+                              //     color: Colors.grey[800],
+                              //     size: 24,
+                              //   ),
+                              // ),
                               child: CircleAvatar(
-                                backgroundColor: Colors.grey[300],
-                                radius: 20,
-                                child: Icon(
-                                  Icons.my_location,
-                                  color: Colors.grey[800],
-                                  size: 24,
-                                ),
+                                backgroundImage: AssetImage(
+                                    'assets/img/3d-target.png'),
+                                radius: 15,
                               ),
                             ),
                           PopupMenuButton<int>(

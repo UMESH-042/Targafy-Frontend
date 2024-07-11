@@ -7,6 +7,7 @@ class CustomRatioChart extends StatelessWidget {
   final String secondParameter;
   final List<List<dynamic>> firstData;
   final List<List<dynamic>> secondData;
+  final List<String> benchmark;
 
   const CustomRatioChart({
     Key? key,
@@ -14,6 +15,7 @@ class CustomRatioChart extends StatelessWidget {
     required this.secondParameter,
     required this.firstData,
     required this.secondData,
+    required this.benchmark,
   }) : super(key: key);
 
   @override
@@ -21,11 +23,30 @@ class CustomRatioChart extends StatelessWidget {
     List<List<dynamic>> formattedfirstData = _convertDates(firstData);
     List<List<dynamic>> formattedSecondData = _convertDates(secondData);
 
+    print('This is the benchmark :-${benchmark}');
+
     List<List<dynamic>> ratioData =
         _calculateRatio(formattedfirstData, formattedSecondData);
 
     DateTime minDate = _findMinDate(formattedfirstData, formattedSecondData);
     DateTime maxDate = _findMaxDate(formattedfirstData, formattedSecondData);
+
+    List<LineSeries<dynamic, DateTime>> benchmarkSeries = [];
+
+    // Create series for each benchmark value
+    for (int i = 0; i < benchmark.length; i++) {
+      benchmarkSeries.add(LineSeries<dynamic, DateTime>(
+        dataSource: [
+          DateTime(minDate.year, minDate.month, 1),
+          DateTime(maxDate.year, maxDate.month,
+              DateTime(maxDate.year, maxDate.month + 1, 0).day)
+        ].map((date) => [date, double.parse(benchmark[i])]).toList(),
+        xValueMapper: (data, _) => data[0],
+        yValueMapper: (data, _) => data[1],
+        name: 'Benchmark ${benchmark[i]}',
+        color: Colors.red, // Adjust color as needed
+      ));
+    }
 
     return SfCartesianChart(
       primaryXAxis: DateTimeAxis(
@@ -70,11 +91,11 @@ class CustomRatioChart extends StatelessWidget {
         axisLabelFormatter: (AxisLabelRenderDetails details) {
           num value = details.value;
           // if (value < 1.0) {
-            // return ChartAxisLabel('${(value * 100).toStringAsFixed(2)}%',
-                // TextStyle(color: Colors.black));
+          // return ChartAxisLabel('${(value * 100).toStringAsFixed(2)}%',
+          // TextStyle(color: Colors.black));
           // } else {
-            return ChartAxisLabel(
-                value.toStringAsFixed(1), TextStyle(color: Colors.black));
+          return ChartAxisLabel(
+              value.toStringAsFixed(1), TextStyle(color: Colors.black));
           // }
         },
         axisLine: const AxisLine(width: 1),
@@ -89,7 +110,18 @@ class CustomRatioChart extends StatelessWidget {
         enablePinching: true,
         enableDoubleTapZooming: true,
       ),
+      // series: <LineSeries<dynamic, DateTime>>[
+      //   LineSeries<dynamic, DateTime>(
+      //     dataSource: ratioData,
+      //     xValueMapper: (data, _) => DateTime.parse(data[0].toString()),
+      //     yValueMapper: (data, _) => double.parse(data[1].toString()),
+      //     name: '$firstParameter/$secondParameter Ratio (%)',
+      //     dataLabelSettings: const DataLabelSettings(isVisible: true),
+      //     color: Colors.green,
+      //   ),
+      // ],
       series: <LineSeries<dynamic, DateTime>>[
+        ...benchmarkSeries,
         LineSeries<dynamic, DateTime>(
           dataSource: ratioData,
           xValueMapper: (data, _) => DateTime.parse(data[0].toString()),

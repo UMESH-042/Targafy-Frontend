@@ -52,7 +52,6 @@ class TargetNotifier extends StateNotifier<AsyncValue<void>> {
         body: json.encode(target.toJson()),
       );
       print(response.body);
-      print('This is benchmark :- ${target.benchMarks}');
       if (response.statusCode == 201) {
         state = const AsyncValue.data(null);
       } else {

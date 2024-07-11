@@ -148,7 +148,7 @@ class DataAddedController {
         }
       }
     } catch (e) {
-      print('Error fetching growth data: $e');
+      print('Error fetching Parameter data: $e');
     }
     return UserDataModel.empty();
   }
@@ -166,7 +166,6 @@ class UserDataModel {
   final int totalTargetAchieved;
   final int actualTotalTarget;
   final int percentage;
-  final List<dynamic> benchmarkValues;
 
   UserDataModel({
     required this.userEntries,
@@ -174,7 +173,6 @@ class UserDataModel {
     required this.totalTargetAchieved,
     required this.actualTotalTarget,
     required this.percentage,
-    required this.benchmarkValues,
   });
 
   factory UserDataModel.fromJson(
@@ -186,7 +184,6 @@ class UserDataModel {
       totalTargetAchieved: responseData['totalTargetAchieved'] ?? 0,
       actualTotalTarget: responseData['actualTotalTarget'] ?? 0,
       percentage: responseData['percentage'] ?? 0,
-      benchmarkValues: List<dynamic>.from(data['benchmarkValues'] ?? []),
     );
   }
 
@@ -197,7 +194,6 @@ class UserDataModel {
       totalTargetAchieved: 0,
       actualTotalTarget: 0,
       percentage: 0,
-      benchmarkValues: [],
     );
   }
 }

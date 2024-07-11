@@ -9,6 +9,7 @@ import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/src/home/view/screens/controller/Comment_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/actual_predicted_data_controller.dart';
+import 'package:targafy/src/home/view/screens/controller/get_drop_downfield_pair.dart';
 import 'package:targafy/src/home/view/screens/controller/user_hierarchy_comments_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_hierarchy_data_controller.dart';
 import 'package:targafy/src/home/view/screens/widgets/AddCharts.dart';
@@ -35,6 +36,13 @@ String domain = AppRemoteRoutes.baseUrl;
 // Providers
 final selectedBusinessData = Provider<Map<String, dynamic>?>((ref) {
   return ref.watch(currentBusinessProvider);
+});
+
+final paramPairsProvider = FutureProvider<List<ParamPair>>((ref) {
+  final repository = ref.watch(paramRepositoryProvider);
+  final selectedBusinessData = ref.watch(currentBusinessProvider);
+  final businessId = selectedBusinessData?['business']?.id;
+  return repository.fetchParamPairs(businessId);
 });
 
 final parameterListProvider =
@@ -171,6 +179,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _isRefreshing = false;
   late bool selectedHierarchyUser;
 
+  late List<ParamPair> dropdownPairs = [];
+
   @override
   void initState() {
     super.initState();
@@ -181,31 +191,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     selectedHierarchyUser = false;
     // loadSavedPairs();
     // _getToken();
-  }
-
-  // void loadSavedPairs(String businessId) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final savedPairs = prefs.getStringList('savedPairs_${businessId}');
-
-  //   if (savedPairs != null) {
-  //     setState(() {
-  //       dropdownPairs = savedPairs
-  //           .map((pairJson) => DropdownFieldPair.fromJson(pairJson))
-  //           .toList();
-  //     });
-  //   }
-  // }
-  Future<List<DropdownFieldPair>> loadSavedPairs(String businessId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedPairs = prefs.getStringList('savedPairs_$businessId');
-
-    if (savedPairs != null) {
-      return savedPairs
-          .map((pairJson) => DropdownFieldPair.fromJson(pairJson))
-          .toList();
-    } else {
-      return []; // Return an empty list or handle null case as needed
-    }
   }
 
   static const List<String> images = [
@@ -324,12 +309,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final businessId = selectedBusinessData?['business']?.id;
     final hierarchyAsync = ref.watch(businessHierarchyProvider);
+    final paramPairsAsync = ref.watch(paramPairsProvider);
 
     if (parameterListAsync == null ||
         selectedBusinessData == null ||
         dataAddedController == null ||
         businessId == null ||
-        hierarchyAsync == null) {
+        hierarchyAsync == null ||
+        paramPairsAsync == null) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -381,172 +368,336 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     // Convert JSON data to List<UserEntry>
     List<UserEntry> userEntries = parseUserEntries(userData);
+
+    paramPairsAsync.when(
+      data: (pairs) {
+        dropdownPairs = pairs;
+      },
+      loading: () {},
+      error: (error, stackTrace) {
+        print(error);
+      },
+    );
+
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: _handleRefresh,
-        child: _isRefreshing
-            ? Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-                ),
-              )
-            : FutureBuilder(
-                future: loadSavedPairs(
-                    businessId), // Assuming this fetches saved pairs based on businessId
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else {
-                    final dropdownPairs = snapshot.data ?? [];
-                    return SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          parameterListAsync.when(
-                            data: (parameterList) {
-                              if (selectedParameter.isEmpty &&
-                                  parameterList.isNotEmpty) {
-                                selectedParameter = parameterList[0].name;
-                              }
-                              return Container(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.04,
-                                margin: EdgeInsets.symmetric(
-                                  horizontal:
-                                      MediaQuery.of(context).size.width * 0.02,
-                                ).copyWith(
-                                  top: MediaQuery.of(context).size.height *
-                                      0.005,
+          onRefresh: _handleRefresh,
+          child: _isRefreshing
+              ? Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                  ),
+                )
+              : SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      parameterListAsync.when(
+                        data: (parameterList) {
+                          if (selectedParameter.isEmpty &&
+                              parameterList.isNotEmpty) {
+                            selectedParameter = parameterList[0].name;
+                          }
+                          return Container(
+                            height: MediaQuery.of(context).size.height * 0.04,
+                            margin: EdgeInsets.symmetric(
+                              horizontal:
+                                  MediaQuery.of(context).size.width * 0.02,
+                            ).copyWith(
+                              top: MediaQuery.of(context).size.height * 0.005,
+                            ),
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: parameterList.length,
+                              itemBuilder: (context, index) {
+                                final parameterName = parameterList[index].name;
+                                final paramId = parameterList[index].id;
+                                print('This is param Id :-$paramId');
+                                return SelectableParameterWidget(
+                                  text: parameterName,
+                                  isSelected:
+                                      parameterName == selectedParameter,
+                                  onTap: () => _handleTapForParameters(
+                                      parameterName, paramId),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (error, stackTrace) => Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Lottie.asset('assets/animations/empty_list.json',
+                                  height: 200, width: 200),
+                              const Text(
+                                "Nothing to display",
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: parameterList.length,
-                                  itemBuilder: (context, index) {
-                                    final parameterName =
-                                        parameterList[index].name;
-                                    final paramId = parameterList[index].id;
-                                    print('This is param Id :-$paramId');
-                                    return SelectableParameterWidget(
-                                      text: parameterName,
-                                      isSelected:
-                                          parameterName == selectedParameter,
-                                      onTap: () => _handleTapForParameters(
-                                          parameterName, paramId),
-                                    );
-                                  },
-                                ),
-                              );
-                            },
-                            loading: () => const Center(
-                                child: CircularProgressIndicator()),
-                            error: (error, stackTrace) => Center(
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (selectedParameter.isNotEmpty)
+                        hierarchyAsync.when(
+                          data: (hierarchy) {
+                            final nodes = hierarchy.nodes;
+                            final edges = hierarchy.edges;
+
+                            final Map<String, String> nodeIdToLabel =
+                                Map.fromEntries(
+                              nodes.map(
+                                  (node) => MapEntry(node.id, node.label.name)),
+                            );
+
+                            final Map<String, List<String>> parentIdToChildren =
+                                {};
+
+                            for (var edge in edges) {
+                              parentIdToChildren.putIfAbsent(
+                                  edge.from, () => []);
+                              parentIdToChildren[edge.from]!.add(edge.to);
+                            }
+
+                            return Container(
+                              alignment:
+                                  Alignment.centerLeft, // Align to the left
+                              margin: EdgeInsets.symmetric(
+                                horizontal:
+                                    MediaQuery.of(context).size.width * 0.02,
+                              ).copyWith(
+                                top: MediaQuery.of(context).size.height * 0.005,
+                              ),
                               child: Column(
-                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Lottie.asset(
-                                      'assets/animations/empty_list.json',
-                                      height: 200,
-                                      width: 200),
-                                  const Text(
-                                    "Nothing to display",
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        SelectableSubGroupWidget(
+                                          text: nodes[0].label.name.isNotEmpty
+                                              ? nodes[0].label.name
+                                              : '-',
+                                          isSelected:
+                                              currentPath.contains(nodes[0].id),
+                                          onTap: () => _handleNodeTap(
+                                              nodes[0].label.name,
+                                              nodes[0].id,
+                                              parentIdToChildren),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          if (selectedParameter.isNotEmpty)
-                            hierarchyAsync.when(
-                              data: (hierarchy) {
-                                final nodes = hierarchy.nodes;
-                                final edges = hierarchy.edges;
-
-                                final Map<String, String> nodeIdToLabel =
-                                    Map.fromEntries(
-                                  nodes.map((node) =>
-                                      MapEntry(node.id, node.label.name)),
-                                );
-
-                                final Map<String, List<String>>
-                                    parentIdToChildren = {};
-
-                                for (var edge in edges) {
-                                  parentIdToChildren.putIfAbsent(
-                                      edge.from, () => []);
-                                  parentIdToChildren[edge.from]!.add(edge.to);
-                                }
-
-                                return Container(
-                                  alignment:
-                                      Alignment.centerLeft, // Align to the left
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal:
-                                        MediaQuery.of(context).size.width *
-                                            0.02,
-                                  ).copyWith(
-                                    top: MediaQuery.of(context).size.height *
-                                        0.005,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      SingleChildScrollView(
+                                  ...currentPath.map((parentId) {
+                                    final children =
+                                        parentIdToChildren[parentId] ?? [];
+                                    return Padding(
+                                      padding: EdgeInsets.only(
+                                          top: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.005),
+                                      child: SingleChildScrollView(
                                         scrollDirection: Axis.horizontal,
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
-                                          children: [
-                                            SelectableSubGroupWidget(
+                                          children: children.map((childId) {
+                                            return SelectableSubGroupWidget(
                                               text:
-                                                  nodes[0].label.name.isNotEmpty
-                                                      ? nodes[0].label.name
-                                                      : '-',
-                                              isSelected: currentPath
-                                                  .contains(nodes[0].id),
+                                                  nodeIdToLabel[childId] ?? '',
+                                              isSelected:
+                                                  currentPath.contains(childId),
                                               onTap: () => _handleNodeTap(
-                                                  nodes[0].label.name,
-                                                  nodes[0].id,
+                                                  nodeIdToLabel[childId]!,
+                                                  childId,
                                                   parentIdToChildren),
-                                            ),
-                                          ],
+                                            );
+                                          }).toList(),
                                         ),
                                       ),
-                                      ...currentPath.map((parentId) {
-                                        final children =
-                                            parentIdToChildren[parentId] ?? [];
-                                        return Padding(
-                                          padding: EdgeInsets.only(
-                                              top: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.005),
-                                          child: SingleChildScrollView(
-                                            scrollDirection: Axis.horizontal,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: children.map((childId) {
-                                                return SelectableSubGroupWidget(
-                                                  text:
-                                                      nodeIdToLabel[childId] ??
-                                                          '',
-                                                  isSelected: currentPath
-                                                      .contains(childId),
-                                                  onTap: () => _handleNodeTap(
-                                                      nodeIdToLabel[childId]!,
-                                                      childId,
-                                                      parentIdToChildren),
-                                                );
-                                              }).toList(),
-                                            ),
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ],
+                                    );
+                                  }).toList(),
+                                ],
+                              ),
+                            );
+                          },
+                          loading: () =>
+                              const Center(child: CircularProgressIndicator()),
+                          error: (error, stackTrace) => Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Lottie.asset(
+                                    'assets/animations/empty_list.json',
+                                    height: 200,
+                                    width: 200),
+                                const Text(
+                                  "Nothing to display",
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      // SizedBox(
+                      //   height: MediaQuery.of(context).size.height * 0.05,
+                      // ),
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.04,
+                        margin: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.02,
+                        ).copyWith(
+                          top: MediaQuery.of(context).size.height * 0.01,
+                        ),
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: images.length,
+                          itemBuilder: (context, index) {
+                            if (!selectedStates.contains(true) &&
+                                images.isNotEmpty) {
+                              selectedStates[0] = true;
+                            }
+
+                            return SelectableChartWidget(
+                              imagePath: images[index],
+                              isSelected: selectedStates[index],
+                              onTap: () => handleTapForCharts(index),
+                            );
+                          },
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: _handlePrevTap,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  Color.fromARGB(255, 145, 173, 216),
+                              shape: CircleBorder(),
+                              padding: EdgeInsets.all(8),
+                            ),
+                            child: Icon(
+                              Icons.chevron_left,
+                              color: Colors.black,
+                              size: 24,
+                            ),
+                          ),
+                          SizedBox(width: 5),
+                          ElevatedButton(
+                            onPressed: currentMonth == DateTime.now().month
+                                ? null
+                                : _handleNextTap,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  Color.fromARGB(255, 145, 173, 216),
+                              shape: CircleBorder(),
+                              padding: EdgeInsets.all(8),
+                            ),
+                            child: Icon(
+                              Icons.chevron_right,
+                              color: Colors.black,
+                              size: 24,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (selectedHierarchyUser &&
+                          selectedParameter.isNotEmpty &&
+                          selectedUserId.isNotEmpty &&
+                          selectedHierarchyUser &&
+                          selectedStates[0])
+                        ref
+                            .watch(userDataFutureProvider(Tuple4(
+                                businessId,
+                                selectedUserId,
+                                selectedParameter,
+                                currentMonth.toString())))
+                            .when(
+                              data: (userData) {
+                                // return CustomChart(
+                                //   parameter: selectedParameter,
+                                //   predictedData: userData.userEntries,
+                                //   actualData: userData.dailyTarget,
+                                // );
+
+                                return Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: CustomChart(
+                                        parameter: selectedParameter,
+                                        actualData: userData.userEntries,
+                                        predictedData:
+                                            userData.dailyTargetAccumulated,
+                                      ),
+                                    ),
+                                    // Padding(
+                                    //   padding: const EdgeInsets.all(8.0),
+                                    //   child: Graphicalstatistics(
+                                    //     parameter: selectedParameter,
+                                    //     actualData: userData.userEntries,
+                                    //     predictedData:
+                                    //         userData.dailyTargetAccumulated,
+                                    //   ),
+                                    // ),
+                                  ],
+                                );
+                              },
+                              loading: () => const Center(
+                                  child: CircularProgressIndicator()),
+                              error: (error, stackTrace) => Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Lottie.asset(
+                                        'assets/animations/empty_list.json',
+                                        height: 200,
+                                        width: 200),
+                                    const Text(
+                                      "Nothing to display",
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                      if (selectedHierarchyUser &&
+                          selectedParameter.isNotEmpty &&
+                          selectedUserId.isNotEmpty &&
+                          selectedStates[2])
+                        ref
+                            .watch(userDataFutureProvider(Tuple4(
+                                businessId,
+                                selectedUserId,
+                                selectedParameter,
+                                currentMonth.toString())))
+                            .when(
+                              data: (userData) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: DataTableWidget(
+                                    parameter: selectedParameter,
+                                    actualData: userData.userEntries,
+                                    predictedData:
+                                        userData.dailyTargetAccumulated,
                                   ),
                                 );
                               },
@@ -572,1195 +723,999 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 ),
                               ),
                             ),
-                          // SizedBox(
-                          //   height: MediaQuery.of(context).size.height * 0.05,
-                          // ),
-                          Container(
-                            height: MediaQuery.of(context).size.height * 0.04,
-                            margin: EdgeInsets.symmetric(
-                              horizontal:
-                                  MediaQuery.of(context).size.width * 0.02,
-                            ).copyWith(
-                              top: MediaQuery.of(context).size.height * 0.01,
-                            ),
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: images.length,
-                              itemBuilder: (context, index) {
-                                if (!selectedStates.contains(true) &&
-                                    images.isNotEmpty) {
-                                  selectedStates[0] = true;
-                                }
-
-                                return SelectableChartWidget(
-                                  imagePath: images[index],
-                                  isSelected: selectedStates[index],
-                                  onTap: () => handleTapForCharts(index),
-                                );
-                              },
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ElevatedButton(
-                                onPressed: _handlePrevTap,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Color.fromARGB(255, 145, 173, 216),
-                                  shape: CircleBorder(),
-                                  padding: EdgeInsets.all(8),
-                                ),
-                                child: Icon(
-                                  Icons.chevron_left,
-                                  color: Colors.black,
-                                  size: 24,
-                                ),
-                              ),
-                              SizedBox(width: 5),
-                              ElevatedButton(
-                                onPressed: currentMonth == DateTime.now().month
-                                    ? null
-                                    : _handleNextTap,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Color.fromARGB(255, 145, 173, 216),
-                                  shape: CircleBorder(),
-                                  padding: EdgeInsets.all(8),
-                                ),
-                                child: Icon(
-                                  Icons.chevron_right,
-                                  color: Colors.black,
-                                  size: 24,
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (selectedHierarchyUser &&
-                              selectedParameter.isNotEmpty &&
-                              selectedUserId.isNotEmpty &&
-                              selectedHierarchyUser &&
-                              selectedStates[0])
-                            ref
-                                .watch(userDataFutureProvider(Tuple4(
-                                    businessId,
-                                    selectedUserId,
-                                    selectedParameter,
-                                    currentMonth.toString())))
-                                .when(
-                                  data: (userData) {
-                                    // return CustomChart(
-                                    //   parameter: selectedParameter,
-                                    //   predictedData: userData.userEntries,
-                                    //   actualData: userData.dailyTarget,
-                                    // );
-
-                                    return Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: CustomChart(
-                                            parameter: selectedParameter,
-                                            actualData: userData.userEntries,
-                                            predictedData:
-                                                userData.dailyTargetAccumulated,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Graphicalstatistics(
-                                            parameter: selectedParameter,
-                                            actualData: userData.userEntries,
-                                            predictedData:
-                                                userData.dailyTargetAccumulated,
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                  loading: () => const Center(
-                                      child: CircularProgressIndicator()),
-                                  error: (error, stackTrace) => Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Lottie.asset(
-                                            'assets/animations/empty_list.json',
-                                            height: 200,
-                                            width: 200),
-                                        const Text(
-                                          "Nothing to display",
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                          if (selectedHierarchyUser &&
-                              selectedParameter.isNotEmpty &&
-                              selectedUserId.isNotEmpty &&
-                              selectedStates[2])
-                            ref
-                                .watch(userDataFutureProvider(Tuple4(
-                                    businessId,
-                                    selectedUserId,
-                                    selectedParameter,
-                                    currentMonth.toString())))
-                                .when(
-                                  data: (userData) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: DataTableWidget(
-                                        parameter: selectedParameter,
-                                        actualData: userData.userEntries,
-                                        predictedData:
-                                            userData.dailyTargetAccumulated,
-                                      ),
-                                    );
-                                  },
-                                  loading: () => const Center(
-                                      child: CircularProgressIndicator()),
-                                  error: (error, stackTrace) => Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Lottie.asset(
-                                            'assets/animations/empty_list.json',
-                                            height: 200,
-                                            width: 200),
-                                        const Text(
-                                          "Nothing to display",
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
 
 // here adding Ratio Data Table for users selected
-                          if (selectedHierarchyUser &&
-                              selectedParameter.isNotEmpty &&
-                              selectedUserId.isNotEmpty &&
-                              selectedHierarchyUser &&
-                              selectedStates[2])
-                            Column(
-                              children: [
-                                for (var pair in dropdownPairs.where((pair) =>
-                                    pair.firstSelectedItem ==
-                                        selectedParameter ||
-                                    pair.secondSelectedItem ==
-                                        selectedParameter)) ...[
-                                  if (pair.firstSelectedItem != null &&
-                                      pair.secondSelectedItem != null)
-                                    ref
-                                        .watch(combinedUserDataFutureProvider(
-                                            Tuple5(
-                                          businessId,
-                                          selectedUserId,
-                                          pair.firstSelectedItem!,
-                                          pair.secondSelectedItem!,
-                                          currentMonth.toString(),
-                                        )))
-                                        .when(
-                                          data: (data) {
-                                            final firstDataModel = data[0];
-                                            final secondDataModel = data[1];
+                      if (selectedHierarchyUser &&
+                          selectedParameter.isNotEmpty &&
+                          selectedUserId.isNotEmpty &&
+                          selectedHierarchyUser &&
+                          selectedStates[2])
+                        Column(
+                          children: [
+                            for (var pair in dropdownPairs.where((pair) =>
+                                pair.firstSelectedItem == selectedParameter ||
+                                pair.secondSelectedItem ==
+                                    selectedParameter)) ...[
+                              if (pair.firstSelectedItem != null &&
+                                  pair.secondSelectedItem != null)
+                                ref
+                                    .watch(
+                                        combinedUserDataFutureProvider(Tuple5(
+                                      businessId,
+                                      selectedUserId,
+                                      pair.firstSelectedItem!,
+                                      pair.secondSelectedItem!,
+                                      currentMonth.toString(),
+                                    )))
+                                    .when(
+                                      data: (data) {
+                                        final firstDataModel = data[0];
+                                        final secondDataModel = data[1];
 
-                                            final firstData =
-                                                firstDataModel.userEntries;
-                                            final secondData =
-                                                secondDataModel.userEntries;
+                                        final firstData =
+                                            firstDataModel.userEntries;
+                                        final secondData =
+                                            secondDataModel.userEntries;
 
-                                            return Padding(
-                                                padding:
-                                                    const EdgeInsets.all(16.0),
-                                                child: DataTableForRatioWidget(
-                                                    firstitem:
-                                                        pair.firstSelectedItem!,
-                                                    seconditem: pair
-                                                        .secondSelectedItem!,
-                                                    actualData: firstData,
-                                                    predictedData: secondData));
-                                          },
-                                          loading: () =>
-                                              const Center(child: Text('')),
-                                          error: (error, stackTrace) => Center(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Lottie.asset(
-                                                    'assets/animations/empty_list.json',
-                                                    height: 200,
-                                                    width: 200),
-                                                const Text(
-                                                  "Nothing to display",
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                ],
-                              ],
-                            ),
-
-                          if (selectedHierarchyUser &&
-                              selectedParameter.isNotEmpty &&
-                              selectedUserId.isNotEmpty &&
-                              selectedStates[1])
-                            ref
-                                .watch(userPieDataFutureProvider(Tuple4(
-                                    businessId,
-                                    selectedUserId,
-                                    selectedParameter,
-                                    currentMonth.toString())))
-                                .when(
-                                  data: (userData) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: PiechartGraph1(
-                                        parameter: selectedParameter,
-                                        actualData: userData.userEntries,
-                                      ),
-                                    );
-                                  },
-                                  loading: () => const Center(
-                                      child: CircularProgressIndicator()),
-                                  error: (error, stackTrace) => Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Lottie.asset(
-                                            'assets/animations/empty_list.json',
-                                            height: 200,
-                                            width: 200),
-                                        const Text(
-                                          "Nothing to display",
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-
-                          // if (selectedHierarchyUser &&
-                          //     selectedParameter.isNotEmpty &&
-                          //     selectedUserId.isNotEmpty &&
-                          //     selectedStates[3])
-                          //   ref
-                          //       .watch(userCommentsFutureProvider(Tuple4(
-                          //           businessId,
-                          //           selectedUserId,
-                          //           selectedParameter,
-                          //           currentMonth.toString())))
-                          //       .when(
-                          //         data: (commentsData) {
-                          //           return Column(
-                          //             children: commentsData.reversed.map((entry) {
-                          //               return Card(
-                          //                 margin: EdgeInsets.symmetric(
-                          //                   vertical: 8.0,
-                          //                   horizontal: 16.0,
-                          //                 ),
-                          //                 child: Column(
-                          //                   crossAxisAlignment:
-                          //                       CrossAxisAlignment.start,
-                          //                   children: [
-                          //                     ListTile(
-                          //                       title: Text(entry.date),
-                          //                     ),
-                          //                     Column(
-                          //                       crossAxisAlignment:
-                          //                           CrossAxisAlignment.start,
-                          //                       children: entry.comments
-                          //                           .map((commentDetail) {
-                          //                         return Padding(
-                          //                           padding: EdgeInsets.symmetric(
-                          //                               horizontal: 16.0),
-                          //                           child: Column(
-                          //                             crossAxisAlignment:
-                          //                                 CrossAxisAlignment.start,
-                          //                             children: [
-                          //                               ListTile(
-                          //                                 title: Text(commentDetail
-                          //                                     .todaysComment),
-                          //                                 subtitle: Text(
-                          //                                   'Added by: ${commentDetail.addedBy} on ${commentDetail.date}',
-                          //                                 ),
-                          //                               ),
-                          //                               SizedBox(
-                          //                                   height:
-                          //                                       8.0), // Adjust spacing as needed
-                          //                             ],
-                          //                           ),
-                          //                         );
-                          //                       }).toList(),
-                          //                     ),
-                          //                   ],
-                          //                 ),
-                          //               );
-                          //             }).toList(),
-                          //           );
-                          //         },
-                          //         loading: () =>
-                          //             Center(child: CircularProgressIndicator()),
-                          //         error: (error, stackTrace) => Center(
-                          //           child: Column(
-                          //             mainAxisSize: MainAxisSize.min,
-                          //             children: [
-                          //               Lottie.asset(
-                          //                   'assets/animations/empty_list.json',
-                          //                   height: 200,
-                          //                   width: 200),
-                          //               const Text(
-                          //                 "Nothing to display",
-                          //                 style: TextStyle(
-                          //                   color: Colors.grey,
-                          //                   fontSize: 14,
-                          //                   fontWeight: FontWeight.w600,
-                          //                 ),
-                          //               ),
-                          //             ],
-                          //           ),
-                          //         ),
-                          //       ),
-                          if (selectedHierarchyUser &&
-                              selectedParameter.isNotEmpty &&
-                              selectedUserId.isNotEmpty &&
-                              selectedStates[3])
-                            ref
-                                .watch(userCommentsFutureProvider(Tuple4(
-                                    businessId,
-                                    selectedUserId,
-                                    selectedParameter,
-                                    currentMonth.toString())))
-                                .when(
-                                  data: (commentsData) {
-                                    final reversedCommentsData =
-                                        commentsData.reversed.toList();
-
-                                    return ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: NeverScrollableScrollPhysics(),
-                                      itemCount: reversedCommentsData.length,
-                                      itemBuilder: (context, index) {
-                                        final entry =
-                                            reversedCommentsData[index];
-                                        return Column(
-                                          children: entry.comments
-                                              .map((commentDetail) {
-                                            return CommentBubble(
-                                              profileImage:
-                                                  'https://randomuser.me/api/portraits/lego/2.jpg', // Replace with actual profile image URL
-                                              message:
-                                                  commentDetail.todaysComment,
-                                              sender: commentDetail.addedBy,
-                                              timestamp: DateTime.parse(
-                                                  commentDetail.date),
-                                              dateAdded:
-                                                  DateTime.parse(entry.date),
-                                            );
-                                          }).toList(),
-                                        );
+                                        return Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: DataTableForRatioWidget(
+                                                firstitem:
+                                                    pair.firstSelectedItem!,
+                                                seconditem:
+                                                    pair.secondSelectedItem!,
+                                                actualData: firstData,
+                                                predictedData: secondData));
                                       },
-                                    );
-                                  },
-                                  loading: () => Center(
-                                      child: CircularProgressIndicator()),
-                                  error: (error, stackTrace) => Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Lottie.asset(
-                                            'assets/animations/empty_list.json',
-                                            height: 200,
-                                            width: 200),
-                                        const Text(
-                                          "Nothing to display",
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                      loading: () =>
+                                          const Center(child: Text('')),
+                                      error: (error, stackTrace) => Center(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Lottie.asset(
+                                                'assets/animations/empty_list.json',
+                                                height: 200,
+                                                width: 200),
+                                            const Text(
+                                              "Nothing to display",
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
+                            ],
+                          ],
+                        ),
+
+                      if (selectedHierarchyUser &&
+                          selectedParameter.isNotEmpty &&
+                          selectedUserId.isNotEmpty &&
+                          selectedStates[1])
+                        ref
+                            .watch(userPieDataFutureProvider(Tuple4(
+                                businessId,
+                                selectedUserId,
+                                selectedParameter,
+                                currentMonth.toString())))
+                            .when(
+                              data: (userData) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: PiechartGraph1(
+                                    parameter: selectedParameter,
+                                    actualData: userData.userEntries,
                                   ),
+                                );
+                              },
+                              loading: () => const Center(
+                                  child: CircularProgressIndicator()),
+                              error: (error, stackTrace) => Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Lottie.asset(
+                                        'assets/animations/empty_list.json',
+                                        height: 200,
+                                        width: 200),
+                                    const Text(
+                                      "Nothing to display",
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                          if (selectedStates.isNotEmpty &&
-                              selectedStates[0] &&
-                              selectedParameter.isEmpty)
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: CustomChart(
-                                parameter: '',
-                                actualData: [],
-                                predictedData: [],
                               ),
                             ),
+
+                      // if (selectedHierarchyUser &&
+                      //     selectedParameter.isNotEmpty &&
+                      //     selectedUserId.isNotEmpty &&
+                      //     selectedStates[3])
+                      //   ref
+                      //       .watch(userCommentsFutureProvider(Tuple4(
+                      //           businessId,
+                      //           selectedUserId,
+                      //           selectedParameter,
+                      //           currentMonth.toString())))
+                      //       .when(
+                      //         data: (commentsData) {
+                      //           return Column(
+                      //             children: commentsData.reversed.map((entry) {
+                      //               return Card(
+                      //                 margin: EdgeInsets.symmetric(
+                      //                   vertical: 8.0,
+                      //                   horizontal: 16.0,
+                      //                 ),
+                      //                 child: Column(
+                      //                   crossAxisAlignment:
+                      //                       CrossAxisAlignment.start,
+                      //                   children: [
+                      //                     ListTile(
+                      //                       title: Text(entry.date),
+                      //                     ),
+                      //                     Column(
+                      //                       crossAxisAlignment:
+                      //                           CrossAxisAlignment.start,
+                      //                       children: entry.comments
+                      //                           .map((commentDetail) {
+                      //                         return Padding(
+                      //                           padding: EdgeInsets.symmetric(
+                      //                               horizontal: 16.0),
+                      //                           child: Column(
+                      //                             crossAxisAlignment:
+                      //                                 CrossAxisAlignment.start,
+                      //                             children: [
+                      //                               ListTile(
+                      //                                 title: Text(commentDetail
+                      //                                     .todaysComment),
+                      //                                 subtitle: Text(
+                      //                                   'Added by: ${commentDetail.addedBy} on ${commentDetail.date}',
+                      //                                 ),
+                      //                               ),
+                      //                               SizedBox(
+                      //                                   height:
+                      //                                       8.0), // Adjust spacing as needed
+                      //                             ],
+                      //                           ),
+                      //                         );
+                      //                       }).toList(),
+                      //                     ),
+                      //                   ],
+                      //                 ),
+                      //               );
+                      //             }).toList(),
+                      //           );
+                      //         },
+                      //         loading: () =>
+                      //             Center(child: CircularProgressIndicator()),
+                      //         error: (error, stackTrace) => Center(
+                      //           child: Column(
+                      //             mainAxisSize: MainAxisSize.min,
+                      //             children: [
+                      //               Lottie.asset(
+                      //                   'assets/animations/empty_list.json',
+                      //                   height: 200,
+                      //                   width: 200),
+                      //               const Text(
+                      //                 "Nothing to display",
+                      //                 style: TextStyle(
+                      //                   color: Colors.grey,
+                      //                   fontSize: 14,
+                      //                   fontWeight: FontWeight.w600,
+                      //                 ),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       ),
+                      if (selectedHierarchyUser &&
+                          selectedParameter.isNotEmpty &&
+                          selectedUserId.isNotEmpty &&
+                          selectedStates[3])
+                        ref
+                            .watch(userCommentsFutureProvider(Tuple4(
+                                businessId,
+                                selectedUserId,
+                                selectedParameter,
+                                currentMonth.toString())))
+                            .when(
+                              data: (commentsData) {
+                                final reversedCommentsData =
+                                    commentsData.reversed.toList();
+
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: reversedCommentsData.length,
+                                  itemBuilder: (context, index) {
+                                    final entry = reversedCommentsData[index];
+                                    return Column(
+                                      children:
+                                          entry.comments.map((commentDetail) {
+                                        return CommentBubble(
+                                          profileImage:
+                                              'https://randomuser.me/api/portraits/lego/2.jpg', // Replace with actual profile image URL
+                                          message: commentDetail.todaysComment,
+                                          sender: commentDetail.addedBy,
+                                          timestamp: DateTime.parse(
+                                              commentDetail.date),
+                                          dateAdded: DateTime.parse(entry.date),
+                                        );
+                                      }).toList(),
+                                    );
+                                  },
+                                );
+                              },
+                              loading: () =>
+                                  Center(child: CircularProgressIndicator()),
+                              error: (error, stackTrace) => Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Lottie.asset(
+                                        'assets/animations/empty_list.json',
+                                        height: 200,
+                                        width: 200),
+                                    const Text(
+                                      "Nothing to display",
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                      if (selectedStates.isNotEmpty &&
+                          selectedStates[0] &&
+                          selectedParameter.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CustomChart(
+                            parameter: '',
+                            actualData: [],
+                            predictedData: [],
+                          ),
+                        ),
 
 // after these are only parameter selected --- checkpoint
 
-                          if (selectedStates.isNotEmpty &&
-                              selectedStates[0] &&
-                              selectedParameter.isNotEmpty &&
-                              selectedUserId.isEmpty &&
-                              !selectedHierarchyUser)
-                            FutureBuilder<UserDataModel>(
-                              future: dataAddedController.fetchDataAdded(
-                                  businessId,
-                                  selectedParameter,
-                                  currentMonth.toString()),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasError) {
-                                  return Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Lottie.asset(
-                                            'assets/animations/empty_list.json',
-                                            height: 200,
-                                            width: 200),
-                                        const Text(
-                                          "Nothing to display",
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                } else if (!snapshot.hasData) {
-                                  return Center(
-                                      child: Text('No data available'));
-                                } else {
-                                  UserDataModel data = snapshot.data!;
-                                  return Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: CustomChart(
-                                          parameter: selectedParameter,
-                                          actualData: data.userEntries,
-                                          predictedData:
-                                              data.dailyTargetAccumulated,
-                                        ),
+                      if (selectedStates.isNotEmpty &&
+                          selectedStates[0] &&
+                          selectedParameter.isNotEmpty &&
+                          selectedUserId.isEmpty &&
+                          !selectedHierarchyUser)
+                        FutureBuilder<UserDataModel>(
+                          future: dataAddedController.fetchDataAdded(businessId,
+                              selectedParameter, currentMonth.toString()),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Lottie.asset(
+                                        'assets/animations/empty_list.json',
+                                        height: 200,
+                                        width: 200),
+                                    const Text(
+                                      "Nothing to display",
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Graphicalstatistics(
-                                          parameter: selectedParameter,
-                                          actualData: data.userEntries,
-                                          predictedData:
-                                              data.dailyTargetAccumulated,
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                }
-                              },
-                            ),
-                          if (selectedStates.isNotEmpty &&
-                              selectedStates[1] &&
-                              selectedParameter.isNotEmpty &&
-                              !selectedHierarchyUser)
-                            FutureBuilder<UserDataModel>(
-                              future: dataAddedController.fetchDataAdded(
-                                  businessId,
-                                  selectedParameter,
-                                  currentMonth.toString()),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
-                                } else if (snapshot.hasError) {
-                                  return Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Lottie.asset(
-                                            'assets/animations/empty_list.json',
-                                            height: 200,
-                                            width: 200),
-                                        const Text(
-                                          "Nothing to display",
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
                                     ),
-                                  );
-                                } else {
-                                  UserDataModel data = snapshot.data!;
-                                  print(data);
-                                  return Padding(
+                                  ],
+                                ),
+                              );
+                            } else if (!snapshot.hasData) {
+                              return Center(child: Text('No data available'));
+                            } else {
+                              UserDataModel data = snapshot.data!;
+                              return Column(
+                                children: [
+                                  Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: PiechartGraph1(
-                                      parameter: selectedParameter,
-                                      actualData: userEntries,
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          if (selectedStates.isNotEmpty &&
-                              selectedStates[2] &&
-                              selectedParameter.isNotEmpty &&
-                              !selectedHierarchyUser)
-                            FutureBuilder<UserDataModel>(
-                              future: dataAddedController.fetchDataAdded(
-                                  businessId,
-                                  selectedParameter,
-                                  currentMonth.toString()),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
-                                } else if (snapshot.hasError) {
-                                  return Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Lottie.asset(
-                                            'assets/animations/empty_list.json',
-                                            height: 200,
-                                            width: 200),
-                                        const Text(
-                                          "Nothing to display",
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                } else {
-                                  UserDataModel data = snapshot.data!;
-                                  print(data);
-                                  return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: DataTableWidget(
+                                    child: CustomChart(
                                       parameter: selectedParameter,
                                       actualData: data.userEntries,
                                       predictedData:
                                           data.dailyTargetAccumulated,
                                     ),
-                                  );
-                                }
-                              },
-                            ),
-                          if (selectedStates.isNotEmpty &&
-                              selectedStates[2] &&
-                              selectedParameter.isNotEmpty &&
-                              selectedUserId.isEmpty &&
-                              !selectedHierarchyUser)
-                            Column(
-                              children: [
-                                for (var pair in dropdownPairs.where((pair) =>
-                                    pair.firstSelectedItem ==
-                                        selectedParameter ||
-                                    pair.secondSelectedItem ==
-                                        selectedParameter)) ...[
-                                  if (pair.firstSelectedItem != null &&
-                                      pair.secondSelectedItem != null)
-                                    FutureBuilder<List<dynamic>>(
-                                      future: Future.wait([
-                                        dataAddedController.fetchDataAdded(
-                                          businessId,
-                                          pair.firstSelectedItem!,
-                                          currentMonth.toString(),
-                                        ),
-                                        dataAddedController.fetchDataAdded(
-                                          businessId,
-                                          pair.secondSelectedItem!,
-                                          currentMonth.toString(),
-                                        ),
-                                      ]),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasError) {
-                                          return Center(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Lottie.asset(
-                                                    'assets/animations/empty_list.json',
-                                                    height: 200,
-                                                    width: 200),
-                                                const Text(
-                                                  "Nothing to display",
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        } else if (!snapshot.hasData) {
-                                          return Center(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Lottie.asset(
-                                                    'assets/animations/empty_list.json',
-                                                    height: 200,
-                                                    width: 200),
-                                                const Text(
-                                                  "Nothing to display",
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        } else {
-                                          var firstDataModel = snapshot.data![0]
-                                              as UserDataModel;
-                                          var secondDataModel = snapshot
-                                              .data![1] as UserDataModel;
-
-                                          List<List<dynamic>> firstData =
-                                              firstDataModel.userEntries;
-                                          List<List<dynamic>> secondData =
-                                              secondDataModel.userEntries;
-
-                                          return Padding(
-                                              padding:
-                                                  const EdgeInsets.all(16.0),
-                                              child: DataTableForRatioWidget(
-                                                  firstitem:
-                                                      pair.firstSelectedItem!,
-                                                  seconditem:
-                                                      pair.secondSelectedItem!,
-                                                  actualData: firstData,
-                                                  predictedData: secondData));
-                                        }
-                                      },
-                                    ),
+                                  ),
+                                  // Padding(
+                                  //   padding: const EdgeInsets.all(8.0),
+                                  //   child: Graphicalstatistics(
+                                  //     parameter: selectedParameter,
+                                  //     actualData: data.userEntries,
+                                  //     predictedData:
+                                  //         data.dailyTargetAccumulated,
+                                  //   ),
+                                  // ),
                                 ],
-                              ],
-                            ),
-
-                          // if (selectedStates[3] &&
-                          //     selectedParameter.isNotEmpty &&
-                          //     selectedUserId.isEmpty &&
-                          //     !selectedHierarchyUser)
-                          //   FutureBuilder<CommentsDataModel>(
-                          //     future: ref
-                          //         .read(commentsDataControllerProvider)
-                          //         .fetchCommentsData(businessId, selectedParameter,
-                          //             currentMonth.toString()),
-                          //     builder: (context, snapshot) {
-                          //       if (snapshot.connectionState ==
-                          //           ConnectionState.waiting) {
-                          //         return const Center(
-                          //             child: CircularProgressIndicator());
-                          //       } else if (snapshot.hasError) {
-                          //         return Center(
-                          //           child: Column(
-                          //             mainAxisSize: MainAxisSize.min,
-                          //             children: [
-                          //               Lottie.asset(
-                          //                   'assets/animations/empty_list.json',
-                          //                   height: 200,
-                          //                   width: 200),
-                          //               const Text(
-                          //                 "Nothing to display",
-                          //                 style: TextStyle(
-                          //                   color: Colors.grey,
-                          //                   fontSize: 14,
-                          //                   fontWeight: FontWeight.w600,
-                          //                 ),
-                          //               ),
-                          //             ],
-                          //           ),
-                          //         );
-                          //       } else if (!snapshot.hasData ||
-                          //           snapshot.data!.comments.isEmpty) {
-                          //         return Center(
-                          //           child: Column(
-                          //             mainAxisSize: MainAxisSize.min,
-                          //             children: [
-                          //               Lottie.asset(
-                          //                   'assets/animations/empty_list.json',
-                          //                   height: 200,
-                          //                   width: 200),
-                          //               const Text(
-                          //                 "Nothing to display",
-                          //                 style: TextStyle(
-                          //                   color: Colors.grey,
-                          //                   fontSize: 14,
-                          //                   fontWeight: FontWeight.w600,
-                          //                 ),
-                          //               ),
-                          //             ],
-                          //           ),
-                          //         );
-                          //       } else {
-                          //         final commentsData = snapshot.data!;
-                          //         return Column(
-                          //           children:
-                          //               commentsData.comments.reversed.map((entry) {
-                          //             return Card(
-                          //               margin: EdgeInsets.symmetric(
-                          //                 vertical: 8.0,
-                          //                 horizontal: 16.0,
-                          //               ),
-                          //               child: Column(
-                          //                 children: [
-                          //                   ListTile(
-                          //                     title: Text(entry.date),
-                          //                   ),
-                          //                   ...entry.comments.map((commentDetail) {
-                          //                     return ListTile(
-                          //                       title:
-                          //                           Text(commentDetail.todaysComment),
-                          //                       subtitle: Text(
-                          //                           'Added by: ${commentDetail.addedBy} on ${commentDetail.date}'),
-                          //                     );
-                          //                   }).toList(),
-                          //                 ],
-                          //               ),
-                          //             );
-                          //           }).toList(),
-                          //         );
-                          //       }
-                          //     },
-                          //   ),
-                          if (selectedStates[3] &&
-                              selectedParameter.isNotEmpty &&
-                              selectedUserId.isEmpty &&
-                              !selectedHierarchyUser)
-                            FutureBuilder<CommentsDataModel>(
-                              future: ref
-                                  .read(commentsDataControllerProvider)
-                                  .fetchCommentsData(
+                              );
+                            }
+                          },
+                        ),
+                      if (selectedStates.isNotEmpty &&
+                          selectedStates[1] &&
+                          selectedParameter.isNotEmpty &&
+                          !selectedHierarchyUser)
+                        FutureBuilder<UserDataModel>(
+                          future: dataAddedController.fetchDataAdded(businessId,
+                              selectedParameter, currentMonth.toString()),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Lottie.asset(
+                                        'assets/animations/empty_list.json',
+                                        height: 200,
+                                        width: 200),
+                                    const Text(
+                                      "Nothing to display",
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } else {
+                              UserDataModel data = snapshot.data!;
+                              print(data);
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: PiechartGraph1(
+                                  parameter: selectedParameter,
+                                  actualData: userEntries,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      if (selectedStates.isNotEmpty &&
+                          selectedStates[2] &&
+                          selectedParameter.isNotEmpty &&
+                          !selectedHierarchyUser)
+                        FutureBuilder<UserDataModel>(
+                          future: dataAddedController.fetchDataAdded(businessId,
+                              selectedParameter, currentMonth.toString()),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Lottie.asset(
+                                        'assets/animations/empty_list.json',
+                                        height: 200,
+                                        width: 200),
+                                    const Text(
+                                      "Nothing to display",
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } else {
+                              UserDataModel data = snapshot.data!;
+                              print(data);
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: DataTableWidget(
+                                  parameter: selectedParameter,
+                                  actualData: data.userEntries,
+                                  predictedData: data.dailyTargetAccumulated,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      if (selectedStates.isNotEmpty &&
+                          selectedStates[2] &&
+                          selectedParameter.isNotEmpty &&
+                          selectedUserId.isEmpty &&
+                          !selectedHierarchyUser)
+                        Column(
+                          children: [
+                            for (var pair in dropdownPairs.where((pair) =>
+                                pair.firstSelectedItem == selectedParameter ||
+                                pair.secondSelectedItem ==
+                                    selectedParameter)) ...[
+                              if (pair.firstSelectedItem != null &&
+                                  pair.secondSelectedItem != null)
+                                FutureBuilder<List<dynamic>>(
+                                  future: Future.wait([
+                                    dataAddedController.fetchDataAdded(
                                       businessId,
-                                      selectedParameter,
-                                      currentMonth.toString()),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
-                                } else if (snapshot.hasError) {
-                                  return Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Lottie.asset(
-                                            'assets/animations/empty_list.json',
-                                            height: 200,
-                                            width: 200),
-                                        const Text(
-                                          "Nothing to display",
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
+                                      pair.firstSelectedItem!,
+                                      currentMonth.toString(),
                                     ),
-                                  );
-                                } else if (!snapshot.hasData ||
-                                    snapshot.data!.comments.isEmpty) {
-                                  return Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Lottie.asset(
-                                            'assets/animations/empty_list.json',
-                                            height: 200,
-                                            width: 200),
-                                        const Text(
-                                          "Nothing to display",
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
+                                    dataAddedController.fetchDataAdded(
+                                      businessId,
+                                      pair.secondSelectedItem!,
+                                      currentMonth.toString(),
                                     ),
-                                  );
-                                } else {
-                                  final commentsData = snapshot.data!;
-                                  // Reverse the comments list
-                                  final reversedCommentsData =
-                                      commentsData.comments.reversed.toList();
-
-                                  return ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemCount: reversedCommentsData.length,
-                                    itemBuilder: (context, index) {
-                                      final entry = reversedCommentsData[index];
-                                      return Column(
-                                        children:
-                                            entry.comments.map((commentDetail) {
-                                          return CommentBubble(
-                                            profileImage:
-                                                'https://randomuser.me/api/portraits/lego/2.jpg', // Replace with actual profile image URL
-                                            message:
-                                                commentDetail.todaysComment,
-                                            sender: commentDetail.addedBy,
-                                            timestamp: DateTime.parse(
-                                                commentDetail.date),
-                                            dateAdded:
-                                                DateTime.parse(entry.date),
-                                          );
-                                        }).toList(),
+                                  ]),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasError) {
+                                      return Center(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Lottie.asset(
+                                                'assets/animations/empty_list.json',
+                                                height: 200,
+                                                width: 200),
+                                            const Text(
+                                              "Nothing to display",
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       );
-                                    },
-                                  );
-                                }
-                              },
-                            ),
-
-                          // for displaying progress bar if only parameter and states is selected
-
-                          // if (selectedStates.isNotEmpty &&
-                          //     selectedStates[2] &&
-                          //     selectedParameter.isNotEmpty &&
-                          //     selectedUserId.isEmpty &&
-                          //     !selectedHierarchyUser)
-                          //   FutureBuilder<UserDataModel>(
-                          //     future: dataAddedController.fetchDataAdded(businessId,
-                          //         selectedParameter, currentMonth.toString()),
-                          //     builder: (context, snapshot) {
-                          //       if (snapshot.hasError) {
-                          //         return Center(
-                          //           child: Column(
-                          //             mainAxisSize: MainAxisSize.min,
-                          //             children: [
-                          //               Lottie.asset(
-                          //                   'assets/animations/empty_list.json',
-                          //                   height: 200,
-                          //                   width: 200),
-                          //               const Text(
-                          //                 "Nothing to display",
-                          //                 style: TextStyle(
-                          //                   color: Colors.grey,
-                          //                   fontSize: 14,
-                          //                   fontWeight: FontWeight.w600,
-                          //                 ),
-                          //               ),
-                          //             ],
-                          //           ),
-                          //         );
-                          //       } else if (!snapshot.hasData) {
-                          //         return Center(
-                          //           child: Column(
-                          //             mainAxisSize: MainAxisSize.min,
-                          //             children: [
-                          //               Lottie.asset(
-                          //                   'assets/animations/empty_list.json',
-                          //                   height: 200,
-                          //                   width: 200),
-                          //               const Text(
-                          //                 "Nothing to display",
-                          //                 style: TextStyle(
-                          //                   color: Colors.grey,
-                          //                   fontSize: 14,
-                          //                   fontWeight: FontWeight.w600,
-                          //                 ),
-                          //               ),
-                          //             ],
-                          //           ),
-                          //         );
-                          //       } else {
-                          //         UserDataModel data = snapshot.data!;
-                          //         return Padding(
-                          //           padding: const EdgeInsets.all(16.0),
-                          //           child: Column(
-                          //             children: [
-                          //               ProgressBarWidget(
-                          //                 label: selectedParameter,
-                          //                 TargetValue: data.actualTotalTarget,
-                          //                 AchievedValue: data.totalTargetAchieved,
-                          //                 color: getRandomColor(),
-                          //               ),
-                          //               Text(
-                          //                 getMonthName(currentMonth),
-                          //                 style: TextStyle(
-                          //                   fontSize: 14,
-                          //                   fontWeight: FontWeight.bold,
-                          //                 ),
-                          //               ),
-                          //             ],
-                          //           ),
-                          //         );
-                          //       }
-                          //     },
-                          //   ),
-
-                          // for displaying the custom ratio charts just below the progress bar indicator if parameter is selected and no user is selected
-
-                          if (selectedStates.isNotEmpty &&
-                              selectedStates[0] &&
-                              selectedParameter.isNotEmpty &&
-                              selectedUserId.isEmpty &&
-                              !selectedHierarchyUser)
-                            Column(
-                              children: [
-                                for (var pair in dropdownPairs.where((pair) =>
-                                    pair.firstSelectedItem ==
-                                        selectedParameter ||
-                                    pair.secondSelectedItem ==
-                                        selectedParameter)) ...[
-                                  if (pair.firstSelectedItem != null &&
-                                      pair.secondSelectedItem != null)
-                                    FutureBuilder<List<dynamic>>(
-                                      future: Future.wait([
-                                        dataAddedController.fetchDataAdded(
-                                          businessId,
-                                          pair.firstSelectedItem!,
-                                          currentMonth.toString(),
-                                        ),
-                                        dataAddedController.fetchDataAdded(
-                                          businessId,
-                                          pair.secondSelectedItem!,
-                                          currentMonth.toString(),
-                                        ),
-                                      ]),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasError) {
-                                          return Center(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Lottie.asset(
-                                                    'assets/animations/empty_list.json',
-                                                    height: 200,
-                                                    width: 200),
-                                                const Text(
-                                                  "Nothing to display",
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ],
+                                    } else if (!snapshot.hasData) {
+                                      return Center(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Lottie.asset(
+                                                'assets/animations/empty_list.json',
+                                                height: 200,
+                                                width: 200),
+                                            const Text(
+                                              "Nothing to display",
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
-                                          );
-                                        } else if (!snapshot.hasData) {
-                                          return Center(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Lottie.asset(
-                                                    'assets/animations/empty_list.json',
-                                                    height: 200,
-                                                    width: 200),
-                                                const Text(
-                                                  "Nothing to display",
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        } else {
-                                          var firstDataModel = snapshot.data![0]
-                                              as UserDataModel;
-                                          var secondDataModel = snapshot
-                                              .data![1] as UserDataModel;
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      var firstDataModel =
+                                          snapshot.data![0] as UserDataModel;
+                                      var secondDataModel =
+                                          snapshot.data![1] as UserDataModel;
 
-                                          List<List<dynamic>> firstData =
-                                              firstDataModel.userEntries;
-                                          List<List<dynamic>> secondData =
-                                              secondDataModel.userEntries;
+                                      List<List<dynamic>> firstData =
+                                          firstDataModel.userEntries;
+                                      List<List<dynamic>> secondData =
+                                          secondDataModel.userEntries;
 
-                                          return Padding(
-                                            padding: const EdgeInsets.all(16.0),
-                                            child: CustomRatioChart(
-                                              firstParameter:
+                                      return Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: DataTableForRatioWidget(
+                                              firstitem:
                                                   pair.firstSelectedItem!,
-                                              secondParameter:
+                                              seconditem:
                                                   pair.secondSelectedItem!,
-                                              firstData: firstData,
-                                              secondData: secondData,
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                ],
-                              ],
-                            ),
+                                              actualData: firstData,
+                                              predictedData: secondData));
+                                    }
+                                  },
+                                ),
+                            ],
+                          ],
+                        ),
 
-                          // for displaying progress bar if user and parameter is selected
-                          // if (selectedHierarchyUser &&
-                          //     selectedParameter.isNotEmpty &&
-                          //     selectedUserId.isNotEmpty &&
-                          //     selectedHierarchyUser &&
-                          //     selectedStates[2])
-                          //   ref
-                          //       .watch(userDataFutureProvider(Tuple4(
-                          //           businessId,
-                          //           selectedUserId,
-                          //           selectedParameter,
-                          //           currentMonth.toString())))
-                          //       .when(
-                          //         data: (userData) {
-                          //           return Padding(
-                          //             padding: const EdgeInsets.all(16.0),
-                          //             child: Column(
-                          //               children: [
-                          //                 ProgressBarWidget(
-                          //                   label: selectedParameter,
-                          //                   TargetValue: userData.actualTotalTarget,
-                          //                   AchievedValue:
-                          //                       userData.totalTargetAchieved,
-                          //                   color: getRandomColor(),
-                          //                 ),
-                          //                 Text(
-                          //                   getMonthName(currentMonth),
-                          //                   style: TextStyle(
-                          //                     fontSize: 14,
-                          //                     fontWeight: FontWeight.bold,
-                          //                   ),
-                          //                 ),
-                          //               ],
-                          //             ),
-                          //           );
-                          //         },
-                          //         loading: () => const Center(
-                          //             child: CircularProgressIndicator()),
-                          //         error: (error, stackTrace) => Center(
-                          //           child: Column(
-                          //             mainAxisSize: MainAxisSize.min,
-                          //             children: [
-                          //               Lottie.asset(
-                          //                   'assets/animations/empty_list.json',
-                          //                   height: 200,
-                          //                   width: 200),
-                          //               const Text(
-                          //                 "Nothing to display",
-                          //                 style: TextStyle(
-                          //                   color: Colors.grey,
-                          //                   fontSize: 14,
-                          //                   fontWeight: FontWeight.w600,
-                          //                 ),
-                          //               ),
-                          //             ],
-                          //           ),
-                          //         ),
-                          //       ),
+                      // if (selectedStates[3] &&
+                      //     selectedParameter.isNotEmpty &&
+                      //     selectedUserId.isEmpty &&
+                      //     !selectedHierarchyUser)
+                      //   FutureBuilder<CommentsDataModel>(
+                      //     future: ref
+                      //         .read(commentsDataControllerProvider)
+                      //         .fetchCommentsData(businessId, selectedParameter,
+                      //             currentMonth.toString()),
+                      //     builder: (context, snapshot) {
+                      //       if (snapshot.connectionState ==
+                      //           ConnectionState.waiting) {
+                      //         return const Center(
+                      //             child: CircularProgressIndicator());
+                      //       } else if (snapshot.hasError) {
+                      //         return Center(
+                      //           child: Column(
+                      //             mainAxisSize: MainAxisSize.min,
+                      //             children: [
+                      //               Lottie.asset(
+                      //                   'assets/animations/empty_list.json',
+                      //                   height: 200,
+                      //                   width: 200),
+                      //               const Text(
+                      //                 "Nothing to display",
+                      //                 style: TextStyle(
+                      //                   color: Colors.grey,
+                      //                   fontSize: 14,
+                      //                   fontWeight: FontWeight.w600,
+                      //                 ),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         );
+                      //       } else if (!snapshot.hasData ||
+                      //           snapshot.data!.comments.isEmpty) {
+                      //         return Center(
+                      //           child: Column(
+                      //             mainAxisSize: MainAxisSize.min,
+                      //             children: [
+                      //               Lottie.asset(
+                      //                   'assets/animations/empty_list.json',
+                      //                   height: 200,
+                      //                   width: 200),
+                      //               const Text(
+                      //                 "Nothing to display",
+                      //                 style: TextStyle(
+                      //                   color: Colors.grey,
+                      //                   fontSize: 14,
+                      //                   fontWeight: FontWeight.w600,
+                      //                 ),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         );
+                      //       } else {
+                      //         final commentsData = snapshot.data!;
+                      //         return Column(
+                      //           children:
+                      //               commentsData.comments.reversed.map((entry) {
+                      //             return Card(
+                      //               margin: EdgeInsets.symmetric(
+                      //                 vertical: 8.0,
+                      //                 horizontal: 16.0,
+                      //               ),
+                      //               child: Column(
+                      //                 children: [
+                      //                   ListTile(
+                      //                     title: Text(entry.date),
+                      //                   ),
+                      //                   ...entry.comments.map((commentDetail) {
+                      //                     return ListTile(
+                      //                       title:
+                      //                           Text(commentDetail.todaysComment),
+                      //                       subtitle: Text(
+                      //                           'Added by: ${commentDetail.addedBy} on ${commentDetail.date}'),
+                      //                     );
+                      //                   }).toList(),
+                      //                 ],
+                      //               ),
+                      //             );
+                      //           }).toList(),
+                      //         );
+                      //       }
+                      //     },
+                      //   ),
+                      if (selectedStates[3] &&
+                          selectedParameter.isNotEmpty &&
+                          selectedUserId.isEmpty &&
+                          !selectedHierarchyUser)
+                        FutureBuilder<CommentsDataModel>(
+                          future: ref
+                              .read(commentsDataControllerProvider)
+                              .fetchCommentsData(businessId, selectedParameter,
+                                  currentMonth.toString()),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Lottie.asset(
+                                        'assets/animations/empty_list.json',
+                                        height: 200,
+                                        width: 200),
+                                    const Text(
+                                      "Nothing to display",
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.comments.isEmpty) {
+                              return Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Lottie.asset(
+                                        'assets/animations/empty_list.json',
+                                        height: 200,
+                                        width: 200),
+                                    const Text(
+                                      "Nothing to display",
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } else {
+                              final commentsData = snapshot.data!;
+                              // Reverse the comments list
+                              final reversedCommentsData =
+                                  commentsData.comments.reversed.toList();
+
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: reversedCommentsData.length,
+                                itemBuilder: (context, index) {
+                                  final entry = reversedCommentsData[index];
+                                  return Column(
+                                    children:
+                                        entry.comments.map((commentDetail) {
+                                      return CommentBubble(
+                                        profileImage:
+                                            'https://randomuser.me/api/portraits/lego/2.jpg', // Replace with actual profile image URL
+                                        message: commentDetail.todaysComment,
+                                        sender: commentDetail.addedBy,
+                                        timestamp:
+                                            DateTime.parse(commentDetail.date),
+                                        dateAdded: DateTime.parse(entry.date),
+                                      );
+                                    }).toList(),
+                                  );
+                                },
+                              );
+                            }
+                          },
+                        ),
+
+                      // for displaying progress bar if only parameter and states is selected
+
+                      // if (selectedStates.isNotEmpty &&
+                      //     selectedStates[2] &&
+                      //     selectedParameter.isNotEmpty &&
+                      //     selectedUserId.isEmpty &&
+                      //     !selectedHierarchyUser)
+                      //   FutureBuilder<UserDataModel>(
+                      //     future: dataAddedController.fetchDataAdded(businessId,
+                      //         selectedParameter, currentMonth.toString()),
+                      //     builder: (context, snapshot) {
+                      //       if (snapshot.hasError) {
+                      //         return Center(
+                      //           child: Column(
+                      //             mainAxisSize: MainAxisSize.min,
+                      //             children: [
+                      //               Lottie.asset(
+                      //                   'assets/animations/empty_list.json',
+                      //                   height: 200,
+                      //                   width: 200),
+                      //               const Text(
+                      //                 "Nothing to display",
+                      //                 style: TextStyle(
+                      //                   color: Colors.grey,
+                      //                   fontSize: 14,
+                      //                   fontWeight: FontWeight.w600,
+                      //                 ),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         );
+                      //       } else if (!snapshot.hasData) {
+                      //         return Center(
+                      //           child: Column(
+                      //             mainAxisSize: MainAxisSize.min,
+                      //             children: [
+                      //               Lottie.asset(
+                      //                   'assets/animations/empty_list.json',
+                      //                   height: 200,
+                      //                   width: 200),
+                      //               const Text(
+                      //                 "Nothing to display",
+                      //                 style: TextStyle(
+                      //                   color: Colors.grey,
+                      //                   fontSize: 14,
+                      //                   fontWeight: FontWeight.w600,
+                      //                 ),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         );
+                      //       } else {
+                      //         UserDataModel data = snapshot.data!;
+                      //         return Padding(
+                      //           padding: const EdgeInsets.all(16.0),
+                      //           child: Column(
+                      //             children: [
+                      //               ProgressBarWidget(
+                      //                 label: selectedParameter,
+                      //                 TargetValue: data.actualTotalTarget,
+                      //                 AchievedValue: data.totalTargetAchieved,
+                      //                 color: getRandomColor(),
+                      //               ),
+                      //               Text(
+                      //                 getMonthName(currentMonth),
+                      //                 style: TextStyle(
+                      //                   fontSize: 14,
+                      //                   fontWeight: FontWeight.bold,
+                      //                 ),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         );
+                      //       }
+                      //     },
+                      //   ),
+
+                      // for displaying the custom ratio charts just below the progress bar indicator if parameter is selected and no user is selected
+
+                      if (selectedStates.isNotEmpty &&
+                          selectedStates[0] &&
+                          selectedParameter.isNotEmpty &&
+                          selectedUserId.isEmpty &&
+                          !selectedHierarchyUser)
+                        Column(
+                          children: [
+                            for (var pair in dropdownPairs.where((pair) =>
+                                pair.firstSelectedItem == selectedParameter ||
+                                pair.secondSelectedItem ==
+                                    selectedParameter)) ...[
+                              if (pair.firstSelectedItem != null &&
+                                  pair.secondSelectedItem != null)
+                                FutureBuilder<List<dynamic>>(
+                                  future: Future.wait([
+                                    dataAddedController.fetchDataAdded(
+                                      businessId,
+                                      pair.firstSelectedItem!,
+                                      currentMonth.toString(),
+                                    ),
+                                    dataAddedController.fetchDataAdded(
+                                      businessId,
+                                      pair.secondSelectedItem!,
+                                      currentMonth.toString(),
+                                    ),
+                                  ]),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasError) {
+                                      return Center(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Lottie.asset(
+                                                'assets/animations/empty_list.json',
+                                                height: 200,
+                                                width: 200),
+                                            const Text(
+                                              "Nothing to display",
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else if (!snapshot.hasData) {
+                                      return Center(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Lottie.asset(
+                                                'assets/animations/empty_list.json',
+                                                height: 200,
+                                                width: 200),
+                                            const Text(
+                                              "Nothing to display",
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      var firstDataModel =
+                                          snapshot.data![0] as UserDataModel;
+                                      var secondDataModel =
+                                          snapshot.data![1] as UserDataModel;
+
+                                      List<List<dynamic>> firstData =
+                                          firstDataModel.userEntries;
+                                      List<List<dynamic>> secondData =
+                                          secondDataModel.userEntries;
+
+                                      return Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: CustomRatioChart(
+                                          firstParameter:
+                                              pair.firstSelectedItem!,
+                                          secondParameter:
+                                              pair.secondSelectedItem!,
+                                          firstData: firstData,
+                                          secondData: secondData,
+                                          benchmark: pair.values,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                            ],
+                          ],
+                        ),
+
+                      // for displaying progress bar if user and parameter is selected
+                      // if (selectedHierarchyUser &&
+                      //     selectedParameter.isNotEmpty &&
+                      //     selectedUserId.isNotEmpty &&
+                      //     selectedHierarchyUser &&
+                      //     selectedStates[2])
+                      //   ref
+                      //       .watch(userDataFutureProvider(Tuple4(
+                      //           businessId,
+                      //           selectedUserId,
+                      //           selectedParameter,
+                      //           currentMonth.toString())))
+                      //       .when(
+                      //         data: (userData) {
+                      //           return Padding(
+                      //             padding: const EdgeInsets.all(16.0),
+                      //             child: Column(
+                      //               children: [
+                      //                 ProgressBarWidget(
+                      //                   label: selectedParameter,
+                      //                   TargetValue: userData.actualTotalTarget,
+                      //                   AchievedValue:
+                      //                       userData.totalTargetAchieved,
+                      //                   color: getRandomColor(),
+                      //                 ),
+                      //                 Text(
+                      //                   getMonthName(currentMonth),
+                      //                   style: TextStyle(
+                      //                     fontSize: 14,
+                      //                     fontWeight: FontWeight.bold,
+                      //                   ),
+                      //                 ),
+                      //               ],
+                      //             ),
+                      //           );
+                      //         },
+                      //         loading: () => const Center(
+                      //             child: CircularProgressIndicator()),
+                      //         error: (error, stackTrace) => Center(
+                      //           child: Column(
+                      //             mainAxisSize: MainAxisSize.min,
+                      //             children: [
+                      //               Lottie.asset(
+                      //                   'assets/animations/empty_list.json',
+                      //                   height: 200,
+                      //                   width: 200),
+                      //               const Text(
+                      //                 "Nothing to display",
+                      //                 style: TextStyle(
+                      //                   color: Colors.grey,
+                      //                   fontSize: 14,
+                      //                   fontWeight: FontWeight.w600,
+                      //                 ),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       ),
 
 // displaying the Customratio graph for Added Charts by the user if parameter is selected and User is also selected
-                          if (selectedHierarchyUser &&
-                              selectedParameter.isNotEmpty &&
-                              selectedUserId.isNotEmpty &&
-                              selectedHierarchyUser &&
-                              selectedStates[0])
-                            Column(
-                              children: [
-                                for (var pair in dropdownPairs.where((pair) =>
-                                    pair.firstSelectedItem ==
-                                        selectedParameter ||
-                                    pair.secondSelectedItem ==
-                                        selectedParameter)) ...[
-                                  if (pair.firstSelectedItem != null &&
-                                      pair.secondSelectedItem != null)
-                                    ref
-                                        .watch(combinedUserDataFutureProvider(
-                                            Tuple5(
-                                          businessId,
-                                          selectedUserId,
-                                          pair.firstSelectedItem!,
-                                          pair.secondSelectedItem!,
-                                          currentMonth.toString(),
-                                        )))
-                                        .when(
-                                          data: (data) {
-                                            final firstDataModel = data[0];
-                                            final secondDataModel = data[1];
+                      if (selectedHierarchyUser &&
+                          selectedParameter.isNotEmpty &&
+                          selectedUserId.isNotEmpty &&
+                          selectedHierarchyUser &&
+                          selectedStates[0])
+                        Column(
+                          children: [
+                            for (var pair in dropdownPairs.where((pair) =>
+                                pair.firstSelectedItem == selectedParameter ||
+                                pair.secondSelectedItem ==
+                                    selectedParameter)) ...[
+                              if (pair.firstSelectedItem != null &&
+                                  pair.secondSelectedItem != null)
+                                ref
+                                    .watch(
+                                        combinedUserDataFutureProvider(Tuple5(
+                                      businessId,
+                                      selectedUserId,
+                                      pair.firstSelectedItem!,
+                                      pair.secondSelectedItem!,
+                                      currentMonth.toString(),
+                                    )))
+                                    .when(
+                                      data: (data) {
+                                        final firstDataModel = data[0];
+                                        final secondDataModel = data[1];
 
-                                            final firstData =
-                                                firstDataModel.userEntries;
-                                            final secondData =
-                                                secondDataModel.userEntries;
+                                        final firstData =
+                                            firstDataModel.userEntries;
+                                        final secondData =
+                                            secondDataModel.userEntries;
 
-                                            return Padding(
-                                              padding:
-                                                  const EdgeInsets.all(16.0),
-                                              child: CustomRatioChart(
-                                                firstParameter:
-                                                    pair.firstSelectedItem!,
-                                                secondParameter:
-                                                    pair.secondSelectedItem!,
-                                                firstData: firstData,
-                                                secondData: secondData,
-                                              ),
-                                            );
-                                          },
-                                          loading: () =>
-                                              const Center(child: Text('')),
-                                          error: (error, stackTrace) => Center(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Lottie.asset(
-                                                    'assets/animations/empty_list.json',
-                                                    height: 200,
-                                                    width: 200),
-                                                const Text(
-                                                  "Nothing to display",
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                        return Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: CustomRatioChart(
+                                            firstParameter:
+                                                pair.firstSelectedItem!,
+                                            secondParameter:
+                                                pair.secondSelectedItem!,
+                                            firstData: firstData,
+                                            secondData: secondData,
+                                            benchmark: pair.values,
                                           ),
+                                        );
+                                      },
+                                      loading: () =>
+                                          const Center(child: Text('')),
+                                      error: (error, stackTrace) => Center(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Lottie.asset(
+                                                'assets/animations/empty_list.json',
+                                                height: 200,
+                                                width: 200),
+                                            const Text(
+                                              "Nothing to display",
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                ],
-                              ],
-                            ),
-                        ],
-                      ),
-                    );
-                  }
-                },
-              ),
-      ),
+                                      ),
+                                    ),
+                            ],
+                          ],
+                        ),
+                    ],
+                  ),
+                )),
     );
   }
 
