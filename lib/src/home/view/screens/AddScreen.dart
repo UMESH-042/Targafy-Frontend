@@ -300,6 +300,7 @@ final addDataForParameterProvider =
         'comment': comment,
       }),
     );
+    print(response.body);
 
     if (response.statusCode != 201) {
       throw Exception('Failed to add data for parameter: $parameterName');
@@ -442,6 +443,7 @@ class _AddscreenState extends ConsumerState<Addscreen> {
                                 selectedParameter = null;
                               });
                             }).catchError((error) {
+                              print(error);
                               // Handle error
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(

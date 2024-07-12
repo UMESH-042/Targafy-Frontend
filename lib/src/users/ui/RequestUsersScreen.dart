@@ -40,27 +40,9 @@ class _BusinessRequestsPageState extends ConsumerState<BusinessRequestsPage> {
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize:
-              Size.fromHeight(MediaQuery.of(context).size.height * 0.19),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: MediaQuery.of(context).size.height * 0.02,
-              horizontal: MediaQuery.of(context).size.width * 0.04,
-            ),
-            child: const Row(
-              children: [
-                CustomBackButton(),
-                SizedBox(width: 20),
-                Text(
-                  "Requests",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontFamily: "Poppins",
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-              ],
-            ),
+              Size.fromHeight(MediaQuery.of(context).size.height * 0.1),
+          child: CustomBackButton(
+            text: 'Requests',
           ),
         ),
         body: userRequestList.isLoading
@@ -125,6 +107,12 @@ class _BusinessRequestsPageState extends ConsumerState<BusinessRequestsPage> {
                                               userId: user.userId,
                                               userRequestCallback: (success) {
                                                 if (success) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                        content: Text(
+                                                            'User accepted successfully')),
+                                                  );
                                                   requestController.clear();
                                                   setState(() {
                                                     ref

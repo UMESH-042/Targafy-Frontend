@@ -15,6 +15,7 @@ import 'package:targafy/business_home_page/screens/create_business.dart';
 import 'package:targafy/business_home_page/screens/join_business.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
+import 'package:targafy/core/notification/screen/notification_screen.dart';
 import 'package:targafy/core/utils/texts.dart';
 import 'package:targafy/feedback/feedback.dart';
 import 'package:targafy/src/activity/ui/activity_screen.dart';
@@ -71,7 +72,8 @@ class _BottomNavigationAndAppBarState
       const UsersScreen(),
       const Addscreen(),
       const ActivityScreen(),
-      FeedbackScreen(token: widget.token!), // Pass the token here
+      // FeedbackScreen(token: widget.token!), // Pass the token here
+      NotificationPage(),
     ];
 
     _getToken();
@@ -683,7 +685,7 @@ class _BottomNavigationAndAppBarState
                                       child: Center(
                                         child: CircleAvatar(
                                           radius:
-                                              getScreenWidth(context) * 0.09,
+                                              getScreenWidth(context) * 0.1,
                                           backgroundImage:
                                               CachedNetworkImageProvider(
                                                   snapshot.data!),
@@ -1010,7 +1012,12 @@ class _BottomNavigationAndAppBarState
             size: 30,
             color: Colors.white,
           ),
-          Icon(Icons.feedback, size: 30, color: Colors.white),
+          // Icon(Icons.feedback, size: 30, color: Colors.white),
+          Icon(
+            Icons.notifications,
+            size: 30,
+            color: Colors.white,
+          ),
         ],
         onTap: _onItemTapped,
       ),

@@ -3,12 +3,12 @@ import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/core/utils/texts.dart';
 
 class CustomBackButton extends StatelessWidget {
+  final String? text;
   const CustomBackButton({
     super.key,
     this.text,
   });
 
-  final String? text;
 
   @override
   Widget build(BuildContext context) {

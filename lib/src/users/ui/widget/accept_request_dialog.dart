@@ -466,6 +466,7 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                               Navigator.pop(context);
                               widget.userRequestCallback(
                                   true); // Notify parent widget
+                                  
                             } catch (e) {
                               widget.userRequestCallback(false);
                             }

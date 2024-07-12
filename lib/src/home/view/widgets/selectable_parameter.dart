@@ -64,7 +64,7 @@ class SelectableParameterWidget extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4.0), // Space between items
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         decoration: BoxDecoration(
-          color: isSelected ? primaryColor : const Color.fromARGB(255, 145, 173, 216),
+          color: isSelected ? primaryColor : lightblue,
           borderRadius: BorderRadius.circular(20), // Circular rectangle
         ),
         child: Center(
