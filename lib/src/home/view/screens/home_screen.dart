@@ -426,21 +426,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         loading: () =>
                             const Center(child: CircularProgressIndicator()),
                         error: (error, stackTrace) => Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Lottie.asset('assets/animations/empty_list.json',
-                                  height: 200, width: 200),
-                              const Text(
-                                "Nothing to display",
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
+                          child: Text('No Parameters Added'),
                         ),
                       ),
                       if (selectedParameter.isNotEmpty)

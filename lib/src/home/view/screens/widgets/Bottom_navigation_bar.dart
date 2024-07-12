@@ -502,8 +502,8 @@ class _BottomNavigationAndAppBarState
                               //   ),
                               // ),
                               child: CircleAvatar(
-                                backgroundImage: AssetImage(
-                                    'assets/img/3d-target.png'),
+                                backgroundImage:
+                                    AssetImage('assets/img/3d-target.png'),
                                 radius: 15,
                               ),
                             ),
@@ -630,6 +630,16 @@ class _BottomNavigationAndAppBarState
 
                   return Column(
                     children: [
+                      SizedBox(
+                        height: getScreenheight(context) * 0.02,
+                      ),
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text("1.0.0"),
+                        ),
+                      ),
                       // Align(
                       //   alignment: Alignment.topRight,
                       //   child: FutureBuilder(

@@ -111,12 +111,16 @@ class ParamRepository {
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
-      if (jsonData == null || jsonData['data'] == null || jsonData['data']['paramPairs'] == null) {
+      if (jsonData == null ||
+          jsonData['data'] == null ||
+          jsonData['data']['paramPairs'] == null) {
         return [];
       }
 
       final data = jsonData['data']['paramPairs'] as List<dynamic>;
-      return data.map((item) => ParamPair.fromJson(item as List<dynamic>)).toList();
+      return data
+          .map((item) => ParamPair.fromJson(item as List<dynamic>))
+          .toList();
     } else {
       throw Exception('Failed to load param pairs');
     }
