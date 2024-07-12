@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,6 +21,7 @@ import 'package:targafy/src/activity/ui/activity_screen.dart';
 import 'package:targafy/src/auth/view/Controllers/login.dart';
 import 'package:targafy/src/home/view/screens/AddScreen.dart';
 import 'package:targafy/src/home/view/screens/UserProfile.dart';
+import 'package:targafy/src/home/view/screens/controller/pending_approval_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_profile_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
 import 'package:targafy/src/home/view/screens/home_screen.dart';
@@ -745,45 +747,125 @@ class _BottomNavigationAndAppBarState
                         ),
                       ),
                       if (businesses.isNotEmpty)
-                        ExpansionTile(
-                          initiallyExpanded: true,
-                          leading: const Icon(Icons.business),
-                          title: const Text('Businesses'),
-                          children: businesses.map((business) {
-                            final businessUser = user?.businesses.firstWhere(
-                              (b) => b.businessId == business.id,
-                              orElse: () => BusinessUser(
-                                  name: '', userType: '', businessId: ''),
-                            );
+                        // ExpansionTile(
+                        //   initiallyExpanded: true,
+                        //   leading: const Icon(Icons.business),
+                        //   title: const Text('Businesses'),
+                        //   children: businesses.map((business) {
+                        //     final businessUser = user?.businesses.firstWhere(
+                        //       (b) => b.businessId == business.id,
+                        //       orElse: () => BusinessUser(
+                        //           name: '', userType: '', businessId: ''),
+                        //     );
 
-                            return ListTile(
-                              leading: business.logo != null
-                                  ? CachedNetworkImage(
-                                      imageUrl: business.logo,
-                                      width: 30,
-                                      height: 30,
-                                      errorWidget: (context, url, error) =>
-                                          Image.network(
-                                        'https://via.placeholder.com/30',
-                                        width: 30,
-                                        height: 30,
-                                      ),
-                                    )
-                                  : const Icon(Icons.business),
-                              title: Text(business.name ?? 'No Name'),
-                              onTap: () {
-                                if (businessUser != null) {
-                                  selectBusiness(
-                                      business,
-                                      businessUser.userType ?? 'No User Type',
-                                      business.businessCode ?? 'No Code',
-                                      ref);
-                                  Navigator.pop(context); // Close the drawer
-                                }
-                              },
-                            );
-                          }).toList(),
-                        ),
+                        //     return ListTile(
+                        //       leading: business.logo != null
+                        //           ? CachedNetworkImage(
+                        //               imageUrl: business.logo,
+                        //               width: 30,
+                        //               height: 30,
+                        //               errorWidget: (context, url, error) =>
+                        //                   Image.network(
+                        //                 'https://via.placeholder.com/30',
+                        //                 width: 30,
+                        //                 height: 30,
+                        //               ),
+                        //             )
+                        //           : const Icon(Icons.business),
+                        //       title: Text(business.name ?? 'No Name'),
+                        //       onTap: () {
+                        //         if (businessUser != null) {
+                        //           selectBusiness(
+                        //               business,
+                        //               businessUser.userType ?? 'No User Type',
+                        //               business.businessCode ?? 'No Code',
+                        //               ref);
+                        //           Navigator.pop(context); // Close the drawer
+                        //         }
+                        //       },
+                        //     );
+                        //   }).toList(),
+
+                        // ),
+                        if (businesses.isNotEmpty)
+                          ExpansionTile(
+                            initiallyExpanded: true,
+                            leading: const Icon(Icons.business),
+                            title: const Text('Businesses'),
+                            children: [
+                              ...businesses.map((business) {
+                                final businessUser =
+                                    user?.businesses.firstWhere(
+                                  (b) => b.businessId == business.id,
+                                  orElse: () => BusinessUser(
+                                      name: '', userType: '', businessId: ''),
+                                );
+
+                                return ListTile(
+                                  leading: business.logo != null
+                                      ? CachedNetworkImage(
+                                          imageUrl: business.logo,
+                                          width: 30,
+                                          height: 30,
+                                          errorWidget: (context, url, error) =>
+                                              Image.network(
+                                            'https://via.placeholder.com/30',
+                                            width: 30,
+                                            height: 30,
+                                          ),
+                                        )
+                                      : const Icon(Icons.business),
+                                  title: Text(business.name ?? 'No Name'),
+                                  onTap: () {
+                                    if (businessUser != null) {
+                                      selectBusiness(
+                                          business,
+                                          businessUser.userType ??
+                                              'No User Type',
+                                          business.businessCode ?? 'No Code',
+                                          ref);
+                                      Navigator.pop(
+                                          context); // Close the drawer
+                                    }
+                                  },
+                                );
+                              }).toList(),
+                              Consumer(
+                                builder: (context, ref, _) {
+                                  final pendingBusinessesAsyncValue = ref.watch(
+                                      pendingBusinessProvider(widget.token!));
+                                  return pendingBusinessesAsyncValue.when(
+                                    data: (pendingBusinesses) {
+                                      if (pendingBusinesses.isNotEmpty) {
+                                        return Column(
+                                          children: pendingBusinesses
+                                              .map((pendingBusiness) {
+                                            return ListTile(
+                                                leading:
+                                                    const Icon(Icons.business),
+                                                title: Text(pendingBusiness
+                                                    .businessName),
+                                                subtitle: const Text('Pending'),
+                                                trailing: Lottie.asset(
+                                                    'assets/animations/sand_clock.json',
+                                                    height: 50,
+                                                    width: 50));
+                                          }).toList(),
+                                        );
+                                      }
+                                      return const SizedBox.shrink();
+                                    },
+                                    loading: () =>
+                                        const CircularProgressIndicator(),
+                                    error: (error, stack) => Visibility(
+                                      visible: false,
+                                      child: const SizedBox(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                       ListTile(
                         leading: const Icon(Icons.add),
                         title: const Text('Create Business'),
