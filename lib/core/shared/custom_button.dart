@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 
 class CustomButton extends StatefulWidget {
@@ -46,7 +47,7 @@ class _CustomButtonState extends State<CustomButton> {
         ),
         duration: const Duration(milliseconds: 100),
         decoration: BoxDecoration(
-            color: Colors.black, borderRadius: BorderRadius.circular(15)),
+            color: primaryColor, borderRadius: BorderRadius.circular(15)),
         padding: EdgeInsets.symmetric(
           vertical: getScreenWidth(context) * 0.035,
         ),

@@ -26,6 +26,7 @@ import 'package:targafy/src/parameters/view/model/parameter_model.dart';
 import 'package:targafy/src/users/ui/controller/user_hierarchy_controller.dart';
 import 'package:targafy/src/users/ui/model/user_hierarchy_model.dart';
 import 'package:targafy/utils/remote_routes.dart';
+import 'package:targafy/utils/socketsServices.dart';
 import 'package:tuple/tuple.dart';
 import 'widgets/CustomCharts.dart';
 import 'widgets/DataTable.dart';

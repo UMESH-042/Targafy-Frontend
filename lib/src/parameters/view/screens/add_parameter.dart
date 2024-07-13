@@ -261,7 +261,6 @@
 //   }
 // }
 
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:targafy/core/shared/components/back_button.dart';
@@ -281,7 +280,8 @@ class AddParameter extends ConsumerStatefulWidget {
 }
 
 class _AddParameterState extends ConsumerState<AddParameter> {
-  final TextEditingController _parameterNameController = TextEditingController();
+  final TextEditingController _parameterNameController =
+      TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final List<String> _selectedUserIds = [];
   final List<String> _selectedUsersNames = [];
@@ -351,7 +351,8 @@ class _AddParameterState extends ConsumerState<AddParameter> {
       );
     }
     if (_selectedUsersNames.isEmpty) {
-      return const SizedBox.shrink(); // Return an empty widget if there are no selected users
+      return const SizedBox
+          .shrink(); // Return an empty widget if there are no selected users
     }
     return Wrap(
       spacing: 8.0,
@@ -402,12 +403,13 @@ class _AddParameterState extends ConsumerState<AddParameter> {
                 },
               ),
               SizedBox(height: height * 0.02),
-
               asyncUsers.when(
                 data: (users) {
                   final sortedUsers = sortList(users, (user) => user.name);
-                  final allUsersIds = sortedUsers.map((user) => user.userId).toList();
-                  final allUsersNames = sortedUsers.map((user) => user.name).toList();
+                  final allUsersIds =
+                      sortedUsers.map((user) => user.userId).toList();
+                  final allUsersNames =
+                      sortedUsers.map((user) => user.name).toList();
 
                   return CustomDropdownField(
                     labelText: 'Select User',
@@ -433,7 +435,8 @@ class _AddParameterState extends ConsumerState<AddParameter> {
                           _selectedUserIds.addAll(allUsersIds);
                           _selectedUsersNames.addAll(allUsersNames);
                         });
-                      } else if (value != null && !_selectedUserIds.contains(value)) {
+                      } else if (value != null &&
+                          !_selectedUserIds.contains(value)) {
                         setState(() {
                           _allSelected = false;
                           _selectedUserIds.add(value);
@@ -463,7 +466,6 @@ class _AddParameterState extends ConsumerState<AddParameter> {
                 },
               ),
               SizedBox(height: height * 0.05),
-
               SubmitButton(onPressed: _submitParameter),
             ],
           ),

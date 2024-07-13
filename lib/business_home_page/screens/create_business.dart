@@ -387,8 +387,8 @@ class _CreateBusinessPageState extends ConsumerState<CreateBusinessPage> {
                       country: countryController.text,
                       onCompletion: (bool isSuccess) {
                         if (isSuccess) {
-                          ref.refresh(businessAndUserProvider(
-                              widget.token!)); // Example of refreshing data using Riverpod
+                          ref.refresh(businessAndUserProvider(widget
+                              .token!)); // Example of refreshing data using Riverpod
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                                 content: Text('Business created successfully')),

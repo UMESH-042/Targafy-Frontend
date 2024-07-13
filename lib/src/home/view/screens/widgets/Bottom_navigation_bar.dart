@@ -31,6 +31,7 @@ import 'package:targafy/src/parameters/view/controller/add_parameter_controller.
 import 'package:targafy/src/parameters/view/screens/add_parameter_target_screen.dart';
 import 'package:targafy/src/users/ui/UsersScreen.dart';
 import 'package:targafy/utils/remote_routes.dart';
+import 'package:targafy/utils/socketsServices.dart';
 // final userAvatarProvider = FutureProvider<String>((ref) async {
 //   final controller = ref.read(userProfileLogoControllerProvider);
 //   return await controller.fetchUserAvatar();
@@ -79,7 +80,30 @@ class _BottomNavigationAndAppBarState
     _getToken();
     _getToken1();
     _refreshParameters();
+    // _initializeSocket();
+    // MessagingSocketService.initSocket('6685bfa2c8b0c5eabb52e85b', context);
   }
+
+  // void _initializeSocket() async {
+  //   try {
+  //     final asyncValue =
+  //         await ref.read(businessAndUserProvider(widget.token!).future);
+
+  //     final user = asyncValue?['user'] as User?;
+
+  //     if (user != null) {
+
+  //       MessagingSocketService.initSocket(user.id, context);
+  //       print('socket service called for this userId : ${user.id}');
+  //     } else {
+
+  //       print('User data is not available');
+  //     }
+  //   } catch (error) {
+  //     // Handle any errors that occur during the fetch process
+  //     print('Error fetching user data: $error');
+  //   }
+  // }
 
   void _refreshParameters() {
     print('Refresh Parameter is called');
@@ -630,7 +654,8 @@ class _BottomNavigationAndAppBarState
                       (data?['businesses'] as List<Business>?) ?? [];
                   print(businesses);
                   final user = data?['user'] as User?;
-                  print(user);
+                  print(user?.id);
+                  // MessagingSocketService.initSocket(user!.id, context);
 
                   return Column(
                     children: [
@@ -684,8 +709,7 @@ class _BottomNavigationAndAppBarState
                                       padding: const EdgeInsets.all(1.5),
                                       child: Center(
                                         child: CircleAvatar(
-                                          radius:
-                                              getScreenWidth(context) * 0.1,
+                                          radius: getScreenWidth(context) * 0.1,
                                           backgroundImage:
                                               CachedNetworkImageProvider(
                                                   snapshot.data!),
