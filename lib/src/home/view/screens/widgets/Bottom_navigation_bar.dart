@@ -8,6 +8,7 @@ import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:socket_io_client/socket_io_client.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
 import 'package:targafy/business_home_page/screens/business_profile.dart';
@@ -32,6 +33,7 @@ import 'package:targafy/src/parameters/view/screens/add_parameter_target_screen.
 import 'package:targafy/src/users/ui/UsersScreen.dart';
 import 'package:targafy/utils/remote_routes.dart';
 import 'package:targafy/utils/socketsServices.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 // final userAvatarProvider = FutureProvider<String>((ref) async {
 //   final controller = ref.read(userProfileLogoControllerProvider);
 //   return await controller.fetchUserAvatar();
@@ -63,6 +65,7 @@ class _BottomNavigationAndAppBarState
   // ];
   late final List<Widget> _widgetOptions;
   bool _isRefreshing = false;
+  late IO.Socket socket;
 
   @override
   void initState() {
@@ -81,29 +84,26 @@ class _BottomNavigationAndAppBarState
     _getToken1();
     _refreshParameters();
     // _initializeSocket();
-    // MessagingSocketService.initSocket('6685bfa2c8b0c5eabb52e85b', context);
   }
 
-  // void _initializeSocket() async {
-  //   try {
-  //     final asyncValue =
-  //         await ref.read(businessAndUserProvider(widget.token!).future);
+  void _initializeSocket() async {
+    try {
+      final asyncValue =
+          await ref.read(businessAndUserProvider(widget.token!).future);
 
-  //     final user = asyncValue?['user'] as User?;
+      final user = asyncValue?['user'] as User?;
 
-  //     if (user != null) {
-
-  //       MessagingSocketService.initSocket(user.id, context);
-  //       print('socket service called for this userId : ${user.id}');
-  //     } else {
-
-  //       print('User data is not available');
-  //     }
-  //   } catch (error) {
-  //     // Handle any errors that occur during the fetch process
-  //     print('Error fetching user data: $error');
-  //   }
-  // }
+      if (user != null) {
+        MessagingSocketService.initSocket(user.id, context);
+        print('socket service called for this userId : ${user.id}');
+      } else {
+        print('User data is not available');
+      }
+    } catch (error) {
+      // Handle any errors that occur during the fetch process
+      print('Error fetching user data: $error');
+    }
+  }
 
   void _refreshParameters() {
     print('Refresh Parameter is called');
@@ -654,8 +654,6 @@ class _BottomNavigationAndAppBarState
                       (data?['businesses'] as List<Business>?) ?? [];
                   print(businesses);
                   final user = data?['user'] as User?;
-                  print(user?.id);
-                  // MessagingSocketService.initSocket(user!.id, context);
 
                   return Column(
                     children: [

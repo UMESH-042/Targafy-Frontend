@@ -82,8 +82,6 @@ class LoginNotifier extends StateNotifier<LoginState> {
       if (res == "Login request sent successfully") {
         debugPrint("Done");
         // GoRouter.of(context).pushNamed(MyAppRouteConstants.verifyRouteName);
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const VerifyOTPScreen()));
         return true;
       } else {
         showSnackBar(context, res, Colors.red);
