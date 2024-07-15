@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:targafy/core/notification/controller/reset_notification_controller.dart';
 import 'package:targafy/core/shared/components/back_button.dart';
 import 'package:targafy/src/users/ui/controller/business_request_controller.dart';
 import 'package:targafy/src/users/ui/widget/accept_request_dialog.dart';
@@ -27,6 +28,8 @@ class _BusinessRequestsPageState extends ConsumerState<BusinessRequestsPage> {
         ref
             .read(businessRequestsProvider.notifier)
             .getRequestsList(context, widget.businessId!);
+
+        ref.read(resetNotificationCounterProvider('accept'));
       }
     });
   }

@@ -798,6 +798,7 @@ import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:share/share.dart';
 import 'package:targafy/src/groups/ui/groups_screen.dart';
+import 'package:targafy/src/home/view/screens/controller/notification_counter_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
 import 'package:targafy/src/users/UserBusinessProfile.dart';
 import 'package:targafy/src/users/ui/RequestUsersScreen.dart';
@@ -809,6 +810,7 @@ import 'package:targafy/src/users/ui/controller/promote_to_admin.dart';
 import 'package:targafy/src/users/ui/controller/remove_user_controller.dart';
 import 'package:targafy/src/users/ui/widget/change_manager_dialog.dart';
 import 'package:targafy/src/users/ui/widget/user_hierarchy_view.dart';
+import 'package:badges/badges.dart' as badges;
 
 class UsersScreen extends ConsumerStatefulWidget {
   const UsersScreen({super.key});
@@ -833,6 +835,15 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
 
     final usersStream2 =
         ref.watch(businessUsersStreamProvider2(businessId ?? ''));
+
+    final notificationCountersAsyncValue =
+        ref.read(notificationCountersProvider);
+
+    // Check the notification counters state
+    final acceptCounter = notificationCountersAsyncValue.maybeWhen(
+      data: (counters) => counters.acceptCounter,
+      orElse: () => 0, // Default to 0 if counters are not available or error
+    );
 
     const placeholderImageUrl =
         'https://randomuser.me/api/portraits/lego/2.jpg';
@@ -908,7 +919,32 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    ElevatedButton(
+                    // ElevatedButton(
+                    //   onPressed: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (context) =>
+                    //             BusinessRequestsPage(businessId: businessId),
+                    //       ),
+                    //     );
+                    //   },
+                    //   style: ElevatedButton.styleFrom(
+                    //     padding: const EdgeInsets.symmetric(
+                    //         vertical: 10, horizontal: 16),
+                    //     backgroundColor: lightblue,
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(15),
+                    //       side: BorderSide(color: primaryColor, width: 2),
+                    //     ),
+                    //   ),
+                    //   child: Text(
+                    //     'Accept Users',
+                    //     style: TextStyle(color: primaryColor),
+                    //   ),
+                    // ),
+
+                          ElevatedButton(
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -927,11 +963,23 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                           side: BorderSide(color: primaryColor, width: 2),
                         ),
                       ),
-                      child: Text(
-                        'Accept Users',
-                        style: TextStyle(color: primaryColor),
-                      ),
+                      child: acceptCounter > 0
+                          ? badges.Badge(
+                              badgeContent: Text(
+                                '$acceptCounter',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              child: Text(
+                                'Accept Users',
+                                style: TextStyle(color: primaryColor),
+                              ),
+                            )
+                          : Text(
+                              'Accept Users',
+                              style: TextStyle(color: primaryColor),
+                            ),
                     ),
+
                     const SizedBox(width: 10),
                     ElevatedButton(
                       onPressed: () {
@@ -1018,8 +1066,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                                         ref.watch(userRoleProvider);
                                     return userRoleAsyncValue.when(
                                       data: (role) {
-                                        if (role == 'User' ||
-                                            role == 'MiniAdmin') {
+                                        if (role == 'User') {
                                           return const SizedBox.shrink();
                                         } else {
                                           return PopupMenuButton<int>(

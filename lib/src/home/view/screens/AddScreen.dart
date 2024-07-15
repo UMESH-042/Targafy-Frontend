@@ -302,7 +302,9 @@ final addDataForParameterProvider =
     );
     print(response.body);
 
-    if (response.statusCode != 201) {
+    if (response.statusCode == 400) {
+      throw Exception('You have already added the data for today');
+    } else if (response.statusCode != 201) {
       throw Exception('Failed to add data for parameter: $parameterName');
     }
   },
@@ -442,13 +444,25 @@ class _AddscreenState extends ConsumerState<Addscreen> {
                               setState(() {
                                 selectedParameter = null;
                               });
-                            }).catchError((error) {
-                              print(error);
-                              // Handle error
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Failed to add data')),
-                              );
+                            }).catchError((e) {
+                              // print(error);
+                              // // Handle error
+                              // ScaffoldMessenger.of(context).showSnackBar(
+                              //   const SnackBar(
+                              //       content: Text('Failed to add data')),
+                              // );
+                              if (e.toString().contains(
+                                  'You have already added the data for today')) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'You have already added the data for today')),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Failed to add data')),
+                                );
+                              }
                             });
                           }
                         },

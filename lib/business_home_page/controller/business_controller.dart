@@ -4,10 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
 import 'package:targafy/utils/remote_routes.dart';
 
-// Provider to fetch auth token from shared preferences
-
-// Provider to fetch business and user details
-
 String domain = AppRemoteRoutes.baseUrl;
 
 final businessAndUserProvider = StreamProvider.autoDispose
@@ -52,17 +48,13 @@ final businessAndUserProvider = StreamProvider.autoDispose
       throw Exception('Failed to fetch business details');
     }
 
-    // Wait for a short duration before fetching data again
-    await Future.delayed(
-        const Duration(seconds: 3)); // Adjust the duration as needed
+    await Future.delayed(const Duration(seconds: 4));
   }
 });
 
-// Provider to track the currently selected business and userType
 final currentBusinessProvider =
     StateProvider<Map<String, dynamic>?>((ref) => null);
 
-// Function to update the currently selected business and userType
 Future<void> selectBusiness(Business business, String userType,
     String businessCode, WidgetRef ref) async {
   // final selectedBusinessData = {

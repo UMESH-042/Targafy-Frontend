@@ -23,6 +23,7 @@ import 'package:targafy/src/activity/ui/activity_screen.dart';
 import 'package:targafy/src/auth/view/Controllers/login.dart';
 import 'package:targafy/src/home/view/screens/AddScreen.dart';
 import 'package:targafy/src/home/view/screens/UserProfile.dart';
+import 'package:targafy/src/home/view/screens/controller/notification_counter_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/pending_approval_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_profile_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
@@ -34,6 +35,7 @@ import 'package:targafy/src/users/ui/UsersScreen.dart';
 import 'package:targafy/utils/remote_routes.dart';
 import 'package:targafy/utils/socketsServices.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:badges/badges.dart' as badges;
 // final userAvatarProvider = FutureProvider<String>((ref) async {
 //   final controller = ref.read(userProfileLogoControllerProvider);
 //   return await controller.fetchUserAvatar();
@@ -55,7 +57,6 @@ class BottomNavigationAndAppBar extends ConsumerStatefulWidget {
 class _BottomNavigationAndAppBarState
     extends ConsumerState<BottomNavigationAndAppBar> {
   int _selectedIndex = 0;
-
   // static final List<Widget> _widgetOptions = <Widget>[
   //   const HomeScreen(),
   //   const UsersScreen(),
@@ -84,6 +85,11 @@ class _BottomNavigationAndAppBarState
     _getToken1();
     _refreshParameters();
     _initializeSocket();
+    // WidgetsBinding.instance!.addPostFrameCallback((_) {
+    //   Future.delayed(Duration(seconds: 5), () {
+    //     _fetchCounters();
+    //   });
+    // });
   }
 
   void _initializeSocket() async {
@@ -214,6 +220,16 @@ class _BottomNavigationAndAppBarState
     }
   }
 
+  Future<void> _fetchCounters(String businessId) async {
+    // var selectedBusinessData = ref.read(currentBusinessProvider);
+    // final selectedBusiness = selectedBusinessData?['business'] as Business?;
+
+    // String? businessId = selectedBusiness?.id;
+    await ref
+        .read(notificationCountersProvider.notifier)
+        .fetchNotificationCounters(widget.token!, businessId!);
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -239,22 +255,6 @@ class _BottomNavigationAndAppBarState
     //     'This is the final authToken which will be used for doing all functions :- ${widget.token}');
     final asyncValue = ref.watch(businessAndUserProvider(widget.token!));
     var selectedBusinessData = ref.read(currentBusinessProvider);
-    // final Map<String, dynamic>? selectedBusinessData1 = {
-    //   'business': Business(
-    //     id: '',
-    //     businessCode: '',
-    //     name: '',
-    //     logo: '',
-    //     industryType: '',
-    //     city: '',
-    //     country: '',
-    //   ),
-    //   'userType': '',
-    //   'businessCode': '',
-    // };
-    // // Check if a business is selected, if not, try to select the first one
-    // print('This is $selectedBusinessData');
-    // print('This is 1 $selectedBusinessData1');
 
     if (selectedBusinessData == null) {
       asyncValue.whenData((data) {
@@ -290,183 +290,13 @@ class _BottomNavigationAndAppBarState
 
     final businessName = selectedBusiness?.name;
     String? businessId = selectedBusiness?.id;
+    if (businessId != null) {
+      _fetchCounters(businessId);
+    }
     print(businessId);
-
+    final notificationCountersAsyncValue =
+        ref.read(notificationCountersProvider);
     return Scaffold(
-      // appBar: PreferredSize(
-      //   preferredSize: Size.fromHeight(getScreenheight(context) * 0.08),
-      //   child: Container(
-      //     alignment: Alignment.center,
-      //     padding: const EdgeInsets.only(
-      //       top: 5,
-      //       bottom: 5,
-      //       left: 5,
-      //     ),
-      //     child: AppBar(
-      //       title: Column(
-      //         mainAxisAlignment: MainAxisAlignment.center,
-      //         crossAxisAlignment: CrossAxisAlignment.center,
-      //         children: <Widget>[
-      //           Text(
-      //             'Targafy',
-      //             style: TextStyle(
-      //               fontSize: getScreenWidth(context) *
-      //                   0.066, // Adjust size as needed
-      //               fontWeight: FontWeight.bold,
-      //             ),
-      //           ),
-      //           Text(
-      //             selectedBusiness != null && selectedUserType != null
-      //                 ? selectedBusiness.name
-      //                 : 'Hi User',
-      //             style: TextStyle(
-      //               fontSize: getScreenWidth(context) *
-      //                   0.038, // Adjust size as needed
-      //             ),
-      //             textAlign: TextAlign.center,
-      //           ),
-      //         ],
-      //       ),
-      //       centerTitle: false,
-      //       actions: [
-      //         // Padding(
-      //         //   padding: const EdgeInsets.symmetric(horizontal: 5),
-      //         //   child: GestureDetector(
-      //         //     child: Image.asset('assets/img/search.png'),
-      //         //   ),
-      //         // ),
-      //         // Padding(
-      //         //   padding: const EdgeInsets.symmetric(horizontal: 15),
-      //         //   child: GestureDetector(
-      //         //     child: Image.asset('assets/img/filter.png'),
-      //         //   ),
-      //         // ),
-      // Padding(
-      //   padding: const EdgeInsets.symmetric(horizontal: 0),
-      //   child: GestureDetector(
-      //     onTap: () async {
-      //       final result = await Navigator.push(
-      //         context,
-      //         MaterialPageRoute(
-      //           builder: (context) => const AddParameterTargetScreen(),
-      //         ),
-      //       );
-      //       if (result == true) {
-      //         _refreshParameters();
-      //       }
-      //     },
-      //     child: CircleAvatar(
-      //       backgroundImage:
-      //           AssetImage('assets/img/Targafy_app_icon.png'),
-      //       radius: 20, // Adjust size as needed
-      //     ),
-      //   ),
-      // ),
-      //         Consumer(
-      //           builder: (context, ref, _) {
-      //             final userRoleAsyncValue = ref.watch(userRoleProvider);
-
-      //             if (userRoleAsyncValue == null) {
-      //               return const SizedBox.shrink();
-      //             }
-
-      //             return userRoleAsyncValue.when(
-      //               data: (role) {
-      //                 return PopupMenuButton<int>(
-      //                   icon: const Icon(Icons.more_vert),
-      //                   color: Colors.white,
-      //                   surfaceTintColor: Colors.white,
-      //                   position: PopupMenuPosition.under,
-      //                   shape: RoundedRectangleBorder(
-      //                     borderRadius: BorderRadius.circular(15)
-      //                         .copyWith(topRight: const Radius.circular(0)),
-      //                   ),
-      //                   onSelected: (value) async {
-      //                     if (value == 1) {
-      //                       final result = await Navigator.push(
-      //                         context,
-      //                         MaterialPageRoute(
-      //                           builder: (context) =>
-      //                               const AddParameterTargetScreen(),
-      //                         ),
-      //                       );
-      //                       if (result == true) {
-      //                         _refreshParameters();
-      //                       }
-      //                     } else if (value == 2) {
-      //                       // Handle action for "Add Charts"
-      //                       final result = await Navigator.push(
-      //                         context,
-      //                         MaterialPageRoute(
-      //                           builder: (context) => const AddCharts(),
-      //                         ),
-      //                       );
-      //                     } else if (value == 3) {
-      //                       // Handle action for "Refresh"
-      //                       Restart.restartApp();
-      //                     } else if (value == 4) {
-      //                       Navigator.push(
-      //                         context,
-      //                         MaterialPageRoute(
-      //                           builder: (context) => BusinessProfile(
-      //                             token: widget.token,
-      //                           ),
-      //                         ),
-      //                       );
-      //                     }
-      //                   },
-      //                   itemBuilder: (BuildContext context) =>
-      //                       <PopupMenuEntry<int>>[
-      //                     if (role != 'User' && role != 'MiniAdmin')
-      //                       PopupMenuItem<int>(
-      //                         value: 1,
-      //                         child: CustomText(
-      //                           text: 'Add Parameters/Target',
-      //                           fontSize: getScreenWidth(context) * 0.04,
-      //                           fontWeight: FontWeight.w600,
-      //                           color: primaryColor,
-      //                         ),
-      //                       ),
-      //                     if (role != 'User' && role != 'MiniAdmin')
-      //                       PopupMenuItem<int>(
-      //                         value: 2,
-      //                         child: CustomText(
-      //                           text: 'Add Charts',
-      //                           fontSize: getScreenWidth(context) * 0.04,
-      //                           fontWeight: FontWeight.w600,
-      //                           color: primaryColor,
-      //                         ),
-      //                       ),
-      //                     PopupMenuItem<int>(
-      //                       value: 3,
-      //                       child: CustomText(
-      //                         text: 'Refresh',
-      //                         fontSize: getScreenWidth(context) * 0.04,
-      //                         fontWeight: FontWeight.w600,
-      //                         color: primaryColor,
-      //                       ),
-      //                     ),
-      //                     PopupMenuItem<int>(
-      //                       value: 4,
-      //                       child: CustomText(
-      //                         text: 'Business Profile',
-      //                         fontSize: getScreenWidth(context) * 0.04,
-      //                         fontWeight: FontWeight.w600,
-      //                         color: primaryColor,
-      //                       ),
-      //                     ),
-      //                   ],
-      //                 );
-      //               },
-      //               loading: () => const SizedBox.shrink(),
-      //               error: (error, stack) => const SizedBox.shrink(),
-      //             );
-      //           },
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      // ),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(getScreenheight(context) * 0.08),
         child: Container(
@@ -529,15 +359,6 @@ class _BottomNavigationAndAppBarState
                                   _refreshParameters();
                                 }
                               },
-                              // child: CircleAvatar(
-                              //   backgroundColor: Colors.grey[300],
-                              //   radius: 20,
-                              //   child: Icon(
-                              //     Icons.my_location,
-                              //     color: Colors.grey[800],
-                              //     size: 24,
-                              //   ),
-                              // ),
                               child: CircleAvatar(
                                 backgroundImage:
                                     AssetImage('assets/img/3d-target.png'),
@@ -554,18 +375,6 @@ class _BottomNavigationAndAppBarState
                                   .copyWith(topRight: const Radius.circular(0)),
                             ),
                             onSelected: (value) async {
-                              // if (value == 1) {
-                              //   final result = await Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //       builder: (context) =>
-                              //           const AddParameterTargetScreen(),
-                              //     ),
-                              //   );
-                              //   if (result == true) {
-                              //     _refreshParameters();
-                              //   }
-                              // } else
                               if (value == 1) {
                                 // Handle action for "Add Charts"
                                 final result = await Navigator.push(
@@ -592,17 +401,7 @@ class _BottomNavigationAndAppBarState
                             },
                             itemBuilder: (BuildContext context) =>
                                 <PopupMenuEntry<int>>[
-                              // if (role != 'User' && role != 'MiniAdmin')
-                              //   PopupMenuItem<int>(
-                              //     value: 1,
-                              //     child: CustomText(
-                              //       text: 'Add Parameters/Target',
-                              //       fontSize: getScreenWidth(context) * 0.04,
-                              //       fontWeight: FontWeight.w600,
-                              //       color: primaryColor,
-                              //     ),
-                              //   ),
-                              if (role != 'User' && role != 'MiniAdmin')
+                              if (role != 'User')
                                 PopupMenuItem<int>(
                                   value: 1,
                                   child: CustomText(
@@ -676,20 +475,6 @@ class _BottomNavigationAndAppBarState
                           child: Text("1.0.0"),
                         ),
                       ),
-                      // Align(
-                      //   alignment: Alignment.topRight,
-                      //   child: FutureBuilder(
-                      //       future: getVersion(),
-                      //       builder: (context, snapshot) {
-                      //         if (snapshot.hasError) {
-                      //           return Padding(
-                      //             padding: const EdgeInsets.all(16.0),
-                      //             child: Text("1.0.0"),
-                      //           );
-                      //         }
-                      //         return Text("${snapshot.data}");
-                      //       }),
-                      // ),
                       DrawerHeader(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -749,16 +534,6 @@ class _BottomNavigationAndAppBarState
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                  // if (user != null)
-                                  //   Center(
-                                  //     child: CustomText(
-                                  //       text: 'Admin',
-                                  //       fontSize:
-                                  //           getScreenWidth(context) * 0.04,
-                                  //       color: primaryColor,
-                                  //       fontWeight: FontWeight.w400,
-                                  //     ),
-                                  //   ),
                                   userRoleAsyncValue.when(
                                     data: (role) => Center(
                                       child: CustomText(
@@ -780,125 +555,81 @@ class _BottomNavigationAndAppBarState
                         ),
                       ),
                       if (businesses.isNotEmpty)
-                        // ExpansionTile(
-                        //   initiallyExpanded: true,
-                        //   leading: const Icon(Icons.business),
-                        //   title: const Text('Businesses'),
-                        //   children: businesses.map((business) {
-                        //     final businessUser = user?.businesses.firstWhere(
-                        //       (b) => b.businessId == business.id,
-                        //       orElse: () => BusinessUser(
-                        //           name: '', userType: '', businessId: ''),
-                        //     );
+                        ExpansionTile(
+                          initiallyExpanded: true,
+                          leading: const Icon(Icons.business),
+                          title: const Text('Businesses'),
+                          children: [
+                            ...businesses.map((business) {
+                              final businessUser = user?.businesses.firstWhere(
+                                (b) => b.businessId == business.id,
+                                orElse: () => BusinessUser(
+                                    name: '', userType: '', businessId: ''),
+                              );
 
-                        //     return ListTile(
-                        //       leading: business.logo != null
-                        //           ? CachedNetworkImage(
-                        //               imageUrl: business.logo,
-                        //               width: 30,
-                        //               height: 30,
-                        //               errorWidget: (context, url, error) =>
-                        //                   Image.network(
-                        //                 'https://via.placeholder.com/30',
-                        //                 width: 30,
-                        //                 height: 30,
-                        //               ),
-                        //             )
-                        //           : const Icon(Icons.business),
-                        //       title: Text(business.name ?? 'No Name'),
-                        //       onTap: () {
-                        //         if (businessUser != null) {
-                        //           selectBusiness(
-                        //               business,
-                        //               businessUser.userType ?? 'No User Type',
-                        //               business.businessCode ?? 'No Code',
-                        //               ref);
-                        //           Navigator.pop(context); // Close the drawer
-                        //         }
-                        //       },
-                        //     );
-                        //   }).toList(),
-
-                        // ),
-                        if (businesses.isNotEmpty)
-                          ExpansionTile(
-                            initiallyExpanded: true,
-                            leading: const Icon(Icons.business),
-                            title: const Text('Businesses'),
-                            children: [
-                              ...businesses.map((business) {
-                                final businessUser =
-                                    user?.businesses.firstWhere(
-                                  (b) => b.businessId == business.id,
-                                  orElse: () => BusinessUser(
-                                      name: '', userType: '', businessId: ''),
-                                );
-
-                                return ListTile(
-                                  leading: business.logo != null
-                                      ? CachedNetworkImage(
-                                          imageUrl: business.logo,
+                              return ListTile(
+                                leading: business.logo != null
+                                    ? CachedNetworkImage(
+                                        imageUrl: business.logo,
+                                        width: 30,
+                                        height: 30,
+                                        errorWidget: (context, url, error) =>
+                                            Image.network(
+                                          'https://via.placeholder.com/30',
                                           width: 30,
                                           height: 30,
-                                          errorWidget: (context, url, error) =>
-                                              Image.network(
-                                            'https://via.placeholder.com/30',
-                                            width: 30,
-                                            height: 30,
-                                          ),
-                                        )
-                                      : const Icon(Icons.business),
-                                  title: Text(business.name ?? 'No Name'),
-                                  onTap: () {
-                                    if (businessUser != null) {
-                                      selectBusiness(
-                                          business,
-                                          businessUser.userType ??
-                                              'No User Type',
-                                          business.businessCode ?? 'No Code',
-                                          ref);
-                                      Navigator.pop(
-                                          context); // Close the drawer
-                                    }
-                                  },
-                                );
-                              }).toList(),
-                              Consumer(
-                                builder: (context, ref, _) {
-                                  final pendingBusinessesAsyncValue = ref.watch(
-                                      pendingBusinessProvider(widget.token!));
-                                  return pendingBusinessesAsyncValue.when(
-                                    data: (pendingBusinesses) {
-                                      if (pendingBusinesses.isNotEmpty) {
-                                        return Column(
-                                          children: pendingBusinesses
-                                              .map((pendingBusiness) {
-                                            return ListTile(
-                                                leading:
-                                                    const Icon(Icons.business),
-                                                title: Text(pendingBusiness
-                                                    .businessName),
-                                                subtitle: const Text('Pending'),
-                                                trailing: Lottie.asset(
-                                                    'assets/animations/sand_clock.json',
-                                                    height: 50,
-                                                    width: 50));
-                                          }).toList(),
-                                        );
-                                      }
-                                      return const SizedBox.shrink();
-                                    },
-                                    loading: () =>
-                                        const CircularProgressIndicator(),
-                                    error: (error, stack) => Visibility(
-                                      visible: false,
-                                      child: const SizedBox(),
-                                    ),
-                                  );
+                                        ),
+                                      )
+                                    : const Icon(Icons.business),
+                                title: Text(business.name ?? 'No Name'),
+                                onTap: () {
+                                  if (businessUser != null) {
+                                    selectBusiness(
+                                        business,
+                                        businessUser.userType ?? 'No User Type',
+                                        business.businessCode ?? 'No Code',
+                                        ref);
+                                    Navigator.pop(context); // Close the drawer
+                                  }
                                 },
-                              ),
-                            ],
-                          ),
+                              );
+                            }).toList(),
+                            Consumer(
+                              builder: (context, ref, _) {
+                                final pendingBusinessesAsyncValue = ref.watch(
+                                    pendingBusinessProvider(widget.token!));
+                                return pendingBusinessesAsyncValue.when(
+                                  data: (pendingBusinesses) {
+                                    if (pendingBusinesses.isNotEmpty) {
+                                      return Column(
+                                        children: pendingBusinesses
+                                            .map((pendingBusiness) {
+                                          return ListTile(
+                                              leading:
+                                                  const Icon(Icons.business),
+                                              title: Text(
+                                                  pendingBusiness.businessName),
+                                              subtitle: const Text('Pending'),
+                                              trailing: Lottie.asset(
+                                                  'assets/animations/sand_clock.json',
+                                                  height: 50,
+                                                  width: 50));
+                                        }).toList(),
+                                      );
+                                    }
+                                    return const SizedBox.shrink();
+                                  },
+                                  loading: () =>
+                                      const CircularProgressIndicator(),
+                                  error: (error, stack) => Visibility(
+                                    visible: false,
+                                    child: const SizedBox(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ListTile(
                         leading: const Icon(Icons.add),
                         title: const Text('Create Business'),
@@ -946,16 +677,6 @@ class _BottomNavigationAndAppBarState
                               null;
                           await prefs.remove('authToken');
                           await prefs.remove('savedPairs');
-
-                          // Navigate to login screen and remove all previous routes
-                          // if (context.mounted) {
-                          //   Navigator.of(context).pushAndRemoveUntil(
-                          //     MaterialPageRoute(
-                          //         builder: (context) => const LoginScreen()),
-                          //     (Route<dynamic> route) => false,
-                          //   );
-                          // }
-                          // ref.read(loginProvider.notifier).logout(context);
                         },
                       ),
                     ],
@@ -1028,6 +749,47 @@ class _BottomNavigationAndAppBarState
               )
             : _widgetOptions.elementAt(_selectedIndex),
       ),
+
+      // bottomNavigationBar: CurvedNavigationBar(
+      //   color: primaryColor,
+      //   backgroundColor: Colors.transparent,
+      //   buttonBackgroundColor: primaryColor,
+      //   height: 60,
+      //   animationCurve: Curves.easeInOut,
+      //   animationDuration: const Duration(milliseconds: 600),
+      //   index: _selectedIndex,
+      //   items: [
+      //     Icon(Icons.home, size: 30, color: Colors.white),
+      //     Icon(Icons.supervised_user_circle, size: 30, color: Colors.white),
+      //     Icon(Icons.add, size: 40, color: Colors.white),
+      //     // Icon(Icons.local_activity, size: 30, color: Colors.white),
+      //     ImageIcon(
+      //       AssetImage("assets/img/activity-icon-without-bg.png"),
+      //       size: 30,
+      //       color: Colors.white,
+      //     ),
+      //     // Icon(Icons.feedback, size: 30, color: Colors.white),
+      //     // Icon(
+      //     //   Icons.notifications,
+      //     //   size: 30,
+      //     //   color: Colors.white,
+      //     // ),
+      //     notificationCountersAsyncValue.when(
+      //       data: (counters) => badges.Badge(
+      //         badgeContent: Text(
+      //           counters.notificationCounter.toString(),
+      //           style: TextStyle(color: Colors.white),
+      //         ),
+      //         child: Icon(Icons.notifications, size: 30, color: Colors.white),
+      //       ),
+      //       loading: () =>
+      //           Icon(Icons.notifications, size: 30, color: Colors.white),
+      //       error: (error, stack) =>
+      //           Icon(Icons.notifications, size: 30, color: Colors.white),
+      //     ),
+      //   ],
+      //   onTap: _onItemTapped,
+      // ),
       bottomNavigationBar: CurvedNavigationBar(
         color: primaryColor,
         backgroundColor: Colors.transparent,
@@ -1036,21 +798,72 @@ class _BottomNavigationAndAppBarState
         animationCurve: Curves.easeInOut,
         animationDuration: const Duration(milliseconds: 600),
         index: _selectedIndex,
-        items: const [
+        items: [
           Icon(Icons.home, size: 30, color: Colors.white),
-          Icon(Icons.supervised_user_circle, size: 30, color: Colors.white),
-          Icon(Icons.add, size: 40, color: Colors.white),
-          // Icon(Icons.local_activity, size: 30, color: Colors.white),
-          ImageIcon(
-            AssetImage("assets/img/activity-icon-without-bg.png"),
-            size: 30,
-            color: Colors.white,
+          notificationCountersAsyncValue.when(
+            data: (counters) => counters.acceptCounter > 0
+                ? badges.Badge(
+                    badgeContent: Text(
+                      counters.acceptCounter
+                          .toString(), // Replace with the actual counter for users
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    child: Icon(Icons.supervised_user_circle,
+                        size: 30, color: Colors.white),
+                  )
+                : Icon(Icons.supervised_user_circle,
+                    size: 30, color: Colors.white),
+            loading: () => Icon(Icons.supervised_user_circle,
+                size: 30, color: Colors.white),
+            error: (error, stack) => Icon(Icons.supervised_user_circle,
+                size: 30, color: Colors.white),
           ),
-          // Icon(Icons.feedback, size: 30, color: Colors.white),
-          Icon(
-            Icons.notifications,
-            size: 30,
-            color: Colors.white,
+          Icon(Icons.add, size: 40, color: Colors.white),
+          notificationCountersAsyncValue.when(
+            data: (counters) => counters.activityCounter > 0
+                ? badges.Badge(
+                    badgeContent: Text(
+                      counters.activityCounter
+                          .toString(), // Replace with the actual counter for activities
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    child: ImageIcon(
+                      AssetImage("assets/img/activity-icon-without-bg.png"),
+                      size: 30,
+                      color: Colors.white,
+                    ),
+                  )
+                : ImageIcon(
+                    AssetImage("assets/img/activity-icon-without-bg.png"),
+                    size: 30,
+                    color: Colors.white,
+                  ),
+            loading: () => ImageIcon(
+              AssetImage("assets/img/activity-icon-without-bg.png"),
+              size: 30,
+              color: Colors.white,
+            ),
+            error: (error, stack) => ImageIcon(
+              AssetImage("assets/img/activity-icon-without-bg.png"),
+              size: 30,
+              color: Colors.white,
+            ),
+          ),
+          notificationCountersAsyncValue.when(
+            data: (counters) => counters.notificationCounter > 0
+                ? badges.Badge(
+                    badgeContent: Text(
+                      counters.notificationCounter.toString(),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    child: Icon(Icons.notifications,
+                        size: 30, color: Colors.white),
+                  )
+                : Icon(Icons.notifications, size: 30, color: Colors.white),
+            loading: () =>
+                Icon(Icons.notifications, size: 30, color: Colors.white),
+            error: (error, stack) =>
+                Icon(Icons.notifications, size: 30, color: Colors.white),
           ),
         ],
         onTap: _onItemTapped,

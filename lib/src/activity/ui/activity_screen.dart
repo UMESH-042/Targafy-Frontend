@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:lottie/lottie.dart';
 import 'package:intl/intl.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
+import 'package:targafy/core/notification/controller/reset_notification_controller.dart';
 import 'package:targafy/src/activity/ui/controller/Activity_controller.dart';
 import 'package:targafy/src/activity/ui/model/activity_model.dart';
 import 'package:targafy/src/activity/ui/widgets/activity_tile.dart';
@@ -17,6 +18,10 @@ class ActivityScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedBusinessData = ref.watch(currentBusinessProvider);
     final businessId = selectedBusinessData?['business']?.id;
+
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      ref.read(resetNotificationCounterProvider('activity'));
+    });
 
     if (businessId == null) {
       return const Scaffold(
