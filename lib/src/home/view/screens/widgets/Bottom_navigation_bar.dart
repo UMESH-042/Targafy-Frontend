@@ -83,7 +83,7 @@ class _BottomNavigationAndAppBarState
     _getToken();
     _getToken1();
     _refreshParameters();
-    // _initializeSocket();
+    _initializeSocket();
   }
 
   void _initializeSocket() async {
@@ -113,6 +113,15 @@ class _BottomNavigationAndAppBarState
       ref
           .read(parametersProviderHome.notifier)
           .fetchParametersforHome(businessId);
+    }
+  }
+
+  void _refreshApprovalPending() {
+    print('Pending Approval List is refreshed');
+    final selectedBusinessData = ref.read(currentBusinessProvider);
+    final businessId = selectedBusinessData?['business']?.id;
+    if (businessId != null) {
+      ref.watch(pendingBusinessProvider(widget.token!));
     }
   }
 
@@ -905,12 +914,15 @@ class _BottomNavigationAndAppBarState
                       ListTile(
                         leading: const Icon(Icons.group_add),
                         title: const Text('Join Business'),
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async {
+                          final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
                                       const JoinBusinessScreen()));
+                          if (result == true) {
+                            _refreshApprovalPending();
+                          }
                         },
                       ),
                       ListTile(

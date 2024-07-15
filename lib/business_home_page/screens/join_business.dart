@@ -147,13 +147,13 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
                             context: context,
                             builder: (context) => AlertDialog(
                               title: Text('Request Sent Successfully'),
-                              content: Text(
-                                  'Your request has been sent successfully. You will be notified soon.'),
+                              content: Text('Approval Awaited!'),
                               actions: <Widget>[
                                 TextButton(
                                   onPressed: () {
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop(true);
+                                    Navigator.of(context).pop(true);
+                                    Navigator.of(context).pop(true);
                                   },
                                   child: Text('OK'),
                                 ),
@@ -170,7 +170,7 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
                               actions: <Widget>[
                                 TextButton(
                                   onPressed: () {
-                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop(true);
                                   },
                                   child: Text('OK'),
                                 ),
@@ -188,7 +188,7 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
                             actions: <Widget>[
                               TextButton(
                                 onPressed: () {
-                                  Navigator.of(context).pop();
+                                  Navigator.of(context).pop(true);
                                 },
                                 child: Text('OK'),
                               ),

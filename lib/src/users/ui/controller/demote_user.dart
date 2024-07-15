@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,7 +10,7 @@ final demoteUserProvider =
 String domain = AppRemoteRoutes.baseUrl;
 
 class DemoteUserController {
-  Future<void> demoteUser(String businessId, String userId) async {
+  Future<void> demoteUser(String businessId, String userId, BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
     final url = '${domain}business/demote/$businessId';
@@ -25,12 +26,22 @@ class DemoteUserController {
       );
 
       if (response.statusCode == 200) {
-        // Success
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('User demoted successfully'),
+            duration: Duration(seconds: 2),
+          ),
+        );
       } else {
         throw Exception('Failed to demote user: ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('Exception demoting user: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to demote user: $e'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 }

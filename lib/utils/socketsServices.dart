@@ -8,7 +8,7 @@ class MessagingSocketService {
     print('This is the Userid :- $userId');
     // Accept BuildContext as parameter
     socket = IO.io(
-      'http://13.234.163.59:3000/home/notifications',
+      'http://13.234.163.59/',
       <String, dynamic>{
         'transports': ['websocket'],
         'autoConnect': false,
@@ -16,13 +16,11 @@ class MessagingSocketService {
     );
 
     socket.connect();
-    
-
     socket.onConnect((_) {
       debugPrint('connected');
       print('connected');
-      // socket.emit("user-joined", userId);
-      // print('user-joined event emitted with userId: $userId');
+      socket.emit("user-joined", userId);
+      print('user-joined event emitted with userId: $userId');
     });
 
     socket.on('receive-message', (data) {
