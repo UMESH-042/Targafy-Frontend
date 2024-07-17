@@ -11,21 +11,21 @@ class NotificationTile extends StatelessWidget {
   const NotificationTile({super.key, required this.notification});
 
   String formatDate(DateTime dateTimeFromServer) {
-    DateTime localDateTime = dateTimeFromServer.toLocal();
+    // DateTime localDateTime = dateTimeFromServer.toLocal();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = DateTime(now.year, now.month, now.day - 1);
 
-    if (localDateTime.day == today.day &&
-        localDateTime.month == today.month &&
-        localDateTime.year == today.year) {
-      return DateFormat.Hm().format(localDateTime);
-    } else if (localDateTime.day == yesterday.day &&
-        localDateTime.month == yesterday.month &&
-        localDateTime.year == yesterday.year) {
-      return DateFormat.Hm().format(localDateTime);
+    if (dateTimeFromServer.day == today.day &&
+        dateTimeFromServer.month == today.month &&
+        dateTimeFromServer.year == today.year) {
+      return DateFormat.Hm().format(dateTimeFromServer);
+    } else if (dateTimeFromServer.day == yesterday.day &&
+        dateTimeFromServer.month == yesterday.month &&
+        dateTimeFromServer.year == yesterday.year) {
+      return DateFormat.Hm().format(dateTimeFromServer);
     } else {
-      return DateFormat.Hm().format(localDateTime);
+      return DateFormat.Hm().format(dateTimeFromServer);
     }
   }
 

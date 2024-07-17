@@ -1838,7 +1838,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
     try {
       final targets = await ref
           .read(targetDataControllerProvider.notifier)
-          .fetchThreeMonthsData(
+          .fetchOneMonthsData(
               userId, widget.businessId, widget.parameterName);
       // Store fetched targets in userTargetData map
       setState(() {
