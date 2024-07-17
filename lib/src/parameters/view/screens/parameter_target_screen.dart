@@ -977,12 +977,777 @@
 //   }
 // }
 
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:targafy/src/parameters/view/controller/get_target_controller.dart';
+// import 'package:targafy/src/parameters/view/model/target_data_model.dart';
+// import 'package:targafy/src/parameters/view/model/user_target_model.dart';
+// import 'package:targafy/src/parameters/view/widgets/TargetCard.dart';
+// import 'package:targafy/src/parameters/view/widgets/small_button.dart';
+// import 'package:targafy/widgets/Special_back_button.dart';
+// import 'package:targafy/widgets/custom_back_button.dart';
+// import 'package:targafy/widgets/custom_dropdown_field.dart';
+// import 'package:targafy/widgets/custom_text_field.dart';
+// import 'package:targafy/widgets/sort_dropdown_list.dart';
+// import 'package:targafy/widgets/submit_button.dart';
+// import '../controller/Add_target_controller.dart';
+
+// class ParameterTargetScreen extends ConsumerStatefulWidget {
+//   final String parameterName;
+//   final String businessId;
+//   final VoidCallback onDataAdded;
+
+//   const ParameterTargetScreen({
+//     super.key,
+//     required this.parameterName,
+//     required this.businessId,
+//     required this.onDataAdded,
+//   });
+
+//   @override
+//   ConsumerState<ParameterTargetScreen> createState() =>
+//       _ParameterTargetScreenState();
+// }
+
+// class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
+//   final _formKey = GlobalKey<FormState>();
+//   final TextEditingController _targetValueController = TextEditingController();
+//   final TextEditingController _commentController = TextEditingController();
+//   List<String> selectedUserIds = [];
+//   List<String> AssingSelectedUserIds = [];
+//   bool isLoading = false;
+//   bool allSelected = false;
+//   bool additionalAllSelected = false;
+//   bool showTargets = false;
+
+//   Map<String, List<TargetData>> userTargetData = {};
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     ref
+//         .read(userProvider.notifier)
+//         .fetchUsers(widget.parameterName, widget.businessId);
+//   }
+
+//   void _clearFields() {
+//     _formKey.currentState?.reset();
+//     _targetValueController.clear();
+//     _commentController.clear();
+//     setState(() {
+//       selectedUserIds.clear();
+//       AssingSelectedUserIds.clear();
+//       allSelected = false;
+//       additionalAllSelected = false;
+//     });
+//   }
+
+//   Future<void> _fetchTargetDataForUser(String userId) async {
+//     try {
+//       final targets = await ref
+//           .read(targetDataControllerProvider.notifier)
+//           .fetchThreeMonthsData(
+//               userId, widget.businessId, widget.parameterName);
+//       // Store fetched targets in userTargetData map
+//       setState(() {
+//         userTargetData[userId] = targets;
+//       });
+//       print('Fetched targets for user $userId: $targets');
+//     } catch (error) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(
+//           content: Text('Failed to fetch targets for user $userId: $error'),
+//         ),
+//       );
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final users = ref.watch(userProvider);
+//     double height = MediaQuery.of(context).size.height;
+//     double width = MediaQuery.of(context).size.width;
+//     // print(AssingSelectedUserIds);
+//     print(selectedUserIds);
+//     print('This is the  map:- $userTargetData');
+
+//     return Scaffold(
+//       body: SingleChildScrollView(
+//         child: Padding(
+//           padding: const EdgeInsets.all(16.0),
+//           child: Column(
+//             children: [
+//               SpecialBackButton(text: '${widget.parameterName} Target'),
+//               SizedBox(height: height * 0.05),
+//               Form(
+//                 key: _formKey,
+//                 child: Column(
+//                   children: [
+//                     CustomInputField(
+//                       labelText: 'Target Value',
+//                       controller: _targetValueController,
+//                       keyboardType: TextInputType.number,
+//                       validator: (value) {
+//                         if (value == null || value.isEmpty) {
+//                           return 'Please enter a target value';
+//                         }
+//                         return null;
+//                       },
+//                     ),
+//                     SizedBox(height: height * 0.02),
+//                     CustomInputField(
+//                       labelText: 'Comment',
+//                       controller: _commentController,
+//                       validator: (value) {
+//                         if (value == null || value.isEmpty) {
+//                           return 'Please enter a comment';
+//                         }
+//                         return null;
+//                       },
+//                     ),
+//                     SizedBox(height: height * 0.02),
+//                     users.when(
+//                       data: (userList) {
+//                         final sortedUserList =
+//                             sortList(userList, (user) => user.name);
+//                         return Column(
+//                           children: [
+//                             CustomDropdownField(
+//                               labelText: 'Assign Users',
+//                               items: [
+//                                 DropdownMenuItem<String>(
+//                                   value: 'select_all',
+//                                   child: const Text('Select All'),
+//                                 ),
+//                                 ...sortedUserList.map((user) {
+//                                   return DropdownMenuItem<String>(
+//                                     value: user.userId,
+//                                     child: Text(user.name),
+//                                   );
+//                                 }).toList(),
+//                               ],
+//                               onChanged: (value) {
+//                                 if (value == 'select_all') {
+//                                   setState(() {
+//                                     AssingSelectedUserIds = sortedUserList
+//                                         .map((user) => user.userId)
+//                                         .toList();
+//                                     additionalAllSelected = true;
+//                                   });
+//                                 } else if (value != null &&
+//                                     !AssingSelectedUserIds.contains(value)) {
+//                                   setState(() {
+//                                     AssingSelectedUserIds.add(value);
+//                                     additionalAllSelected = false;
+//                                   });
+//                                 }
+//                               },
+//                             ),
+//                             SizedBox(height: height * 0.02),
+//                             Wrap(
+//                               children: additionalAllSelected
+//                                   ? [
+//                                       Chip(
+//                                         label: const Text('All Selected'),
+//                                         onDeleted: () {
+//                                           setState(() {
+//                                             AssingSelectedUserIds.clear();
+//                                             additionalAllSelected = false;
+//                                           });
+//                                         },
+//                                       ),
+//                                     ]
+//                                   : AssingSelectedUserIds.map((userId) {
+//                                       return Chip(
+//                                         label: Text(userList
+//                                             .firstWhere(
+//                                                 (user) => user.userId == userId)
+//                                             .name),
+//                                         onDeleted: () {
+//                                           setState(() {
+//                                             AssingSelectedUserIds.remove(
+//                                                 userId);
+//                                           });
+//                                         },
+//                                       );
+//                                     }).toList(),
+//                             ),
+//                           ],
+//                         );
+//                       },
+//                       loading: () => const CircularProgressIndicator(),
+//                       error: (error, stackTrace) =>
+//                           Text('Failed to load users: $error'),
+//                     ),
+//                     SizedBox(height: height * 0.05),
+//                     isLoading
+//                         ? const CircularProgressIndicator()
+//                         : SubmitButton(
+//                             onPressed: () async {
+//                               if (_formKey.currentState!.validate()) {
+//                                 setState(() {
+//                                   isLoading = true;
+//                                 });
+//                                 final target = Target(
+//                                   targetValue: _targetValueController.text,
+//                                   paramName: widget.parameterName,
+//                                   comment: _commentController.text,
+//                                   userIds: AssingSelectedUserIds,
+//                                   monthIndex: DateTime.now().month.toString(),
+//                                 );
+//                                 try {
+//                                   await ref
+//                                       .read(targetProvider.notifier)
+//                                       .addTarget(target, widget.businessId);
+//                                   ScaffoldMessenger.of(context).showSnackBar(
+//                                     const SnackBar(
+//                                         content:
+//                                             Text('Target added successfully')),
+//                                   );
+//                                   widget.onDataAdded();
+//                                   _clearFields();
+//                                 } catch (error) {
+//                                   ScaffoldMessenger.of(context).showSnackBar(
+//                                     SnackBar(
+//                                         content: Text(
+//                                             'Failed to add target: $error')),
+//                                   );
+//                                   _clearFields();
+//                                 } finally {
+//                                   setState(() {
+//                                     isLoading = false;
+//                                   });
+//                                 }
+//                               }
+//                             },
+//                           ),
+//                     SizedBox(height: height * 0.1),
+//                     users.when(
+//                       data: (userList) {
+//                         final sortedUserList =
+//                             sortList(userList, (user) => user.name);
+//                         return Column(
+//                           children: [
+//                             CustomDropdownField(
+//                               labelText: 'Select Users',
+//                               items: [
+//                                 DropdownMenuItem<String>(
+//                                   value: 'select_all',
+//                                   child: const Text('Select All'),
+//                                 ),
+//                                 ...sortedUserList.map((user) {
+//                                   return DropdownMenuItem<String>(
+//                                     value: user.userId,
+//                                     child: Text(user.name),
+//                                   );
+//                                 }).toList(),
+//                               ],
+//                               onChanged: (value) {
+//                                 if (value == 'select_all') {
+//                                   setState(() {
+//                                     selectedUserIds = sortedUserList
+//                                         .map((user) => user.userId)
+//                                         .toList();
+//                                     allSelected = true;
+//                                   });
+//                                 } else if (value != null &&
+//                                     !selectedUserIds.contains(value)) {
+//                                   setState(() {
+//                                     selectedUserIds.add(value);
+//                                     allSelected = false;
+//                                   });
+//                                 }
+//                               },
+//                             ),
+//                             SizedBox(height: height * 0.02),
+//                             Wrap(
+//                               children: allSelected
+//                                   ? [
+//                                       Chip(
+//                                         label: const Text('All Selected'),
+//                                         onDeleted: () {
+//                                           setState(() {
+//                                             selectedUserIds.clear();
+//                                             allSelected = false;
+//                                           });
+//                                         },
+//                                       ),
+//                                     ]
+//                                   : selectedUserIds.map((userId) {
+//                                       return Chip(
+//                                         label: Text(users.when(
+//                                           data: (userList) => userList
+//                                               .firstWhere((user) =>
+//                                                   user.userId == userId)
+//                                               .name,
+//                                           loading: () => '',
+//                                           error: (error, stackTrace) => '',
+//                                         )),
+//                                         onDeleted: () {
+//                                           setState(() {
+//                                             selectedUserIds.remove(userId);
+//                                           });
+//                                         },
+//                                       );
+//                                     }).toList(),
+//                             ),
+//                           ],
+//                         );
+//                       },
+//                       loading: () => const CircularProgressIndicator(),
+//                       error: (error, stackTrace) =>
+//                           Text('Failed to load users: $error'),
+//                     ),
+//                     SizedBox(height: height * 0.02),
+//                     CustomSmallButton(
+//                       title: 'Get Targets',
+//                       onPressed: () {
+//                         for (final userId in selectedUserIds) {
+//                           _fetchTargetDataForUser(userId);
+//                         }
+//                         setState(() {
+//                           showTargets = true;
+//                         });
+//                       },
+//                     ),
+//                     SizedBox(height: height * 0.02),
+//                     if (showTargets)
+//                       ...selectedUserIds.map((userId) {
+//                         return users.when(
+//                           data: (userList) {
+//                             final user = userList
+//                                 .firstWhere((user) => user.userId == userId);
+//                             final targets = userTargetData[userId] ?? [];
+//                             return TargetCard(
+//                               user: user,
+//                               targets: targets,
+//                               parameterName: widget.parameterName,
+//                               businessId: widget.businessId,
+//                             );
+//                           },
+//                           loading: () => const CircularProgressIndicator(),
+//                           error: (error, stackTrace) =>
+//                               Text('Failed to load users: $error'),
+//                         );
+//                       }).toList(),
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+//   import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:targafy/src/parameters/view/controller/get_target_controller.dart';
+// import 'package:targafy/src/parameters/view/model/target_data_model.dart';
+// import 'package:targafy/src/parameters/view/model/user_target_model.dart';
+// import 'package:targafy/src/parameters/view/widgets/small_button.dart';
+// import 'package:targafy/widgets/Special_back_button.dart';
+// import 'package:targafy/widgets/custom_back_button.dart';
+// import 'package:targafy/widgets/custom_dropdown_field.dart';
+// import 'package:targafy/widgets/custom_text_field.dart';
+// import 'package:targafy/widgets/sort_dropdown_list.dart';
+// import 'package:targafy/widgets/submit_button.dart';
+// import '../controller/Add_target_controller.dart';
+
+// class ParameterTargetScreen extends ConsumerStatefulWidget {
+//   final String parameterName;
+//   final String businessId;
+//   final VoidCallback onDataAdded;
+
+//   const ParameterTargetScreen({
+//     super.key,
+//     required this.parameterName,
+//     required this.businessId,
+//     required this.onDataAdded,
+//   });
+
+//   @override
+//   ConsumerState<ParameterTargetScreen> createState() =>
+//       _ParameterTargetScreenState();
+// }
+
+// class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
+//   final _formKey = GlobalKey<FormState>();
+//   final TextEditingController _targetValueController = TextEditingController();
+//   final TextEditingController _commentController = TextEditingController();
+//   List<String> selectedUserIds = [];
+//   List<String> AssingSelectedUserIds = [];
+//   bool isLoading = false;
+//   bool allSelected = false;
+//   bool additionalAllSelected = false;
+//   bool showTargets = false;
+
+//   Map<String, List<TargetData>> userTargetData = {};
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     ref
+//         .read(userProvider.notifier)
+//         .fetchUsers(widget.parameterName, widget.businessId);
+//   }
+
+//   void _clearFields() {
+//     _formKey.currentState?.reset();
+//     _targetValueController.clear();
+//     _commentController.clear();
+//     setState(() {
+//       selectedUserIds.clear();
+//       AssingSelectedUserIds.clear();
+//       allSelected = false;
+//       additionalAllSelected = false;
+//     });
+//   }
+
+//   Future<void> _fetchTargetDataForUser(String userId) async {
+//     try {
+//       final targets = await ref
+//           .read(targetDataControllerProvider.notifier)
+//           .fetchThreeMonthsData(
+//               userId, widget.businessId, widget.parameterName);
+//       // Store fetched targets in userTargetData map
+//       setState(() {
+//         userTargetData[userId] = targets;
+//       });
+//       print('Fetched targets for user $userId: $targets');
+//     } catch (error) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(
+//           content: Text('Failed to fetch targets for user $userId: $error'),
+//         ),
+//       );
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final users = ref.watch(userProvider);
+//     double height = MediaQuery.of(context).size.height;
+//     double width = MediaQuery.of(context).size.width;
+//     // print(AssingSelectedUserIds);
+//     print(selectedUserIds);
+//     print('This is the  map:- $userTargetData');
+
+//     return Scaffold(
+//       body: SingleChildScrollView(
+//         child: Padding(
+//           padding: const EdgeInsets.all(16.0),
+//           child: Column(
+//             children: [
+//               SpecialBackButton(text: '${widget.parameterName} Target'),
+//               SizedBox(height: height * 0.05),
+//               Form(
+//                 key: _formKey,
+//                 child: Column(
+//                   children: [
+//                     CustomInputField(
+//                       labelText: 'Target Value',
+//                       controller: _targetValueController,
+//                       keyboardType: TextInputType.number,
+//                       validator: (value) {
+//                         if (value == null || value.isEmpty) {
+//                           return 'Please enter a target value';
+//                         }
+//                         return null;
+//                       },
+//                     ),
+//                     SizedBox(height: height * 0.02),
+//                     CustomInputField(
+//                       labelText: 'Comment',
+//                       controller: _commentController,
+//                       validator: (value) {
+//                         if (value == null || value.isEmpty) {
+//                           return 'Please enter a comment';
+//                         }
+//                         return null;
+//                       },
+//                     ),
+//                     SizedBox(height: height * 0.02),
+//                     users.when(
+//                       data: (userList) {
+//                         final sortedUserList =
+//                             sortList(userList, (user) => user.name);
+//                         return Column(
+//                           children: [
+//                             CustomDropdownField(
+//                               labelText: 'Assign Users',
+//                               items: [
+//                                 DropdownMenuItem<String>(
+//                                   value: 'select_all',
+//                                   child: const Text('Select All'),
+//                                 ),
+//                                 ...sortedUserList.map((user) {
+//                                   return DropdownMenuItem<String>(
+//                                     value: user.userId,
+//                                     child: Text(user.name),
+//                                   );
+//                                 }).toList(),
+//                               ],
+//                               onChanged: (value) {
+//                                 if (value == 'select_all') {
+//                                   setState(() {
+//                                     AssingSelectedUserIds = sortedUserList
+//                                         .map((user) => user.userId)
+//                                         .toList();
+//                                     additionalAllSelected = true;
+//                                   });
+//                                 } else if (value != null &&
+//                                     !AssingSelectedUserIds.contains(value)) {
+//                                   setState(() {
+//                                     AssingSelectedUserIds.add(value);
+//                                     additionalAllSelected = false;
+//                                   });
+//                                 }
+//                               },
+//                             ),
+//                             SizedBox(height: height * 0.02),
+//                             Wrap(
+//                               children: additionalAllSelected
+//                                   ? [
+//                                       Chip(
+//                                         label: const Text('All Selected'),
+//                                         onDeleted: () {
+//                                           setState(() {
+//                                             AssingSelectedUserIds.clear();
+//                                             additionalAllSelected = false;
+//                                           });
+//                                         },
+//                                       ),
+//                                     ]
+//                                   : AssingSelectedUserIds.map((userId) {
+//                                       return Chip(
+//                                         label: Text(userList
+//                                             .firstWhere(
+//                                                 (user) => user.userId == userId)
+//                                             .name),
+//                                         onDeleted: () {
+//                                           setState(() {
+//                                             AssingSelectedUserIds.remove(
+//                                                 userId);
+//                                           });
+//                                         },
+//                                       );
+//                                     }).toList(),
+//                             ),
+//                           ],
+//                         );
+//                       },
+//                       loading: () => const CircularProgressIndicator(),
+//                       error: (error, stackTrace) =>
+//                           Text('Failed to load users: $error'),
+//                     ),
+//                     SizedBox(height: height * 0.05),
+//                     isLoading
+//                         ? const CircularProgressIndicator()
+//                         : SubmitButton(
+//                             onPressed: () async {
+//                               if (_formKey.currentState!.validate()) {
+//                                 setState(() {
+//                                   isLoading = true;
+//                                 });
+//                                 final target = Target(
+//                                   targetValue: _targetValueController.text,
+//                                   paramName: widget.parameterName,
+//                                   comment: _commentController.text,
+//                                   userIds: AssingSelectedUserIds,
+//                                   monthIndex: DateTime.now().month.toString(),
+//                                 );
+//                                 try {
+//                                   await ref
+//                                       .read(targetProvider.notifier)
+//                                       .addTarget(target, widget.businessId);
+//                                   ScaffoldMessenger.of(context).showSnackBar(
+//                                     const SnackBar(
+//                                         content:
+//                                             Text('Target added successfully')),
+//                                   );
+//                                   widget.onDataAdded();
+//                                   _clearFields();
+//                                 } catch (error) {
+//                                   ScaffoldMessenger.of(context).showSnackBar(
+//                                     SnackBar(
+//                                         content: Text(
+//                                             'Failed to add target: $error')),
+//                                   );
+//                                   _clearFields();
+//                                 } finally {
+//                                   setState(() {
+//                                     isLoading = false;
+//                                   });
+//                                 }
+//                               }
+//                             },
+//                           ),
+//                     SizedBox(height: height * 0.1),
+//                     users.when(
+//                       data: (userList) {
+//                         final sortedUserList =
+//                             sortList(userList, (user) => user.name);
+//                         return Column(
+//                           children: [
+//                             CustomDropdownField(
+//                               labelText: 'Select Users',
+//                               items: [
+//                                 DropdownMenuItem<String>(
+//                                   value: 'select_all',
+//                                   child: const Text('Select All'),
+//                                 ),
+//                                 ...sortedUserList.map((user) {
+//                                   return DropdownMenuItem<String>(
+//                                     value: user.userId,
+//                                     child: Text(user.name),
+//                                   );
+//                                 }).toList(),
+//                               ],
+//                               onChanged: (value) {
+//                                 if (value == 'select_all') {
+//                                   setState(() {
+//                                     selectedUserIds = sortedUserList
+//                                         .map((user) => user.userId)
+//                                         .toList();
+//                                     allSelected = true;
+//                                   });
+//                                 } else if (value != null &&
+//                                     !selectedUserIds.contains(value)) {
+//                                   setState(() {
+//                                     selectedUserIds.add(value);
+//                                     allSelected = false;
+//                                   });
+//                                 }
+//                               },
+//                             ),
+//                             SizedBox(height: height * 0.02),
+//                             Wrap(
+//                               children: allSelected
+//                                   ? [
+//                                       Chip(
+//                                         label: const Text('All Selected'),
+//                                         onDeleted: () {
+//                                           setState(() {
+//                                             selectedUserIds.clear();
+//                                             allSelected = false;
+//                                           });
+//                                         },
+//                                       ),
+//                                     ]
+//                                   : selectedUserIds.map((userId) {
+//                                       return Chip(
+//                                         label: Text(users.when(
+//                                           data: (userList) => userList
+//                                               .firstWhere((user) =>
+//                                                   user.userId == userId)
+//                                               .name,
+//                                           loading: () => '',
+
+//                                           error: (error, stackTrace) => '',
+//                                         )),
+//                                         onDeleted: () {
+//                                           setState(() {
+//                                             selectedUserIds.remove(userId);
+//                                           });
+//                                         },
+//                                       );
+//                                     }).toList(),
+//                             ),
+//                           ],
+//                         );
+//                       },
+//                       loading: () => const CircularProgressIndicator(),
+//                       error: (error, stackTrace) =>
+//                           Text('Failed to load users: $error'),
+//                     ),
+//                     SizedBox(height: height * 0.05),
+//                     SmallButton(
+//                       text: 'Show Targets',
+//                       onPressed: () async {
+//                         setState(() {
+//                           showTargets = false;
+//                           userTargetData.clear();
+//                         });
+//                         for (String userId in selectedUserIds) {
+//                           await _fetchTargetDataForUser(userId);
+//                         }
+//                         setState(() {
+//                           showTargets = true;
+//                         });
+//                       },
+//                     ),
+//                     SizedBox(height: height * 0.05),
+//                     showTargets ? buildTargetTable() : Container(),
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   Widget buildTargetTable() {
+//     final columns = [
+//       'User Name',
+//       'Month',
+//       'Target Value',
+//     ];
+
+//     List<TableRow> rows = [
+//       TableRow(
+//         children: columns.map((column) {
+//           return TableCell(
+//             child: Padding(
+//               padding: const EdgeInsets.all(8.0),
+//               child: Text(
+//                 column,
+//                 style: const TextStyle(fontWeight: FontWeight.bold),
+//               ),
+//             ),
+//           );
+//         }).toList(),
+//       ),
+//     ];
+
+//     userTargetData.forEach((userId, targets) {
+//       for (var target in targets) {
+//         rows.add(TableRow(
+//           children: [
+//             Padding(
+//               padding: const EdgeInsets.all(8.0),
+//               child: Text(userId), // Replace with actual user name if needed
+//             ),
+//             Padding(
+//               padding: const EdgeInsets.all(8.0),
+//               child: Text(target.month),
+//             ),
+//             Padding(
+//               padding: const EdgeInsets.all(8.0),
+//               child: Text(target.targetValue),
+//             ),
+
+//           ],
+//         ));
+//       }
+//     });
+
+//     return Table(
+//       border: TableBorder.all(),
+//       children: rows,
+//     );
+//   }
+// }
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/src/parameters/view/controller/get_target_controller.dart';
 import 'package:targafy/src/parameters/view/model/target_data_model.dart';
 import 'package:targafy/src/parameters/view/model/user_target_model.dart';
-import 'package:targafy/src/parameters/view/widgets/TargetCard.dart';
 import 'package:targafy/src/parameters/view/widgets/small_button.dart';
 import 'package:targafy/widgets/Special_back_button.dart';
 import 'package:targafy/widgets/custom_back_button.dart';
@@ -1298,44 +2063,121 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                       error: (error, stackTrace) =>
                           Text('Failed to load users: $error'),
                     ),
-                    SizedBox(height: height * 0.02),
+                    SizedBox(height: height * 0.05),
                     CustomSmallButton(
-                      title: 'Get Targets',
-                      onPressed: () {
-                        for (final userId in selectedUserIds) {
-                          _fetchTargetDataForUser(userId);
-                        }
-                        setState(() {
-                          showTargets = true;
-                        });
-                      },
+                        title: 'Get Targets',
+                        onPressed: () {
+                          setState(() {
+                            showTargets = true;
+                          });
+
+                          // Fetch target data for each selected user
+                          for (final userId in selectedUserIds) {
+                            _fetchTargetDataForUser(userId);
+                          }
+                        }),
+                    SizedBox(
+                      height: 20,
                     ),
-                    SizedBox(height: height * 0.02),
-                    if (showTargets)
-                      ...selectedUserIds.map((userId) {
-                        return users.when(
-                          data: (userList) {
-                            final user = userList
-                                .firstWhere((user) => user.userId == userId);
-                            final targets = userTargetData[userId] ?? [];
-                            return TargetCard(
-                              user: user,
-                              targets: targets,
-                              parameterName: widget.parameterName,
-                              businessId: widget.businessId,
-                            );
-                          },
-                          loading: () => const CircularProgressIndicator(),
-                          error: (error, stackTrace) =>
-                              Text('Failed to load users: $error'),
-                        );
-                      }).toList(),
+                    if (showTargets) buildTargetTable(),
                   ],
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget buildTargetTable() {
+    final users = ref.watch(userProvider).when(
+          data: (userList) => userList,
+          loading: () => [],
+          error: (error, stackTrace) => [],
+        );
+
+    String _formatNumber(dynamic value) {
+      if (value == null || value == '') {
+        return '0';
+      }
+      if (value is int) {
+        if (value >= 1000) {
+          return '${(value / 1000).toStringAsFixed(0)}k';
+        } else {
+          return '$value';
+        }
+      } else if (value is String) {
+        int intValue = int.tryParse(value) ?? 0;
+        if (intValue >= 1000) {
+          return '${(intValue / 1000).toStringAsFixed(0)}k';
+        } else {
+          return value;
+        }
+      } else {
+        return '-';
+      }
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8),
+        color: lightblue, // Set background color to light blue
+      ),
+      padding: EdgeInsets.all(16),
+      width: MediaQuery.of(context).size.width,
+      child: DataTable(
+        border: TableBorder.all(color: primaryColor),
+        decoration: BoxDecoration(
+          border: Border.all(color: primaryColor),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        columnSpacing: 10, // Adjust spacing between columns
+        dataRowHeight: 60, // Adjust height of each row
+        columns: [
+          DataColumn(
+              label: Flexible(
+                  child: Text('Employee', textAlign: TextAlign.center))),
+          DataColumn(
+              label: Flexible(
+                  child: Text('Previous Month', textAlign: TextAlign.center))),
+          DataColumn(
+              label: Flexible(
+                  child: Text('Set Target', textAlign: TextAlign.center))),
+        ],
+        rows: [
+          for (final userId in selectedUserIds)
+            if (userTargetData.containsKey(userId) &&
+                userTargetData[userId]!.length >= 2)
+              DataRow(cells: [
+                DataCell(
+                  Text(
+                    users.firstWhere((user) => user.userId == userId).name,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                DataCell(
+                  Center(
+                    child: Text(
+                      '${_formatNumber(userTargetData[userId]![1].targetDone)}/${_formatNumber(userTargetData[userId]![1].targetValue)}',
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                DataCell(
+                  Center(
+                    child: Text(
+                      _formatNumber(userTargetData[userId]![0].targetValue),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ]),
+        ],
       ),
     );
   }

@@ -3,6 +3,9 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:targafy/src/parameters/view/model/target_data_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 final targetDataControllerProvider =
     StateNotifierProvider<TargetDataController, AsyncValue<List<TargetData>>>(
@@ -16,7 +19,7 @@ class TargetDataController extends StateNotifier<AsyncValue<List<TargetData>>> {
   Future<List<TargetData>> fetchThreeMonthsData(
       String userId, String businessId, String parameterName) async {
     final url = Uri.parse(
-        'http://13.234.163.59/api/v1/data/get-three-months-data/$userId/$businessId/$parameterName');
+        '${domain}data/get-one-months-data/$userId/$businessId/$parameterName');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
@@ -59,37 +62,39 @@ class TargetDataController extends StateNotifier<AsyncValue<List<TargetData>>> {
     }
   }
 
-  Future<void> updateTarget(String userId, String parameterName,
-      String monthIndex, String comment, String newTargetValue,String businessId) async {
-    final url = Uri.parse(
-        'http://13.234.163.59/api/v1/target/update-user-target/$businessId/$parameterName');
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('authToken');
+  Future<void> updateTarget(
+    List<Map<String, String>> userTargets,
+    String parameterName,
+    String monthIndex,
+    String businessId) async {
+  final url = Uri.parse(
+      'http://13.234.163.59/api/v1/target/update-user-target/$businessId/$parameterName');
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('authToken');
 
-    try {
-      final response = await http.put(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'userId': userId,
-          'monthIndex': monthIndex,
-          'comment': comment,
-          'newTargetValue': newTargetValue,
-        }),
-      );
-      print(response.body);
-      if (response.statusCode == 200) {
-        print('Target updated successfully');
-        // Optionally, you can fetch updated data after successful update
-        // ref.read(fetchThreeMonthsDataProvider).fetchThreeMonthsData(userId, businessId, parameterName);
-      } else {
-        throw Exception('Failed to update target: ${response.statusCode}');
-      }
-    } catch (error) {
-      throw Exception('Network error: $error');
+  try {
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'userTargets': userTargets,
+        'monthIndex': monthIndex,
+      }),
+    );
+    print(response.body);
+    if (response.statusCode == 200) {
+      print('Targets updated successfully');
+      // Optionally, you can fetch updated data after successful update
+      // ref.read(fetchThreeMonthsDataProvider).fetchThreeMonthsData(userId, businessId, parameterName);
+    } else {
+      throw Exception('Failed to update targets: ${response.statusCode}');
     }
+  } catch (error) {
+    throw Exception('Network error: $error');
   }
+}
+
 }
