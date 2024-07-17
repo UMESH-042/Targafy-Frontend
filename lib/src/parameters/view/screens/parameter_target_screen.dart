@@ -1750,7 +1750,6 @@ import 'package:targafy/src/parameters/view/model/target_data_model.dart';
 import 'package:targafy/src/parameters/view/model/user_target_model.dart';
 import 'package:targafy/src/parameters/view/widgets/small_button.dart';
 import 'package:targafy/widgets/Special_back_button.dart';
-import 'package:targafy/widgets/custom_back_button.dart';
 import 'package:targafy/widgets/custom_dropdown_field.dart';
 import 'package:targafy/widgets/custom_text_field.dart';
 import 'package:targafy/widgets/sort_dropdown_list.dart';
@@ -1786,6 +1785,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
   bool showTargets = false;
 
   Map<String, List<TargetData>> userTargetData = {};
+  Map<String, bool> isEditing = {};
 
   @override
   void initState() {
@@ -1793,6 +1793,33 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
     ref
         .read(userProvider.notifier)
         .fetchUsers(widget.parameterName, widget.businessId);
+  }
+
+  // void toggleEditing(String userId) {
+  //   setState(() {
+  //     if (isEditing.containsKey(userId)) {
+  //       isEditing[userId] = !isEditing[userId]!;
+  //     } else {
+  //       isEditing[userId] = true;
+  //     }
+  //   });
+  // }
+  void toggleEditing(String userId) {
+    setState(() {
+      // Toggle editing for the current userId
+      if (isEditing.containsKey(userId)) {
+        isEditing[userId] = !isEditing[userId]!;
+      } else {
+        isEditing[userId] = true;
+      }
+
+      // Turn off editing for all other userIds
+      for (final id in selectedUserIds) {
+        if (id != userId) {
+          isEditing[id] = false;
+        }
+      }
+    });
   }
 
   void _clearFields() {
@@ -2097,6 +2124,47 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
           error: (error, stackTrace) => [],
         );
 
+    void saveTargets() async {
+      List<Map<String, String>> updatedTargets = [];
+
+      for (final userId in selectedUserIds) {
+        if (userTargetData.containsKey(userId)) {
+          // Check if the user target is being edited
+          if (isEditing.containsKey(userId) && isEditing[userId]!) {
+            // Handle saving logic for edited targets
+            // Example: Read from state or controllers to get new target values
+            updatedTargets.add({
+              'userId': userId,
+              'newTargetValue': userTargetData[userId]![0].targetValue,
+            });
+          }
+        }
+      }
+
+      try {
+        await ref.read(targetDataControllerProvider.notifier).updateTarget(
+              updatedTargets,
+              widget.parameterName,
+              DateTime.now().month.toString(),
+              widget.businessId,
+            );
+        print('This is updateTarget :- $updatedTargets');
+        print('This is month number ${DateTime.now().month.toString()}');
+        setState(() {
+          isEditing.clear(); // Clear all editing states
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Targets updated successfully')),
+        );
+      } catch (error) {
+        print('This is updateTarget :- $updatedTargets');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update targets: $error')),
+        );
+      }
+    }
+
     String _formatNumber(dynamic value) {
       if (value == null || value == '') {
         return '0';
@@ -2127,56 +2195,102 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
       ),
       padding: EdgeInsets.all(16),
       width: MediaQuery.of(context).size.width,
-      child: DataTable(
-        border: TableBorder.all(color: primaryColor),
-        decoration: BoxDecoration(
-          border: Border.all(color: primaryColor),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        columnSpacing: 10, // Adjust spacing between columns
-        dataRowHeight: 60, // Adjust height of each row
-        columns: [
-          DataColumn(
-              label: Flexible(
-                  child: Text('Employee', textAlign: TextAlign.center))),
-          DataColumn(
-              label: Flexible(
-                  child: Text('Previous Month', textAlign: TextAlign.center))),
-          DataColumn(
-              label: Flexible(
-                  child: Text('Set Target', textAlign: TextAlign.center))),
-        ],
-        rows: [
-          for (final userId in selectedUserIds)
-            if (userTargetData.containsKey(userId) &&
-                userTargetData[userId]!.length >= 2)
-              DataRow(cells: [
-                DataCell(
-                  Text(
-                    users.firstWhere((user) => user.userId == userId).name,
+      child: Column(
+        children: [
+          DataTable(
+            border: TableBorder.all(color: primaryColor),
+            decoration: BoxDecoration(
+              border: Border.all(color: primaryColor),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            columnSpacing: 10,
+            dataRowHeight: 60,
+            columns: [
+              DataColumn(
+                label: Flexible(
+                  child: Text('Employee', textAlign: TextAlign.center),
+                ),
+              ),
+              DataColumn(
+                label: Flexible(
+                  child: Text(
+                    'Previous Month',
                     textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                DataCell(
-                  Center(
-                    child: Text(
-                      '${_formatNumber(userTargetData[userId]![1].targetDone)}/${_formatNumber(userTargetData[userId]![1].targetValue)}',
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
+              ),
+              DataColumn(
+                label: Flexible(
+                  child: Text(
+                    'Set Target',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+            rows: [
+              for (final userId in selectedUserIds)
+                if (userTargetData.containsKey(userId) &&
+                    userTargetData[userId]!.length >= 2)
+                  DataRow(cells: [
+                    DataCell(
+                      Text(
+                        users.firstWhere((user) => user.userId == userId).name,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ),
-                DataCell(
-                  Center(
-                    child: Text(
-                      _formatNumber(userTargetData[userId]![0].targetValue),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
+                    DataCell(
+                      Center(
+                        child: Text(
+                          '${_formatNumber(userTargetData[userId]![1].targetDone)}/${_formatNumber(userTargetData[userId]![1].targetValue)}',
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ]),
+                    DataCell(
+                      GestureDetector(
+                        onTap: () {
+                          toggleEditing(userId);
+                        },
+                        child: isEditing.containsKey(userId) &&
+                                isEditing[userId]!
+                            ? Center(
+                                child: TextFormField(
+                                  initialValue:
+                                      userTargetData[userId]![0].targetValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      userTargetData[userId]![0].targetValue =
+                                          newValue;
+                                    });
+                                  },
+                                  onFieldSubmitted: (value) {
+                                    toggleEditing(userId);
+                                  },
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.center,
+                                ),
+                              )
+                            : Center(
+                                child: Text(
+                                  _formatNumber(
+                                      userTargetData[userId]![0].targetValue),
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ]),
+            ],
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: saveTargets,
+            child: Text('Save Targets'),
+          ),
         ],
       ),
     );

@@ -62,39 +62,35 @@ class TargetDataController extends StateNotifier<AsyncValue<List<TargetData>>> {
     }
   }
 
-  Future<void> updateTarget(
-    List<Map<String, String>> userTargets,
-    String parameterName,
-    String monthIndex,
-    String businessId) async {
-  final url = Uri.parse(
-      'http://13.234.163.59/api/v1/target/update-user-target/$businessId/$parameterName');
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('authToken');
+  Future<void> updateTarget(List<Map<String, String>> userTargets,
+      String parameterName, String monthIndex, String businessId) async {
+    final url = Uri.parse(
+        'http://13.234.163.59/api/v1/target/update-user-target/$businessId/$parameterName');
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
 
-  try {
-    final response = await http.put(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'userTargets': userTargets,
-        'monthIndex': monthIndex,
-      }),
-    );
-    print(response.body);
-    if (response.statusCode == 200) {
-      print('Targets updated successfully');
-      // Optionally, you can fetch updated data after successful update
-      // ref.read(fetchThreeMonthsDataProvider).fetchThreeMonthsData(userId, businessId, parameterName);
-    } else {
-      throw Exception('Failed to update targets: ${response.statusCode}');
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'userTargets': userTargets,
+          'monthIndex': monthIndex,
+        }),
+      );
+      print(response.body);
+      if (response.statusCode == 200) {
+        print('Targets updated successfully');
+        // Optionally, you can fetch updated data after successful update
+        // ref.read(fetchThreeMonthsDataProvider).fetchThreeMonthsData(userId, businessId, parameterName);
+      } else {
+        throw Exception('Failed to update targets: ${response.statusCode}');
+      }
+    } catch (error) {
+      throw Exception('Network error: $error');
     }
-  } catch (error) {
-    throw Exception('Network error: $error');
   }
-}
-
 }

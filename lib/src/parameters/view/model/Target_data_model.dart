@@ -1,7 +1,7 @@
 class TargetData {
   final String month;
-  final String targetValue;
-  final String targetDone;
+   String targetValue;
+   String targetDone;
 
   TargetData({
     required this.month,
