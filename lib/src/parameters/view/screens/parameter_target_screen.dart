@@ -1318,12 +1318,12 @@
 //                             final user = userList
 //                                 .firstWhere((user) => user.userId == userId);
 //                             final targets = userTargetData[userId] ?? [];
-                            // return TargetCard(
-                            //   user: user,
-                            //   targets: targets,
-                            //   parameterName: widget.parameterName,
-                            //   businessId: widget.businessId,
-                            // );
+// return TargetCard(
+//   user: user,
+//   targets: targets,
+//   parameterName: widget.parameterName,
+//   businessId: widget.businessId,
+// );
 //                           },
 //                           loading: () => const CircularProgressIndicator(),
 //                           error: (error, stackTrace) =>
@@ -1793,6 +1793,9 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
     ref
         .read(userProvider.notifier)
         .fetchUsers(widget.parameterName, widget.businessId);
+
+    ref.read(userProvider1.notifier).fetchFilteredUsers(widget.businessId,
+        widget.parameterName, DateTime.now().month.toString());
   }
 
   // void toggleEditing(String userId) {
@@ -1838,8 +1841,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
     try {
       final targets = await ref
           .read(targetDataControllerProvider.notifier)
-          .fetchOneMonthsData(
-              userId, widget.businessId, widget.parameterName);
+          .fetchOneMonthsData(userId, widget.businessId, widget.parameterName);
       // Store fetched targets in userTargetData map
       setState(() {
         userTargetData[userId] = targets;
@@ -1857,6 +1859,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
   @override
   Widget build(BuildContext context) {
     final users = ref.watch(userProvider);
+    final filteredUsers = ref.watch(userProvider1);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     // print(AssingSelectedUserIds);
@@ -2014,7 +2017,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                             },
                           ),
                     SizedBox(height: height * 0.1),
-                    users.when(
+                    filteredUsers.when(
                       data: (userList) {
                         final sortedUserList =
                             sortList(userList, (user) => user.name);
