@@ -205,6 +205,7 @@ RemoteMessage createRemoteMessageFromData(Map<String, dynamic> data) {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(options: firebaseOptions);
 
   MessagingSocketService.init();

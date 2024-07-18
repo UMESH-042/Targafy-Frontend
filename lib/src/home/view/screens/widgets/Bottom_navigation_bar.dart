@@ -68,6 +68,8 @@ class _BottomNavigationAndAppBarState
   bool _isRefreshing = false;
   late IO.Socket socket;
 
+  String _appVersion = '';
+
   @override
   void initState() {
     _requestNotificationPermissions();
@@ -85,6 +87,7 @@ class _BottomNavigationAndAppBarState
     _getToken1();
     _refreshParameters();
     _initializeSocket();
+
     // WidgetsBinding.instance!.addPostFrameCallback((_) {
     //   Future.delayed(Duration(seconds: 5), () {
     //     _fetchCounters();
@@ -478,7 +481,7 @@ class _BottomNavigationAndAppBarState
                         alignment: Alignment.topRight,
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
-                          child: Text("1.0.0"),
+                          child: Text("1.0.1"),
                         ),
                       ),
                       DrawerHeader(

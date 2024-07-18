@@ -789,17 +789,844 @@
 //   }
 // }
 
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:flutter_svg/svg.dart';
+// import 'package:targafy/business_home_page/controller/business_controller.dart';
+// import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
+// import 'package:targafy/core/constants/colors.dart';
+// import 'package:targafy/core/constants/dimensions.dart';
+// import 'package:share/share.dart';
+// import 'package:targafy/src/groups/ui/groups_screen.dart';
+// import 'package:targafy/src/home/view/screens/controller/notification_counter_controller.dart';
+// import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
+// import 'package:targafy/src/users/UserBusinessProfile.dart';
+// import 'package:targafy/src/users/ui/RequestUsersScreen.dart';
+// import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
+// import 'package:targafy/src/users/ui/controller/change_mangager_controller.dart';
+// import 'package:targafy/src/users/ui/controller/demote_user.dart';
+// import 'package:targafy/src/users/ui/controller/promote_to_MiniAdmin.dart';
+// import 'package:targafy/src/users/ui/controller/promote_to_admin.dart';
+// import 'package:targafy/src/users/ui/controller/remove_user_controller.dart';
+// import 'package:targafy/src/users/ui/widget/change_manager_dialog.dart';
+// import 'package:targafy/src/users/ui/widget/user_hierarchy_view.dart';
+// import 'package:badges/badges.dart' as badges;
+
+// class UsersScreen extends ConsumerStatefulWidget {
+//   const UsersScreen({super.key});
+
+//   @override
+//   _UsersScreenState createState() => _UsersScreenState();
+// }
+
+// class _UsersScreenState extends ConsumerState<UsersScreen> {
+//   @override
+//   Widget build(BuildContext context) {
+//     final selectedBusinessData = ref.watch(currentBusinessProvider);
+//     final selectedBusiness = selectedBusinessData?['business'] as Business?;
+//     final selectedbusinessCode =
+//         selectedBusinessData?['businessCode'] as String?;
+//     final businessName = selectedBusiness?.name;
+//     final businessId = selectedBusiness?.id;
+//     print(businessId);
+
+//     double height = MediaQuery.of(context).size.height;
+//     double width = MediaQuery.of(context).size.width;
+
+//     final usersStream2 =
+//         ref.watch(businessUsersStreamProvider2(businessId ?? ''));
+
+//     final notificationCountersAsyncValue =
+//         ref.read(notificationCountersProvider);
+
+//     // Check the notification counters state
+//     final acceptCounter = notificationCountersAsyncValue.maybeWhen(
+//       data: (counters) => counters.acceptCounter,
+//       orElse: () => 0, // Default to 0 if counters are not available or error
+//     );
+
+//     const placeholderImageUrl =
+//         'https://randomuser.me/api/portraits/lego/2.jpg';
+
+//     return Scaffold(
+//       body: Padding(
+//         padding: const EdgeInsets.all(8.0),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.stretch,
+//           children: [
+//             if (businessId == null)
+//               Center(
+//                 child: Text(
+//                   'Please select a business',
+//                   style: TextStyle(
+//                     fontSize: 20,
+//                     fontWeight: FontWeight.bold,
+//                     color: Colors.red,
+//                   ),
+//                 ),
+//               )
+//             else ...[
+//               SingleChildScrollView(
+//                 scrollDirection: Axis.horizontal,
+//                 child: Row(
+//                   children: [
+//                     const SizedBox(width: 10),
+//                     ElevatedButton(
+//                       onPressed: () {
+//                         String shareText = 'Dear User,\n\n'
+//                             'We invite you to download our app via the following link: '
+//                             'Please download the app from: https://play.google.com/store/apps/details?id=com.terabiz.targafy\n\n'
+//                             'And then join our business using code: $selectedbusinessCode\n\n'
+//                             'Best regards,\n'
+//                             '$businessName Team';
+//                         Share.share(shareText,
+//                             subject: 'Join our business on BizIssue');
+//                       },
+//                       style: ElevatedButton.styleFrom(
+//                         padding: const EdgeInsets.symmetric(
+//                             vertical: 10, horizontal: 16),
+//                         backgroundColor: lightblue,
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(15),
+//                           side: BorderSide(color: primaryColor, width: 2),
+//                         ),
+//                       ),
+//                       child: Text(
+//                         'Invite Users',
+//                         style: TextStyle(color: primaryColor),
+//                       ),
+//                     ),
+//                     const SizedBox(width: 10),
+//                     GestureDetector(
+//                       onTap: () {
+//                         Navigator.of(context).push(MaterialPageRoute(
+//                             builder: (context) =>
+//                                 UserHierarchy(businessId: businessId)));
+//                       },
+//                       child: Container(
+//                         padding: const EdgeInsets.all(5),
+//                         decoration: BoxDecoration(
+//                           color: primaryColor.withOpacity(0.8),
+//                           borderRadius: BorderRadius.circular(50),
+//                         ),
+//                         child: SvgPicture.asset(
+//                           "assets/svgs/hierarchy.svg",
+//                           semanticsLabel: 'Acme Logo',
+//                           height: 25,
+//                           width: width * 0.1,
+//                           color: Colors.white,
+//                         ),
+//                       ),
+//                     ),
+//                     const SizedBox(width: 10),
+//                     // ElevatedButton(
+//                     //   onPressed: () {
+//                     //     Navigator.push(
+//                     //       context,
+//                     //       MaterialPageRoute(
+//                     //         builder: (context) =>
+//                     //             BusinessRequestsPage(businessId: businessId),
+//                     //       ),
+//                     //     );
+//                     //   },
+//                     //   style: ElevatedButton.styleFrom(
+//                     //     padding: const EdgeInsets.symmetric(
+//                     //         vertical: 10, horizontal: 16),
+//                     //     backgroundColor: lightblue,
+//                     //     shape: RoundedRectangleBorder(
+//                     //       borderRadius: BorderRadius.circular(15),
+//                     //       side: BorderSide(color: primaryColor, width: 2),
+//                     //     ),
+//                     //   ),
+//                     //   child: Text(
+//                     //     'Accept Users',
+//                     //     style: TextStyle(color: primaryColor),
+//                     //   ),
+//                     // ),
+
+//                           ElevatedButton(
+//                       onPressed: () {
+//                         Navigator.push(
+//                           context,
+//                           MaterialPageRoute(
+//                             builder: (context) =>
+//                                 BusinessRequestsPage(businessId: businessId),
+//                           ),
+//                         );
+//                       },
+//                       style: ElevatedButton.styleFrom(
+//                         padding: const EdgeInsets.symmetric(
+//                             vertical: 10, horizontal: 16),
+//                         backgroundColor: lightblue,
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(15),
+//                           side: BorderSide(color: primaryColor, width: 2),
+//                         ),
+//                       ),
+//                       child: acceptCounter > 0
+//                           ? badges.Badge(
+//                               badgeContent: Text(
+//                                 '$acceptCounter',
+//                                 style: TextStyle(color: Colors.white),
+//                               ),
+//                               child: Text(
+//                                 'Accept Users',
+//                                 style: TextStyle(color: primaryColor),
+//                               ),
+//                             )
+//                           : Text(
+//                               'Accept Users',
+//                               style: TextStyle(color: primaryColor),
+//                             ),
+//                     ),
+
+//                     const SizedBox(width: 10),
+//                     ElevatedButton(
+//                       onPressed: () {
+//                         Navigator.push(
+//                           context,
+//                           MaterialPageRoute(
+//                             builder: (context) => const GroupScreen(),
+//                           ),
+//                         );
+//                       },
+//                       style: ElevatedButton.styleFrom(
+//                         padding: const EdgeInsets.symmetric(
+//                             vertical: 10, horizontal: 16),
+//                         backgroundColor: lightblue,
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(15),
+//                           side: BorderSide(color: primaryColor, width: 2),
+//                         ),
+//                       ),
+//                       child: Text(
+//                         'Group',
+//                         style: TextStyle(color: primaryColor),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//               SizedBox(height: getScreenheight(context) * 0.03),
+//               usersStream2.when(
+//                 data: (users) => Expanded(
+//                   child: ListView.separated(
+//                     itemCount: users.length,
+//                     separatorBuilder: (context, index) =>
+//                         SizedBox(height: getScreenheight(context) * 0.016),
+//                     itemBuilder: (context, index) {
+//                       final user = users[index];
+//                       return GestureDetector(
+//                         onTap: () {
+//                           Navigator.push(
+//                             context,
+//                             MaterialPageRoute(
+//                               builder: (context) =>
+//                                   UserBusinessProfilePage(userId: user.userId),
+//                             ),
+//                           );
+//                         },
+//                         child: Container(
+//                           padding: const EdgeInsets.all(10),
+//                           decoration: BoxDecoration(
+//                             borderRadius: BorderRadius.circular(15),
+//                             border: Border.all(color: primaryColor, width: 2),
+//                           ),
+//                           child: Row(
+//                             children: [
+//                               const CircleAvatar(
+//                                 backgroundImage:
+//                                     NetworkImage(placeholderImageUrl),
+//                               ),
+//                               SizedBox(width: getScreenheight(context) * 0.02),
+//                               Expanded(
+//                                 child: Column(
+//                                   crossAxisAlignment: CrossAxisAlignment.start,
+//                                   children: [
+//                                     Text(
+//                                       user.name,
+//                                       style: TextStyle(
+//                                         color: primaryColor,
+//                                         fontWeight: FontWeight.bold,
+//                                       ),
+//                                     ),
+//                                     Text(
+//                                       'Role: ${user.role}',
+//                                       style: TextStyle(color: primaryColor),
+//                                     ),
+//                                   ],
+//                                 ),
+//                               ),
+//                               Padding(
+//                                 padding:
+//                                     const EdgeInsets.symmetric(horizontal: 10),
+//                                 child: Consumer(
+//                                   builder: (context, ref, _) {
+//                                     final userRoleAsyncValue =
+//                                         ref.watch(userRoleProvider);
+//                                     return userRoleAsyncValue.when(
+//                                       data: (role) {
+//                                         if (role == 'User') {
+//                                           return const SizedBox.shrink();
+//                                         } else {
+//                                           return PopupMenuButton<int>(
+//                                             icon: const Icon(Icons.more_vert),
+//                                             color: Colors.white,
+//                                             surfaceTintColor: Colors.white,
+//                                             position: PopupMenuPosition.under,
+//                                             shape: RoundedRectangleBorder(
+//                                               borderRadius:
+//                                                   BorderRadius.circular(15)
+//                                                       .copyWith(
+//                                                 topRight:
+//                                                     const Radius.circular(0),
+//                                               ),
+//                                             ),
+//                                             onSelected: (value) async {
+//                                               switch (value) {
+//                                                 case 1:
+//                                                   ref
+//                                                       .read(
+//                                                           promoteUserToAdminProvider)
+//                                                       .promote(businessId,
+//                                                           user.userId, context);
+//                                                   break;
+//                                                 case 2:
+//                                                   ref
+//                                                       .read(
+//                                                           promoteUserToMiniAdminProvider)
+//                                                       .promote(businessId,
+//                                                           user.userId, context);
+//                                                   break;
+//                                                 case 3:
+//                                                   ref
+//                                                       .read(demoteUserProvider)
+//                                                       .demoteUser(businessId,
+//                                                           user.userId, context);
+//                                                   break;
+//                                                 case 4:
+//                                                   ref
+//                                                       .read(removeUserProvider)
+//                                                       .removeUser(businessId,
+//                                                           user.userId);
+//                                                   break;
+//                                                 case 5:
+//                                                   // Change Manager functionality
+//                                                   _showManagerSelectionDialog(
+//                                                       context,
+//                                                       user.userId,
+//                                                       businessId!);
+//                                                   break;
+//                                               }
+//                                             },
+//                                             itemBuilder:
+//                                                 (BuildContext context) =>
+//                                                     <PopupMenuEntry<int>>[
+//                                               PopupMenuItem<int>(
+//                                                 value: 1,
+//                                                 child: Text(
+//                                                   'Promote to Admin',
+//                                                   style: TextStyle(
+//                                                       color: primaryColor),
+//                                                 ),
+//                                               ),
+//                                               PopupMenuItem<int>(
+//                                                 value: 2,
+//                                                 child: Text(
+//                                                   'Promote to MiniAdmin',
+//                                                   style: TextStyle(
+//                                                       color: primaryColor),
+//                                                 ),
+//                                               ),
+//                                               PopupMenuItem<int>(
+//                                                 value: 3,
+//                                                 child: Text(
+//                                                   'Demote to User',
+//                                                   style: TextStyle(
+//                                                       color: primaryColor),
+//                                                 ),
+//                                               ),
+//                                               PopupMenuItem<int>(
+//                                                 value: 4,
+//                                                 child: Text(
+//                                                   'Remove User',
+//                                                   style: TextStyle(
+//                                                       color: primaryColor),
+//                                                 ),
+//                                               ),
+//                                               PopupMenuItem<int>(
+//                                                 value: 5,
+//                                                 child: Text(
+//                                                   'Change Manager',
+//                                                   style: TextStyle(
+//                                                       color: primaryColor),
+//                                                 ),
+//                                               ),
+//                                             ],
+//                                           );
+//                                         }
+//                                       },
+//                                       loading: () => const SizedBox.shrink(),
+//                                       error: (error, stack) =>
+//                                           const SizedBox.shrink(),
+//                                     );
+//                                   },
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         ),
+//                       );
+//                     },
+//                   ),
+//                 ),
+//                 loading: () => const Center(child: CircularProgressIndicator()),
+//                 error: (error, stackTrace) =>
+//                     Center(child: Text('Error: $error')),
+//               ),
+//             ],
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+
+//   Future<void> _showManagerSelectionDialog(
+//       BuildContext context, String userId, String businessId) async {
+//     final newManager = await showDialog<String>(
+//       context: context,
+//       builder: (context) => ManagerSelectionDialog(
+//         businessId: businessId,
+//         userId: userId,
+//         changeManagerCallback: (success) {
+//           if (success) {
+//             ScaffoldMessenger.of(context).showSnackBar(
+//               const SnackBar(content: Text('Manager Changed successfully')),
+//             );
+//           }
+//         },
+//       ),
+//     );
+//   }
+// }
+
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:flutter_svg/svg.dart';
+// import 'package:targafy/business_home_page/controller/business_controller.dart';
+// import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
+// import 'package:targafy/core/constants/colors.dart';
+// import 'package:targafy/core/constants/dimensions.dart';
+// import 'package:share/share.dart';
+// import 'package:targafy/src/groups/ui/groups_screen.dart';
+// import 'package:targafy/src/home/view/screens/controller/notification_counter_controller.dart';
+// import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
+// import 'package:targafy/src/users/UserBusinessProfile.dart';
+// import 'package:targafy/src/users/ui/RequestUsersScreen.dart';
+// import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
+// import 'package:targafy/src/users/ui/controller/change_mangager_controller.dart';
+// import 'package:targafy/src/users/ui/controller/demote_user.dart';
+// import 'package:targafy/src/users/ui/controller/promote_to_MiniAdmin.dart';
+// import 'package:targafy/src/users/ui/controller/promote_to_admin.dart';
+// import 'package:targafy/src/users/ui/controller/remove_user_controller.dart';
+// import 'package:targafy/src/users/ui/widget/change_manager_dialog.dart';
+// import 'package:targafy/src/users/ui/widget/user_hierarchy_view.dart';
+// import 'package:badges/badges.dart' as badges;
+
+// class UsersScreen extends ConsumerStatefulWidget {
+//   const UsersScreen({super.key});
+
+//   @override
+//   _UsersScreenState createState() => _UsersScreenState();
+// }
+
+// class _UsersScreenState extends ConsumerState<UsersScreen> {
+//   @override
+//   Widget build(BuildContext context) {
+//     final selectedBusinessData = ref.watch(currentBusinessProvider);
+//     final selectedBusiness = selectedBusinessData?['business'] as Business?;
+//     final selectedbusinessCode =
+//         selectedBusinessData?['businessCode'] as String?;
+//     final businessName = selectedBusiness?.name;
+//     final businessId = selectedBusiness?.id;
+//     print(businessId);
+
+//     double height = MediaQuery.of(context).size.height;
+//     double width = MediaQuery.of(context).size.width;
+
+//     final usersStream2 =
+//         ref.watch(businessUsersStreamProvider2(businessId ?? ''));
+
+//     final notificationCountersAsyncValue =
+//         ref.read(notificationCountersProvider);
+
+//     // Check the notification counters state
+//     final acceptCounter = notificationCountersAsyncValue.maybeWhen(
+//       data: (counters) => counters.acceptCounter,
+//       orElse: () => 0, // Default to 0 if counters are not available or error
+//     );
+
+//     const placeholderImageUrl =
+//         'https://randomuser.me/api/portraits/lego/2.jpg';
+
+//     return Scaffold(
+//       body: Padding(
+//         padding: const EdgeInsets.all(8.0),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.stretch,
+//           children: [
+//             if (businessId == null)
+//               Center(
+//                 child: Text(
+//                   'Please select a business',
+//                   style: TextStyle(
+//                     fontSize: 20,
+//                     fontWeight: FontWeight.bold,
+//                     color: Colors.red,
+//                   ),
+//                 ),
+//               )
+//             else ...[
+//               SingleChildScrollView(
+//                 scrollDirection: Axis.horizontal,
+//                 child: Row(
+//                   children: [
+//                     const SizedBox(width: 10),
+//                     ElevatedButton(
+//                       onPressed: () {
+//                         String shareText = 'Dear User,\n\n'
+//                             'We invite you to download our app via the following link: '
+//                             'Please download the app from: https://play.google.com/store/apps/details?id=com.terabiz.targafy\n\n'
+//                             'And then join our business using code: $selectedbusinessCode\n\n'
+//                             'Best regards,\n'
+//                             '$businessName Team';
+//                         Share.share(shareText,
+//                             subject: 'Join our business on BizIssue');
+//                       },
+//                       style: ElevatedButton.styleFrom(
+//                         padding: const EdgeInsets.symmetric(
+//                             vertical: 10, horizontal: 16),
+//                         backgroundColor: lightblue,
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(15),
+//                           side: BorderSide(color: primaryColor, width: 2),
+//                         ),
+//                       ),
+//                       child: Text(
+//                         'Invite Users',
+//                         style: TextStyle(color: primaryColor),
+//                       ),
+//                     ),
+//                     const SizedBox(width: 10),
+//                     GestureDetector(
+//                       onTap: () {
+//                         Navigator.of(context).push(MaterialPageRoute(
+//                             builder: (context) =>
+//                                 UserHierarchy(businessId: businessId)));
+//                       },
+//                       child: Container(
+//                         padding: const EdgeInsets.all(5),
+//                         decoration: BoxDecoration(
+//                           color: primaryColor.withOpacity(0.8),
+//                           borderRadius: BorderRadius.circular(50),
+//                         ),
+//                         child: SvgPicture.asset(
+//                           "assets/svgs/hierarchy.svg",
+//                           semanticsLabel: 'Acme Logo',
+//                           height: 25,
+//                           width: width * 0.1,
+//                           color: Colors.white,
+//                         ),
+//                       ),
+//                     ),
+//                     const SizedBox(width: 10),
+//                     ElevatedButton(
+//                       onPressed: () {
+//                         Navigator.push(
+//                           context,
+//                           MaterialPageRoute(
+//                             builder: (context) =>
+//                                 BusinessRequestsPage(businessId: businessId),
+//                           ),
+//                         );
+//                       },
+//                       style: ElevatedButton.styleFrom(
+//                         padding: const EdgeInsets.symmetric(
+//                             vertical: 10, horizontal: 16),
+//                         backgroundColor: lightblue,
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(15),
+//                           side: BorderSide(color: primaryColor, width: 2),
+//                         ),
+//                       ),
+//                       child: acceptCounter > 0
+//                           ? badges.Badge(
+//                               badgeContent: Text(
+//                                 '$acceptCounter',
+//                                 style: TextStyle(color: Colors.white),
+//                               ),
+//                               child: Text(
+//                                 'Accept Users',
+//                                 style: TextStyle(color: primaryColor),
+//                               ),
+//                             )
+//                           : Text(
+//                               'Accept Users',
+//                               style: TextStyle(color: primaryColor),
+//                             ),
+//                     ),
+//                     const SizedBox(width: 10),
+//                     ElevatedButton(
+//                       onPressed: () {
+//                         Navigator.push(
+//                           context,
+//                           MaterialPageRoute(
+//                             builder: (context) => const GroupScreen(),
+//                           ),
+//                         );
+//                       },
+//                       style: ElevatedButton.styleFrom(
+//                         padding: const EdgeInsets.symmetric(
+//                             vertical: 10, horizontal: 16),
+//                         backgroundColor: lightblue,
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(15),
+//                           side: BorderSide(color: primaryColor, width: 2),
+//                         ),
+//                       ),
+//                       child: Text(
+//                         'Group',
+//                         style: TextStyle(color: primaryColor),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//               SizedBox(height: getScreenheight(context) * 0.03),
+//               usersStream2.when(
+//                 data: (users) => Expanded(
+//                   child: ListView.separated(
+//                     itemCount: users.length,
+//                     separatorBuilder: (context, index) =>
+//                         SizedBox(height: getScreenheight(context) * 0.016),
+//                     itemBuilder: (context, index) {
+//                       final user = users[index];
+//                       final roleShortForm = _getRoleShortForm(user.role);
+
+//                       return GestureDetector(
+//                         onTap: () {
+//                           Navigator.push(
+//                             context,
+//                             MaterialPageRoute(
+//                               builder: (context) =>
+//                                   UserBusinessProfilePage(userId: user.userId),
+//                             ),
+//                           );
+//                         },
+//                         child: Container(
+//                           padding: const EdgeInsets.all(10),
+//                           decoration: BoxDecoration(
+//                             borderRadius: BorderRadius.circular(15),
+//                             border: Border.all(color: primaryColor, width: 2),
+//                           ),
+//                           child: Row(
+//                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                             children: [
+//                               const CircleAvatar(
+//                                 backgroundImage:
+//                                     NetworkImage(placeholderImageUrl),
+//                               ),
+//                               SizedBox(width: getScreenheight(context) * 0.02),
+//                               Expanded(
+//                                 child: Column(
+//                                   crossAxisAlignment: CrossAxisAlignment.start,
+//                                   children: [
+//                                     Text(
+//                                       '${user.name} ($roleShortForm)',
+//                                       style: TextStyle(
+//                                         color: primaryColor,
+//                                         fontWeight: FontWeight.bold,
+//                                       ),
+//                                     ),
+//                                   ],
+//                                 ),
+//                               ),
+//                               Padding(
+//                                 padding:
+//                                     const EdgeInsets.symmetric(horizontal: 10),
+//                                 child: Consumer(
+//                                   builder: (context, ref, _) {
+//                                     final userRoleAsyncValue =
+//                                         ref.watch(userRoleProvider);
+//                                     return userRoleAsyncValue.when(
+//                                       data: (role) {
+//                                         if (role == 'User') {
+//                                           return const SizedBox.shrink();
+//                                         } else {
+//                                           return PopupMenuButton<int>(
+//                                             icon: const Icon(Icons.more_vert),
+//                                             color: Colors.white,
+//                                             surfaceTintColor: Colors.white,
+//                                             position: PopupMenuPosition.under,
+//                                             shape: RoundedRectangleBorder(
+//                                               borderRadius:
+//                                                   BorderRadius.circular(15)
+//                                                       .copyWith(
+//                                                 topRight:
+//                                                     const Radius.circular(0),
+//                                               ),
+//                                             ),
+//                                             onSelected: (value) async {
+//                                               switch (value) {
+//                                                 case 1:
+//                                                   ref
+//                                                       .read(
+//                                                           promoteUserToAdminProvider)
+//                                                       .promote(businessId,
+//                                                           user.userId, context);
+//                                                   break;
+//                                                 case 2:
+//                                                   ref
+//                                                       .read(
+//                                                           promoteUserToMiniAdminProvider)
+//                                                       .promote(businessId,
+//                                                           user.userId, context);
+//                                                   break;
+//                                                 case 3:
+//                                                   ref
+//                                                       .read(demoteUserProvider)
+//                                                       .demoteUser(businessId,
+//                                                           user.userId, context);
+//                                                 case 4:
+//                                                   ref
+//                                                       .read(removeUserProvider)
+//                                                       .removeUser(businessId,
+//                                                           user.userId);
+//                                                   break;
+//                                                 case 5:
+//                                                   // Change Manager functionality
+//                                                   _showManagerSelectionDialog(
+//                                                       context,
+//                                                       user.userId,
+//                                                       businessId!);
+//                                                   break;
+//                                               }
+//                                             },
+//                                             itemBuilder:
+//                                                 (BuildContext context) =>
+//                                                     <PopupMenuEntry<int>>[
+//                                               PopupMenuItem<int>(
+//                                                 value: 1,
+//                                                 child: Text(
+//                                                   'Promote to Admin',
+//                                                   style: TextStyle(
+//                                                       color: primaryColor),
+//                                                 ),
+//                                               ),
+//                                               PopupMenuItem<int>(
+//                                                 value: 2,
+//                                                 child: Text(
+//                                                   'Promote to MiniAdmin',
+//                                                   style: TextStyle(
+//                                                       color: primaryColor),
+//                                                 ),
+//                                               ),
+//                                               PopupMenuItem<int>(
+//                                                 value: 3,
+//                                                 child: Text(
+//                                                   'Demote to User',
+//                                                   style: TextStyle(
+//                                                       color: primaryColor),
+//                                                 ),
+//                                               ),
+//                                               PopupMenuItem<int>(
+//                                                 value: 4,
+//                                                 child: Text(
+//                                                   'Remove User',
+//                                                   style: TextStyle(
+//                                                       color: primaryColor),
+//                                                 ),
+//                                               ),
+//                                               PopupMenuItem<int>(
+//                                                 value: 5,
+//                                                 child: Text(
+//                                                   'Change Manager',
+//                                                   style: TextStyle(
+//                                                       color: primaryColor),
+//                                                 ),
+//                                               ),
+//                                             ],
+//                                           );
+//                                         }
+//                                       },
+//                                       loading: () => const SizedBox.shrink(),
+//                                       error: (error, stack) =>
+//                                           const SizedBox.shrink(),
+//                                     );
+//                                   },
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         ),
+//                       );
+//                     },
+//                   ),
+//                 ),
+//                 loading: () => const Center(child: CircularProgressIndicator()),
+//                 error: (error, stackTrace) =>
+//                     Center(child: Text('Error: $error')),
+//               ),
+//             ],
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+
+//   String _getRoleShortForm(String role) {
+//     switch (role) {
+//       case 'Admin':
+//         return 'A';
+//       case 'MiniAdmin':
+//         return 'MA';
+//       case 'User':
+//         return 'U';
+//       default:
+//         return '';
+//     }
+//   }
+
+//   Future<void> _showManagerSelectionDialog(
+//       BuildContext context, String userId, String businessId) async {
+//     final newManager = await showDialog<String>(
+//       context: context,
+//       builder: (context) => ManagerSelectionDialog(
+//         businessId: businessId,
+//         userId: userId,
+//         changeManagerCallback: (success) {
+//           if (success) {
+//             ScaffoldMessenger.of(context).showSnackBar(
+//               const SnackBar(content: Text('Manager Changed successfully')),
+//             );
+//           }
+//         },
+//       ),
+//     );
+//   }
+// }
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:share/share.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
-import 'package:share/share.dart';
 import 'package:targafy/src/groups/ui/groups_screen.dart';
 import 'package:targafy/src/home/view/screens/controller/notification_counter_controller.dart';
-import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
 import 'package:targafy/src/users/UserBusinessProfile.dart';
 import 'package:targafy/src/users/ui/RequestUsersScreen.dart';
 import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
@@ -810,7 +1637,6 @@ import 'package:targafy/src/users/ui/controller/promote_to_admin.dart';
 import 'package:targafy/src/users/ui/controller/remove_user_controller.dart';
 import 'package:targafy/src/users/ui/widget/change_manager_dialog.dart';
 import 'package:targafy/src/users/ui/widget/user_hierarchy_view.dart';
-import 'package:badges/badges.dart' as badges;
 
 class UsersScreen extends ConsumerStatefulWidget {
   const UsersScreen({super.key});
@@ -839,10 +1665,9 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
     final notificationCountersAsyncValue =
         ref.read(notificationCountersProvider);
 
-    // Check the notification counters state
     final acceptCounter = notificationCountersAsyncValue.maybeWhen(
       data: (counters) => counters.acceptCounter,
-      orElse: () => 0, // Default to 0 if counters are not available or error
+      orElse: () => 0,
     );
 
     const placeholderImageUrl =
@@ -919,32 +1744,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    // ElevatedButton(
-                    //   onPressed: () {
-                    //     Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //         builder: (context) =>
-                    //             BusinessRequestsPage(businessId: businessId),
-                    //       ),
-                    //     );
-                    //   },
-                    //   style: ElevatedButton.styleFrom(
-                    //     padding: const EdgeInsets.symmetric(
-                    //         vertical: 10, horizontal: 16),
-                    //     backgroundColor: lightblue,
-                    //     shape: RoundedRectangleBorder(
-                    //       borderRadius: BorderRadius.circular(15),
-                    //       side: BorderSide(color: primaryColor, width: 2),
-                    //     ),
-                    //   ),
-                    //   child: Text(
-                    //     'Accept Users',
-                    //     style: TextStyle(color: primaryColor),
-                    //   ),
-                    // ),
-
-                          ElevatedButton(
+                    ElevatedButton(
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -979,7 +1779,6 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                               style: TextStyle(color: primaryColor),
                             ),
                     ),
-
                     const SizedBox(width: 10),
                     ElevatedButton(
                       onPressed: () {
@@ -1044,134 +1843,103 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      user.name,
+                                      '${user.name} (${_getRoleShortForm(user.role)})',
                                       style: TextStyle(
                                         color: primaryColor,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    Text(
-                                      'Role: ${user.role}',
-                                      style: TextStyle(color: primaryColor),
-                                    ),
                                   ],
                                 ),
                               ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                child: Consumer(
-                                  builder: (context, ref, _) {
-                                    final userRoleAsyncValue =
-                                        ref.watch(userRoleProvider);
-                                    return userRoleAsyncValue.when(
-                                      data: (role) {
-                                        if (role == 'User') {
-                                          return const SizedBox.shrink();
-                                        } else {
-                                          return PopupMenuButton<int>(
-                                            icon: const Icon(Icons.more_vert),
-                                            color: Colors.white,
-                                            surfaceTintColor: Colors.white,
-                                            position: PopupMenuPosition.under,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(15)
-                                                      .copyWith(
-                                                topRight:
-                                                    const Radius.circular(0),
-                                              ),
-                                            ),
-                                            onSelected: (value) async {
-                                              switch (value) {
-                                                case 1:
-                                                  ref
-                                                      .read(
-                                                          promoteUserToAdminProvider)
-                                                      .promote(businessId,
-                                                          user.userId, context);
-                                                  break;
-                                                case 2:
-                                                  ref
-                                                      .read(
-                                                          promoteUserToMiniAdminProvider)
-                                                      .promote(businessId,
-                                                          user.userId, context);
-                                                  break;
-                                                case 3:
-                                                  ref
-                                                      .read(demoteUserProvider)
-                                                      .demoteUser(businessId,
-                                                          user.userId, context);
-                                                  break;
-                                                case 4:
-                                                  ref
-                                                      .read(removeUserProvider)
-                                                      .removeUser(businessId,
-                                                          user.userId);
-                                                  break;
-                                                case 5:
-                                                  // Change Manager functionality
-                                                  _showManagerSelectionDialog(
-                                                      context,
-                                                      user.userId,
-                                                      businessId!);
-                                                  break;
-                                              }
-                                            },
-                                            itemBuilder:
-                                                (BuildContext context) =>
-                                                    <PopupMenuEntry<int>>[
-                                              PopupMenuItem<int>(
-                                                value: 1,
-                                                child: Text(
-                                                  'Promote to Admin',
-                                                  style: TextStyle(
-                                                      color: primaryColor),
-                                                ),
-                                              ),
-                                              PopupMenuItem<int>(
-                                                value: 2,
-                                                child: Text(
-                                                  'Promote to MiniAdmin',
-                                                  style: TextStyle(
-                                                      color: primaryColor),
-                                                ),
-                                              ),
-                                              PopupMenuItem<int>(
-                                                value: 3,
-                                                child: Text(
-                                                  'Demote to User',
-                                                  style: TextStyle(
-                                                      color: primaryColor),
-                                                ),
-                                              ),
-                                              PopupMenuItem<int>(
-                                                value: 4,
-                                                child: Text(
-                                                  'Remove User',
-                                                  style: TextStyle(
-                                                      color: primaryColor),
-                                                ),
-                                              ),
-                                              PopupMenuItem<int>(
-                                                value: 5,
-                                                child: Text(
-                                                  'Change Manager',
-                                                  style: TextStyle(
-                                                      color: primaryColor),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        }
-                                      },
-                                      loading: () => const SizedBox.shrink(),
-                                      error: (error, stack) =>
-                                          const SizedBox.shrink(),
-                                    );
-                                  },
+                              PopupMenuButton<int>(
+                                icon: const Icon(Icons.more_vert),
+                                color: Colors.white,
+                                surfaceTintColor: Colors.white,
+                                position: PopupMenuPosition.under,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(15).copyWith(
+                                    topRight: const Radius.circular(0),
+                                  ),
                                 ),
+                                onSelected: (value) async {
+                                  switch (value) {
+                                    case 1:
+                                      ref
+                                          .read(promoteUserToAdminProvider)
+                                          .promote(
+                                            businessId,
+                                            user.userId,
+                                            context,
+                                          );
+                                      break;
+                                    case 2:
+                                      ref
+                                          .read(promoteUserToMiniAdminProvider)
+                                          .promote(
+                                            businessId,
+                                            user.userId,
+                                            context,
+                                          );
+                                      break;
+                                    case 3:
+                                      ref.read(demoteUserProvider).demoteUser(
+                                          businessId, user.userId, context);
+                                      break;
+                                    case 4:
+                                      ref.read(removeUserProvider).removeUser(
+                                            businessId,
+                                            user.userId,
+                                          );
+                                      break;
+                                    case 5:
+                                      _showManagerSelectionDialog(
+                                        context,
+                                        user.userId,
+                                        businessId!,
+                                      );
+                                      break;
+                                  }
+                                },
+                                itemBuilder: (BuildContext context) =>
+                                    <PopupMenuEntry<int>>[
+                                  PopupMenuItem<int>(
+                                    value: 1,
+                                    child: Text(
+                                      'Promote to Admin',
+                                      style: TextStyle(color: primaryColor),
+                                    ),
+                                  ),
+                                  PopupMenuItem<int>(
+                                    value: 2,
+                                    child: Text(
+                                      'Promote to MiniAdmin',
+                                      style: TextStyle(color: primaryColor),
+                                    ),
+                                  ),
+                                  PopupMenuItem<int>(
+                                    value: 3,
+                                    child: Text(
+                                      'Demote to User',
+                                      style: TextStyle(color: primaryColor),
+                                    ),
+                                  ),
+                                  PopupMenuItem<int>(
+                                    value: 4,
+                                    child: Text(
+                                      'Remove User',
+                                      style: TextStyle(color: primaryColor),
+                                    ),
+                                  ),
+                                  PopupMenuItem<int>(
+                                    value: 5,
+                                    child: Text(
+                                      'Change Manager',
+                                      style: TextStyle(color: primaryColor),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -1189,6 +1957,19 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
         ),
       ),
     );
+  }
+
+  String _getRoleShortForm(String role) {
+    switch (role) {
+      case 'Admin':
+        return 'A';
+      case 'MiniAdmin':
+        return 'MA';
+      case 'User':
+        return 'U';
+      default:
+        return '';
+    }
   }
 
   Future<void> _showManagerSelectionDialog(

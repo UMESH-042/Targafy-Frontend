@@ -920,7 +920,7 @@ class CustomChart extends StatelessWidget {
           dataSource: formattedActualData,
           xValueMapper: (data, _) => DateTime.parse(data[0].toString()),
           yValueMapper: (data, _) => double.parse(data[1].toString()),
-          name: 'Achievement $parameter',
+          name: 'Achievement',
           dataLabelSettings: const DataLabelSettings(isVisible: true),
           color: Colors.red,
         ),
@@ -928,7 +928,7 @@ class CustomChart extends StatelessWidget {
           dataSource: formattedPredictedData,
           xValueMapper: (data, _) => DateTime.parse(data[0].toString()),
           yValueMapper: (data, _) => double.parse(data[1].toString()),
-          name: 'Target $parameter',
+          name: 'Target',
           dataLabelSettings: DataLabelSettings(
             isVisible: true,
             labelPosition: ChartDataLabelPosition.inside,
