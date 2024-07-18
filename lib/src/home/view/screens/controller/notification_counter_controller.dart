@@ -10,10 +10,10 @@ class NotificationCounters {
   final int totalNotification;
 
   NotificationCounters({
-     this.acceptCounter=0,
-     this.activityCounter=0,
-    this.notificationCounter=0,
-     this.totalNotification=0,
+    this.acceptCounter = 0,
+    this.activityCounter = 0,
+    this.notificationCounter = 0,
+    this.totalNotification = 0,
   });
 
   factory NotificationCounters.fromJson(Map<String, dynamic> json) {
@@ -30,7 +30,6 @@ class NotificationCounters {
 class NotificationCountersNotifier
     extends StateNotifier<AsyncValue<NotificationCounters>> {
   NotificationCountersNotifier() : super(const AsyncLoading());
-  
 
   Future<void> fetchNotificationCounters(
       String token, String businessId) async {
@@ -84,4 +83,81 @@ class NotificationCountersNotifier
 final notificationCountersProvider = StateNotifierProvider<
     NotificationCountersNotifier, AsyncValue<NotificationCounters>>(
   (ref) => NotificationCountersNotifier(),
+);
+
+// Define a model for the notification counters
+class NotificationCounters1 {
+  final int acceptCounter;
+  final int activityCounter;
+  final int notificationCounter;
+  final int totalNotification;
+
+  NotificationCounters1({
+    this.acceptCounter = 0,
+    this.activityCounter = 0,
+    this.notificationCounter = 0,
+    this.totalNotification = 0,
+  });
+
+  factory NotificationCounters1.fromJson(Map<String, dynamic> json) {
+    return NotificationCounters1(
+      acceptCounter: json['acceptCounter'],
+      activityCounter: json['activityCounter'],
+      notificationCounter: json['notificationCounter'],
+      totalNotification: json['totalNotification'],
+    );
+  }
+}
+
+// Define a state notifier to manage the notification counters state
+class NotificationCountersNotifier1
+    extends StateNotifier<Map<String, AsyncValue<NotificationCounters1>>> {
+  NotificationCountersNotifier1() : super({});
+
+  Future<void> fetchNotificationCounters(
+      String token, String businessId) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            'http://13.234.163.59/api/v1/notification/get-notification-counters/$businessId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body)['data'];
+        final counters = NotificationCounters1.fromJson(data);
+        state = {
+          ...state,
+          businessId: AsyncValue.data(counters),
+        };
+      } else {
+        state = {
+          ...state,
+          businessId: AsyncValue.error(
+              'Failed to fetch notification counters', StackTrace.current),
+        };
+      }
+    } catch (e) {
+      state = {
+        ...state,
+        businessId: AsyncValue.error(e, StackTrace.current),
+      };
+    }
+  }
+
+  Future<void> fetchTotalNotificationsForBusinesses(
+      String token, List<String> businessIds) async {
+    for (final businessId in businessIds) {
+      await fetchNotificationCounters(token, businessId);
+    }
+  }
+}
+
+// Define a provider for the notification counters state notifier
+final notificationCountersProvider1 = StateNotifierProvider<
+    NotificationCountersNotifier1,
+    Map<String, AsyncValue<NotificationCounters1>>>(
+  (ref) => NotificationCountersNotifier1(),
 );

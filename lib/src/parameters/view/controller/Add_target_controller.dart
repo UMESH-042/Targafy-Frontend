@@ -33,14 +33,10 @@ class UserNotifier extends StateNotifier<AsyncValue<List<User>>> {
       state = AsyncValue.error(e, StackTrace.current);
     }
   }
-
 }
-
 
 class UserNotifier1 extends StateNotifier<AsyncValue<List<User>>> {
   UserNotifier1() : super(const AsyncValue.loading());
-
-  
 
   Future<void> fetchFilteredUsers(
       String businessId, String paramName, String monthIndex) async {
@@ -78,6 +74,7 @@ class UserNotifier1 extends StateNotifier<AsyncValue<List<User>>> {
     }
   }
 }
+
 // Target Notifier
 class TargetNotifier extends StateNotifier<AsyncValue<void>> {
   TargetNotifier() : super(const AsyncValue.data(null));
@@ -110,7 +107,6 @@ final userProvider =
     StateNotifierProvider<UserNotifier, AsyncValue<List<User>>>((ref) {
   return UserNotifier();
 });
-
 
 final userProvider1 =
     StateNotifierProvider<UserNotifier1, AsyncValue<List<User>>>((ref) {

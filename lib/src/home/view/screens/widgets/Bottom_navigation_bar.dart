@@ -286,7 +286,7 @@ class _BottomNavigationAndAppBarState
     final selectedbusinessCode =
         selectedBusinessData?['businessCode'] as String?;
     final selectedRole = selectedBusinessData?['role'] as String?;
-    print(selectedbusinessCode);
+    // print(selectedbusinessCode);
 
     final businessName = selectedBusiness?.name;
     String? businessId = selectedBusiness?.id;
@@ -455,13 +455,19 @@ class _BottomNavigationAndAppBarState
               }
               return asyncValue.when(
                 data: (data) {
-                  print('this is the :-$data');
+                  // print('this is the :-$data');
 
                   // final businesses = data['businesses'] as List<Business>?;
                   final businesses =
                       (data?['businesses'] as List<Business>?) ?? [];
-                  print(businesses);
                   final user = data?['user'] as User?;
+
+                  final notificationCountersMap =
+                      ref.watch(notificationCountersProvider1);
+                  ref
+                      .read(notificationCountersProvider1.notifier)
+                      .fetchTotalNotificationsForBusinesses(
+                          widget.token!, businesses.map((b) => b.id).toList());
 
                   return Column(
                     children: [
@@ -566,7 +572,8 @@ class _BottomNavigationAndAppBarState
                                 orElse: () => BusinessUser(
                                     name: '', userType: '', businessId: ''),
                               );
-
+                              final counters =
+                                  notificationCountersMap[business.id];
                               return ListTile(
                                 leading: business.logo != null
                                     ? CachedNetworkImage(
@@ -582,6 +589,28 @@ class _BottomNavigationAndAppBarState
                                       )
                                     : const Icon(Icons.business),
                                 title: Text(business.name ?? 'No Name'),
+                                trailing: counters?.when(
+                                  data: (c) {
+                                    if (c.totalNotification > 0) {
+                                      return badges.Badge(
+                                        badgeContent: Text(
+                                          c.totalNotification.toString(),
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      );
+                                    } else {
+                                      return null; // Don't display anything if the counter is zero
+                                    }
+                                  },
+                                  loading: () => const SizedBox(
+                                    height: 24.0,
+                                    width: 24.0,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2.0),
+                                  ),
+                                  error: (error, stack) =>
+                                      const Icon(Icons.error),
+                                ),
                                 onTap: () {
                                   if (businessUser != null) {
                                     selectBusiness(
