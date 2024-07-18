@@ -10,10 +10,10 @@ class NotificationCounters {
   final int totalNotification;
 
   NotificationCounters({
-    required this.acceptCounter,
-    required this.activityCounter,
-    required this.notificationCounter,
-    required this.totalNotification,
+     this.acceptCounter=0,
+     this.activityCounter=0,
+    this.notificationCounter=0,
+     this.totalNotification=0,
   });
 
   factory NotificationCounters.fromJson(Map<String, dynamic> json) {
@@ -30,6 +30,7 @@ class NotificationCounters {
 class NotificationCountersNotifier
     extends StateNotifier<AsyncValue<NotificationCounters>> {
   NotificationCountersNotifier() : super(const AsyncLoading());
+  
 
   Future<void> fetchNotificationCounters(
       String token, String businessId) async {
@@ -42,6 +43,7 @@ class NotificationCountersNotifier
         },
       );
       // print(response.statusCode);
+      // print(response.body);
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['data'];
         final counters = NotificationCounters.fromJson(data);
@@ -55,7 +57,7 @@ class NotificationCountersNotifier
     }
   }
 
-    // Function to fetch notification counters for a list of business IDs
+  // Function to fetch notification counters for a list of business IDs
   // Future<void> fetchTotalNotificationsForBusinesses(String token, List<String> businessIds) async {
   //   try {
   //     for (final businessId in businessIds) {
@@ -63,7 +65,7 @@ class NotificationCountersNotifier
   //         Uri.parse('http://13.234.163.59/api/v1/notification/get-notification-counters/$businessId'),
   //         headers: {'Authorization': 'Bearer $token'},
   //       );
-        
+
   //       if (response.statusCode == 200) {
   //         final data = json.decode(response.body)['data'];
   //         final counters = NotificationCounters.fromJson(data);
@@ -76,7 +78,6 @@ class NotificationCountersNotifier
   //     // Handle error if needed
   //   }
   // }
-
 }
 
 // Define a provider for the notification counters state notifier

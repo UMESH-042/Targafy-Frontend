@@ -850,16 +850,18 @@ class _BottomNavigationAndAppBarState
             ),
           ),
           notificationCountersAsyncValue.when(
-            data: (counters) => counters.notificationCounter > 0
-                ? badges.Badge(
-                    badgeContent: Text(
-                      counters.notificationCounter.toString(),
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    child: Icon(Icons.notifications,
-                        size: 30, color: Colors.white),
-                  )
-                : Icon(Icons.notifications, size: 30, color: Colors.white),
+            data: (counters) {
+              return counters.notificationCounter > 0
+                  ? badges.Badge(
+                      badgeContent: Text(
+                        counters.notificationCounter.toString(),
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      child: Icon(Icons.notifications,
+                          size: 30, color: Colors.white),
+                    )
+                  : Icon(Icons.notifications, size: 30, color: Colors.white);
+            },
             loading: () =>
                 Icon(Icons.notifications, size: 30, color: Colors.white),
             error: (error, stack) =>

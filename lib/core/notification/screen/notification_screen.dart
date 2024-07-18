@@ -370,11 +370,13 @@ class NotificationPage extends ConsumerWidget {
             );
           }
 
+          // Sort notifications by createdDate in descending order
+          notification.sort((a, b) => b.createdDate.compareTo(a.createdDate));
+
           Map<DateTime, List<NotificationModel>> groupedActivities =
               _groupActivitiesByDate(notification);
 
           return ListView.builder(
-            reverse: true,
             itemCount: groupedActivities.length,
             itemBuilder: (context, index) {
               DateTime date = groupedActivities.keys.elementAt(index);

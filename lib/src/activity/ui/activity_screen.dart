@@ -14,6 +14,7 @@ class ActivityScreen extends ConsumerWidget {
   const ActivityScreen({
     super.key,
   });
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedBusinessData = ref.watch(currentBusinessProvider);
@@ -62,11 +63,13 @@ class ActivityScreen extends ConsumerWidget {
             );
           }
 
+          // Sort activities by createdDate in descending order
+          activities.sort((a, b) => b.createdDate.compareTo(a.createdDate));
+
           Map<DateTime, List<ActivityModel>> groupedActivities =
               _groupActivitiesByDate(activities);
 
           return ListView.builder(
-            reverse: true,
             itemCount: groupedActivities.length,
             itemBuilder: (context, index) {
               DateTime date = groupedActivities.keys.elementAt(index);
@@ -130,39 +133,23 @@ class ActivityScreen extends ConsumerWidget {
     return groupedActivities;
   }
 
-  // String _formatDate(DateTime dateTimeFromServer) {
-  //   DateTime localDateTime = dateTimeFromServer.toLocal();
-  //   final now = DateTime.now();
-  //   final today = DateTime(now.year, now.month, now.day);
-  //   final yesterday = DateTime(now.year, now.month, now.day - 1);
-
-  //   if (localDateTime.day == today.day &&
-  //       localDateTime.month == today.month &&
-  //       localDateTime.year == today.year) {
-  //     return "Today";
-  //   } else if (localDateTime.day == yesterday.day &&
-  //       localDateTime.month == yesterday.month &&
-  //       localDateTime.year == yesterday.year) {
-  //     return 'Yesterday';
-  //   } else {
-  //     return DateFormat('dd/MM/yy').format(localDateTime);
-  //   }
-  // }
   String _formatDate(DateTime dateTimeFromServer) {
+    DateTime localDateTime = dateTimeFromServer.toLocal();
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = DateTime(now.year, now.month, now.day - 1);
 
-    if (dateTimeFromServer.day == today.day &&
-        dateTimeFromServer.month == today.month &&
-        dateTimeFromServer.year == today.year) {
+    if (localDateTime.day == today.day &&
+        localDateTime.month == today.month &&
+        localDateTime.year == today.year) {
       return "Today";
-    } else if (dateTimeFromServer.day == yesterday.day &&
-        dateTimeFromServer.month == yesterday.month &&
-        dateTimeFromServer.year == yesterday.year) {
+    } else if (localDateTime.day == yesterday.day &&
+        localDateTime.month == yesterday.month &&
+        localDateTime.year == yesterday.year) {
       return 'Yesterday';
     } else {
-      return DateFormat('dd/MM/yy').format(dateTimeFromServer);
+      return DateFormat('dd/MM/yy').format(localDateTime);
     }
   }
 }

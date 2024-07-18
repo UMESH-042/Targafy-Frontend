@@ -143,7 +143,7 @@ class UserBusinessProfilePage extends ConsumerWidget {
               const Divider(),
               _buildKeyValuePair("Rating", user.totalRating.toString()),
               _buildKeyValuePair("Contact Number", user.contactNumber),
-              _buildKeyValuePair("User Type", user.userType),
+              // _buildKeyValuePair("User Type", user.userType),
               _buildKeyValuePair("Role", user.role),
               _buildKeyValuePair("Last Seen", user.lastSeen),
               // Add more fields as needed

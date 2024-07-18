@@ -19,7 +19,7 @@ class ActivityService {
         'Authorization': 'Bearer $token',
       },
     );
-
+    print(response.body);
     if (response.statusCode == 200) {
       final List activitiesJson =
           jsonDecode(response.body)['data']['activities'];

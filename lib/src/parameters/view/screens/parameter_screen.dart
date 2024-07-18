@@ -728,6 +728,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:targafy/src/parameters/view/model/user_target_model.dart';
 import 'package:targafy/utils/remote_routes.dart';
+import 'package:targafy/widgets/sort_dropdown_list.dart';
 import 'package:targafy/widgets/submit_button.dart';
 
 // Define the domain for API requests
@@ -780,6 +781,7 @@ class _ParameterScreenState extends ConsumerState<ParameterScreen> {
   final List<String> _selectedUserIds = [];
   final List<String> _selectedUsersNames = [];
   String? _selectedUserId;
+  bool _isAllSelected = false;
 
   @override
   void initState() {
@@ -796,6 +798,19 @@ class _ParameterScreenState extends ConsumerState<ParameterScreen> {
   }
 
   Widget _buildChips() {
+    if (_isAllSelected) {
+      return InputChip(
+        label: const Text("All Selected"),
+        onDeleted: () {
+          setState(() {
+            _isAllSelected = false;
+            _selectedUserIds.clear();
+            _selectedUsersNames.clear();
+          });
+        },
+      );
+    }
+
     if (_selectedUsersNames.isEmpty) {
       return const SizedBox
           .shrink(); // Return an empty widget if there are no selected users
@@ -887,8 +902,9 @@ class _ParameterScreenState extends ConsumerState<ParameterScreen> {
                                 return !assignedUsers.any((assignedUser) =>
                                     assignedUser.userId == user.userId);
                               }).toList();
-
-                              if (filteredUsers.isEmpty) {
+                              final sortedUserList =
+                                  sortList(filteredUsers, (user) => user.name);
+                              if (sortedUserList.isEmpty) {
                                 return Center(
                                   child: Text(
                                     'No users available to assign',
@@ -922,21 +938,41 @@ class _ParameterScreenState extends ConsumerState<ParameterScreen> {
                                       elevation: 16,
                                       style: TextStyle(color: primaryColor),
                                       underline: SizedBox.shrink(),
-                                      items: filteredUsers.map((user) {
-                                        return DropdownMenuItem<String>(
-                                          value: user.userId,
-                                          child: Text(user.name),
-                                        );
-                                      }).toList(),
+                                      items: [
+                                        const DropdownMenuItem<String>(
+                                          value: 'all',
+                                          child: Text('Select All'),
+                                        ),
+                                        ...sortedUserList.map((user) {
+                                          return DropdownMenuItem<String>(
+                                            value: user.userId,
+                                            child: Text(user.name),
+                                          );
+                                        }).toList(),
+                                      ],
                                       onChanged: (value) {
                                         setState(() {
-                                          if (value != null &&
+                                          if (value == 'all') {
+                                            _isAllSelected = true;
+                                            _selectedUserId = null;
+                                            _selectedUserIds.clear();
+                                            _selectedUsersNames.clear();
+                                            _selectedUserIds.addAll(
+                                                sortedUserList
+                                                    .map((user) => user.userId)
+                                                    .toList());
+                                            _selectedUsersNames.addAll(
+                                                sortedUserList
+                                                    .map((user) => user.name)
+                                                    .toList());
+                                          } else if (value != null &&
                                               !_selectedUserIds
                                                   .contains(value)) {
+                                            _isAllSelected = false;
                                             _selectedUserId = value;
                                             _selectedUserIds.add(value);
                                             _selectedUsersNames.add(
-                                                filteredUsers
+                                                sortedUserList
                                                     .firstWhere((user) =>
                                                         user.userId == value)
                                                     .name);
