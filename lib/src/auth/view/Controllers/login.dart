@@ -173,17 +173,18 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
   Future<void> _storeAuthToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
-    final expiryTime =
-        DateTime.now().add(const Duration(days: 1)).millisecondsSinceEpoch;
+    // final expiryTime =
+    // DateTime.now().add(const Duration(days: 1)).millisecondsSinceEpoch;
     await prefs.setString('authToken', token);
-    await prefs.setInt('expiryTime', expiryTime);
+    // await prefs.setInt('expiryTime', expiryTime);
     print('new auth token has been set- $token');
   }
 
   Future<bool> _isAuthTokenValid() async {
-    final prefs = await SharedPreferences.getInstance();
-    final expiryTime = prefs.getInt('expiryTime') ?? 0;
-    return DateTime.now().millisecondsSinceEpoch < expiryTime;
+    // final prefs = await SharedPreferences.getInstance();
+    // final expiryTime = prefs.getInt('expiryTime') ?? 0;
+    // return DateTime.now().millisecondsSinceEpoch < expiryTime;
+    return true;
   }
 
   Future<void> checkAndUpdateAuthToken(BuildContext context) async {

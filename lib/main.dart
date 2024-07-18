@@ -206,19 +206,16 @@ RemoteMessage createRemoteMessageFromData(Map<String, dynamic> data) {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: firebaseOptions);
-    
+
   MessagingSocketService.init();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   final token = await SharedPreferenceService().getAuthToken();
   bool hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
-  final expiryTime = prefs.getInt('expiryTime') ?? 0;
-  final isTokenValid = DateTime.now().millisecondsSinceEpoch < expiryTime;
-  print(token);
 
+  final isTokenValid = true;
+  print(token);
 
   runApp(ProviderScope(
       child: MyApp(
