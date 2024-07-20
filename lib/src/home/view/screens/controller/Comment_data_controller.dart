@@ -79,15 +79,16 @@ class CommentDetail {
   final String todaysComment;
   final String addedBy;
   final String date;
+  final String time;
 
   CommentDetail(
-      {required this.todaysComment, required this.addedBy, required this.date});
+      {required this.todaysComment, required this.addedBy, required this.date,required this.time});
 
   factory CommentDetail.fromJson(Map<String, dynamic> json) {
     return CommentDetail(
       todaysComment: json['todaysComment'],
       addedBy: json['addedBy'],
-      date: json['date'],
+      date: json['date'], time: json['time'],
     );
   }
 }

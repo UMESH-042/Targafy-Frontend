@@ -936,8 +936,14 @@ class CustomChart extends StatelessWidget {
             builder: (dynamic data, dynamic point, dynamic series,
                 int pointIndex, int seriesIndex) {
               if (pointIndex == formattedPredictedData.length - 1) {
-                return Text(point.y.toStringAsFixed(2),
-                    style: TextStyle(color: Colors.black));
+                // return Text(point.y.toStringAsFixed(2),
+                //     style: TextStyle(color: Colors.black));
+                double value = point.y;
+                // Format the label text based on value
+                String labelText = value >= 100
+                    ? value.toStringAsFixed(0)
+                    : value.toStringAsFixed(2);
+                return Text(labelText, style: TextStyle(color: Colors.black));
               }
               return SizedBox.shrink();
             },

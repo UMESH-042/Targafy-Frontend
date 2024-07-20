@@ -67,6 +67,7 @@ class _BottomNavigationAndAppBarState
   late final List<Widget> _widgetOptions;
   bool _isRefreshing = false;
   late IO.Socket socket;
+  bool flag = false;
 
   String _appVersion = '';
 
@@ -105,6 +106,27 @@ class _BottomNavigationAndAppBarState
       if (user != null) {
         MessagingSocketService.initSocket(user.id, context);
         print('socket service called for this userId : ${user.id}');
+      } else {
+        print('User data is not available');
+      }
+    } catch (error) {
+      // Handle any errors that occur during the fetch process
+      print('Error fetching user data: $error');
+    }
+  }
+
+  void _initializeSocketLastSeen(String businessId) async {
+    try {
+      final asyncValue =
+          await ref.read(businessAndUserProvider(widget.token!).future);
+
+      final user = asyncValue?['user'] as User?;
+
+      if (user != null && businessId != null) {
+        // MessagingSocketService.initSocket(user.id, context);
+        lastseenSocketService.initSocket(user.id, businessId, context);
+        print(
+            'socket service called for this userId : ${user.id} and businessId :- $businessId');
       } else {
         print('User data is not available');
       }
@@ -296,6 +318,10 @@ class _BottomNavigationAndAppBarState
     if (businessId != null) {
       _fetchCounters(businessId);
     }
+    if (businessId != null && flag == false) {
+      _initializeSocketLastSeen(businessId);
+      flag = true;
+    }
     print(businessId);
     final notificationCountersAsyncValue =
         ref.read(notificationCountersProvider);
@@ -481,7 +507,7 @@ class _BottomNavigationAndAppBarState
                         alignment: Alignment.topRight,
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
-                          child: Text("1.0.1"),
+                          child: Text("1.0.2"),
                         ),
                       ),
                       DrawerHeader(
@@ -616,12 +642,16 @@ class _BottomNavigationAndAppBarState
                                 ),
                                 onTap: () {
                                   if (businessUser != null) {
+                                    lastseenSocketService.disconnectSocket();
                                     selectBusiness(
                                         business,
                                         businessUser.userType ?? 'No User Type',
                                         business.businessCode ?? 'No Code',
                                         ref);
                                     Navigator.pop(context); // Close the drawer
+                                    setState(() {
+                                      flag = false;
+                                    });
                                   }
                                 },
                               );

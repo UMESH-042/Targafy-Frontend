@@ -933,8 +933,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                               'https://randomuser.me/api/portraits/lego/2.jpg', // Replace with actual profile image URL
                                           message: commentDetail.todaysComment,
                                           sender: commentDetail.addedBy,
-                                          timestamp: DateTime.parse(
-                                              commentDetail.date),
+                                          timestamp: commentDetail.time,
                                           dateAdded: DateTime.parse(entry.date),
                                         );
                                       }).toList(),
@@ -1382,8 +1381,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             'https://randomuser.me/api/portraits/lego/2.jpg', // Replace with actual profile image URL
                                         message: commentDetail.todaysComment,
                                         sender: commentDetail.addedBy,
-                                        timestamp:
-                                            DateTime.parse(commentDetail.date),
+                                        timestamp: commentDetail.time,
                                         dateAdded: DateTime.parse(entry.date),
                                       );
                                     }).toList(),

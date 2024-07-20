@@ -241,3 +241,60 @@ class MessagingSocketService {
     }
   }
 }
+
+class lastseenSocketService {
+  static late IO.Socket socket;
+
+  static void initSocket(
+      String userId, String businessId, BuildContext context) {
+    print('This is the Userid :- $userId');
+
+    final username = "${userId}_${businessId}";
+    print('This is username $username');
+    // Accept BuildContext as parameter
+    socket = IO.io(
+      'http://13.234.163.59/business/activity',
+      <String, dynamic>{
+        'transports': ['websocket'],
+        'autoConnect': false,
+      },
+    );
+
+    socket.connect();
+    socket.onConnect((_) {
+      debugPrint('connected');
+      print('connected');
+      socket.emit("business-user-joined", username);
+      print(
+          'business-user-joined event emitted with userId: $userId and businessId : $businessId');
+    });
+
+    // socket.on('receive-message', (data) {
+    //   print("###This data is received : $data");
+    //   debugPrint("###This data is received : $data");
+    // });
+
+    socket.onConnectError((error) {
+      print('Connect error: $error');
+      debugPrint('Connect error: $error');
+    });
+
+    socket.onError((error) {
+      print('Error: $error');
+      debugPrint('Error: $error');
+    });
+
+    socket.onDisconnect((_) {
+      print('Socket disconnected');
+      debugPrint('Socket disconnected');
+    });
+  }
+
+  static void disconnectSocket() {
+    if (socket.connected) {
+      socket.disconnect();
+      print('Socket disconnected manually');
+      debugPrint('Socket disconnected manually');
+    }
+  }
+}

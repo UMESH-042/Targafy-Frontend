@@ -2133,9 +2133,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
       for (final userId in selectedUserIds) {
         if (userTargetData.containsKey(userId)) {
           // Check if the user target is being edited
-          if (isEditing.containsKey(userId) && isEditing[userId]!) {
-            // Handle saving logic for edited targets
-            // Example: Read from state or controllers to get new target values
+          if (isEditing.containsKey(userId)) {
             updatedTargets.add({
               'userId': userId,
               'newTargetValue': userTargetData[userId]![0].targetValue,
@@ -2172,16 +2170,20 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
       if (value == null || value == '') {
         return '0';
       }
-      if (value is int) {
+      if (value is int || value is double) {
         if (value >= 1000) {
-          return '${(value / 1000).toStringAsFixed(0)}k';
+          return '${(value / 1000).toStringAsFixed(1)}k';
         } else {
-          return '$value';
+          return value.toStringAsFixed(0);
         }
       } else if (value is String) {
-        int intValue = int.tryParse(value) ?? 0;
-        if (intValue >= 1000) {
-          return '${(intValue / 1000).toStringAsFixed(0)}k';
+        double? doubleValue = double.tryParse(value);
+        if (doubleValue != null) {
+          if (doubleValue >= 1000) {
+            return '${(doubleValue / 1000).toStringAsFixed(1)}k';
+          } else {
+            return doubleValue.toStringAsFixed(0);
+          }
         } else {
           return value;
         }

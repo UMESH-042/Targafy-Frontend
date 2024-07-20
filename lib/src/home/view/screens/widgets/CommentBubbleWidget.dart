@@ -87,7 +87,7 @@ class CommentBubble extends StatelessWidget {
   final String profileImage;
   final String message;
   final String sender;
-  final DateTime timestamp;
+  final String timestamp;
   final DateTime dateAdded; // New field for the date when the comment was added
 
   const CommentBubble({
@@ -102,6 +102,9 @@ class CommentBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isMe = sender ==
         'my_user_id'; // Change this to your logic for checking the sender
+
+    final parsedTime = DateFormat('HH:mm:ss').parse(timestamp);
+    final formattedTime = DateFormat('h:mm a').format(parsedTime);
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -155,7 +158,7 @@ class CommentBubble extends StatelessWidget {
                     ),
                     SizedBox(height: 5),
                     Text(
-                      DateFormat('h:mm a').format(timestamp),
+                      formattedTime,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey,

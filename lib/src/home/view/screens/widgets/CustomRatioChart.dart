@@ -1841,12 +1841,15 @@ class CustomRatioChart extends StatelessWidget {
     for (var date in actualMap.keys) {
       if (predictedMap.containsKey(date)) {
         double ratio = actualMap[date]! / predictedMap[date]!;
+
         if (ratio.isNaN || ratio.isInfinite) {
           continue;
         }
+
         if (ratio < 2) {
           ratio = ratio * 100;
         }
+
         ratioData.add([date, ratio.toStringAsFixed(0)]);
       }
     }
@@ -1909,6 +1912,9 @@ class CustomRatioChart extends StatelessWidget {
     double minValue = double.infinity;
     for (var entry in data) {
       double value = double.parse(entry[1].toString());
+      if (value.isFinite) {
+        minValue = value;
+      }
       if (value < minValue) {
         minValue = value;
       }
@@ -1920,6 +1926,9 @@ class CustomRatioChart extends StatelessWidget {
     double maxValue = double.negativeInfinity;
     for (var entry in data) {
       double value = double.parse(entry[1].toString());
+      if (value.isFinite) {
+        maxValue = value;
+      }
       if (value > maxValue) {
         maxValue = value;
       }
@@ -1939,6 +1948,12 @@ class CustomRatioChart extends StatelessWidget {
   }
 
   double _calculateYAxisInterval(double minValue, double maxValue) {
+    if (minValue.isNaN ||
+        maxValue.isNaN ||
+        minValue.isInfinite ||
+        maxValue.isInfinite) {
+      return 1.0;
+    }
     int range = (maxValue - minValue).ceil();
     int interval = (range / 5).ceil();
     if (interval <= 0) {

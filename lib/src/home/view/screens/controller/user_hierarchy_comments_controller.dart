@@ -71,11 +71,13 @@ class TodaysComment {
   final String todaysComment;
   final String addedBy;
   final String date;
+  final String time;
 
   TodaysComment({
     required this.todaysComment,
     required this.addedBy,
     required this.date,
+    required this.time,
   });
 
   factory TodaysComment.fromJson(Map<String, dynamic> json) {
@@ -83,6 +85,7 @@ class TodaysComment {
       todaysComment: json['todaysComment'] ?? '',
       addedBy: json['addedBy'] ?? '',
       date: json['date'] ?? '',
+      time: json['time']??'',
     );
   }
 }
