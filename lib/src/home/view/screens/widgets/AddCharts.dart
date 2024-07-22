@@ -442,6 +442,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:targafy/core/constants/colors.dart';
+import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/src/home/view/screens/controller/add_charts_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/get_drop_downfield_pair.dart';
 import 'package:targafy/src/home/view/screens/home_screen.dart';
@@ -828,6 +829,173 @@ class ParamPairWidget extends StatelessWidget {
                   .toList(),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class AddChartsMainPage extends ConsumerStatefulWidget {
+  final String? businessId;
+  const AddChartsMainPage({
+    Key? key,
+    required this.businessId,
+  }) : super(key: key);
+
+  @override
+  ConsumerState<AddChartsMainPage> createState() => _AddChartsMainPageState();
+}
+
+class _AddChartsMainPageState extends ConsumerState<AddChartsMainPage> {
+  List<DropdownFieldPair> dropdownPairs = [];
+  List<ParamPair> fetchedDropdownPairs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchParamPairs();
+  }
+
+  Future<void> fetchParamPairs() async {
+    try {
+      final paramPairs = await ref.read(paramPairsProvider.future);
+
+      setState(() {
+        fetchedDropdownPairs = paramPairs
+            .map((paramPair) => ParamPair(
+                  firstSelectedItem: paramPair.firstSelectedItem,
+                  secondSelectedItem: paramPair.secondSelectedItem,
+                  values: paramPair.values,
+                ))
+            .toList();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to fetch param pairs: $e')),
+      );
+    }
+  }
+
+  void addNewDropdownPair() {
+    setState(() {
+      dropdownPairs.add(DropdownFieldPair());
+    });
+  }
+
+  void deleteDropdownPair(int index) {
+    setState(() {
+      dropdownPairs.removeAt(index);
+    });
+  }
+
+  void onFirstItemSelected(int index, String selectedItem) {
+    setState(() {
+      dropdownPairs[index].firstSelectedItem = selectedItem;
+    });
+  }
+
+  void onSecondItemSelected(int index, String selectedItem) {
+    setState(() {
+      dropdownPairs[index].secondSelectedItem = selectedItem;
+    });
+  }
+
+  void onBenchmarkChanged(int index, int benchmarkIndex, String value) {
+    setState(() {
+      dropdownPairs[index].benchMarks[benchmarkIndex] = value;
+    });
+  }
+
+  void addBenchmark(int index) {
+    setState(() {
+      dropdownPairs[index].benchMarks.add('');
+      dropdownPairs[index].controllers.add(TextEditingController());
+    });
+  }
+
+  void removeBenchmark(int index, int benchmarkIndex) {
+    setState(() {
+      dropdownPairs[index].benchMarks.removeAt(benchmarkIndex);
+      dropdownPairs[index].controllers.removeAt(benchmarkIndex);
+    });
+  }
+
+  Future<void> savePairs() async {
+    try {
+      await ref
+          .read(addChartsControllerProvider)
+          .savePairs(widget.businessId!, dropdownPairs);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Pairs saved successfully')),
+      );
+      setState(() {
+        dropdownPairs.clear();
+      });
+      // ref.read(paramPairsProvider.future);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save pairs: $e')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(height: getScreenheight(context) * 0.03),
+          Expanded(
+            child: ListView.builder(
+              itemCount: dropdownPairs.length,
+              itemBuilder: (context, index) {
+                return DropdownPairWidget(
+                  pair: dropdownPairs[index],
+                  index: index,
+                  onFirstItemSelected: onFirstItemSelected,
+                  onSecondItemSelected: onSecondItemSelected,
+                  onBenchmarkChanged: onBenchmarkChanged,
+                  onAddBenchmark: addBenchmark,
+                  onRemoveBenchmark: removeBenchmark,
+                  onDeletePressed: () => deleteDropdownPair(index),
+                );
+              },
+            ),
+          ),
+          Center(
+            child: Text(
+              'Previous Added Data',
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: fetchedDropdownPairs.length,
+              itemBuilder: (context, index) {
+                return ParamPairWidget(
+                  paramPair: fetchedDropdownPairs[index],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryColor,
+        onPressed: addNewDropdownPair,
+        tooltip: 'Add New Pair',
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: CustomSmallButton(
+          onPressed: savePairs,
+          title: 'Save',
         ),
       ),
     );
