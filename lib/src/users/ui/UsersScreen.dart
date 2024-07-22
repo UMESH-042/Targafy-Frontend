@@ -1616,6 +1616,7 @@
 //   }
 // }
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -1636,6 +1637,7 @@ import 'package:targafy/src/users/ui/controller/demote_user.dart';
 import 'package:targafy/src/users/ui/controller/promote_to_MiniAdmin.dart';
 import 'package:targafy/src/users/ui/controller/promote_to_admin.dart';
 import 'package:targafy/src/users/ui/controller/remove_user_controller.dart';
+import 'package:targafy/src/users/ui/controller/useravatar_controller.dart';
 import 'package:targafy/src/users/ui/widget/change_manager_dialog.dart';
 import 'package:targafy/src/users/ui/widget/user_hierarchy_view.dart';
 
@@ -1862,9 +1864,37 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                           ),
                           child: Row(
                             children: [
-                              const CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage(placeholderImageUrl),
+                              Consumer(
+                                builder: (context, ref, _) {
+                                  final avatarUrlAsyncValue = ref.watch(userAvatarProvider(user.userId));
+                                  return avatarUrlAsyncValue.when(
+                                    data: (avatarUrl) {
+                                      return CachedNetworkImage(
+                                        imageUrl: avatarUrl,
+                                        placeholder: (context, url) => CircleAvatar(
+                                          backgroundImage: NetworkImage(placeholderImageUrl),
+                                          radius: 20,
+                                        ),
+                                        errorWidget: (context, url, error) => CircleAvatar(
+                                          backgroundImage: NetworkImage(placeholderImageUrl),
+                                          radius: 20,
+                                        ),
+                                        imageBuilder: (context, imageProvider) => CircleAvatar(
+                                          backgroundImage: imageProvider,
+                                          radius: 20,
+                                        ),
+                                      );
+                                    },
+                                    loading: () => CircleAvatar(
+                                      backgroundImage: NetworkImage(placeholderImageUrl),
+                                      radius: 20,
+                                    ),
+                                    error: (error, stack) => CircleAvatar(
+                                      backgroundImage: NetworkImage(placeholderImageUrl),
+                                      radius: 20,
+                                    ),
+                                  );
+                                },
                               ),
                               SizedBox(width: getScreenheight(context) * 0.02),
                               Expanded(

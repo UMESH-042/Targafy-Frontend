@@ -22,7 +22,7 @@ class BusinessController
 
     try {
       final response = await http.get(
-        Uri.parse('${domain}business/get-user-hierarchy/$businessId'),
+        Uri.parse('${domain}business/get-sub-hierarchy/$businessId'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -39,6 +39,3 @@ class BusinessController
     }
   }
 }
-
-
-

@@ -821,7 +821,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           error: (error, stackTrace) => Center(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
-                              children: [
+                              children: [ 
                                 Lottie.asset(
                                     'assets/animations/empty_list.json',
                                     height: 200,

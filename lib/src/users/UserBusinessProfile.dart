@@ -719,6 +719,7 @@
 // }
 
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -729,6 +730,7 @@ import 'package:targafy/src/parameters/view/widgets/TargetCard.dart';
 import 'package:targafy/src/parameters/view/widgets/small_button.dart';
 import 'package:targafy/src/users/ui/controller/user_business_profile_controller.dart';
 import 'package:targafy/src/services/shared_preference_service.dart';
+import 'package:targafy/src/users/ui/controller/useravatar_controller.dart';
 import 'package:targafy/utils/remote_routes.dart';
 import 'package:intl/intl.dart';
 import 'package:targafy/src/parameters/view/model/target_data_model.dart';
@@ -819,10 +821,13 @@ class _UserBusinessProfilePageState
   Widget build(BuildContext context) {
     final selectedBusinessData = ref.read(currentBusinessProvider);
     final businessId = selectedBusinessData?['business']?.id;
+    const placeholderImageUrl =
+        'https://randomuser.me/api/portraits/lego/2.jpg';
 
     return Consumer(builder: (context, watch, child) {
       final userAsyncValue = ref.watch(userProvider(widget.userId));
       final userRoleAsyncValue = ref.watch(userRoleProvider);
+      final userAvatarAsyncValue = ref.watch(userAvatarProvider(widget.userId));
 
       return userRoleAsyncValue.when(
         data: (role) {
@@ -838,10 +843,34 @@ class _UserBusinessProfilePageState
                   userAsyncValue.when(
                     data: (user) => Column(
                       children: [
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundImage: AssetImage(
-                              'assets/images/user_avatar.png'), // Replace with the actual image if available
+                        userAvatarAsyncValue.when(
+                          data: (avatarUrl) => CachedNetworkImage(
+                            imageUrl: avatarUrl,
+                            imageBuilder: (context, imageProvider) =>
+                                CircleAvatar(
+                              radius: 50,
+                              backgroundImage: imageProvider,
+                            ),
+                            placeholder: (context, url) => const CircleAvatar(
+                              radius: 50,
+                              backgroundImage:
+                                  NetworkImage(placeholderImageUrl),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                const CircleAvatar(
+                              radius: 50,
+                              backgroundImage:
+                                  NetworkImage(placeholderImageUrl),
+                            ),
+                          ),
+                          loading: () => const CircleAvatar(
+                            radius: 50,
+                            backgroundImage: NetworkImage(placeholderImageUrl),
+                          ),
+                          error: (error, stackTrace) => const CircleAvatar(
+                            radius: 50,
+                            backgroundImage: NetworkImage(placeholderImageUrl),
+                          ),
                         ),
                         const SizedBox(height: 16),
                         Text(
