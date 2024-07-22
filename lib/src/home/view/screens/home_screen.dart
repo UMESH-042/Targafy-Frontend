@@ -190,8 +190,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     selectedUser = '';
     selectedUserId = '';
     selectedHierarchyUser = false;
+    currentPath = [];
+    selectedItemsByRow = {};
+    _isRefreshing = false;
+    dropdownPairs = [];
     // loadSavedPairs();
     // _getToken();
+  }
+
+  @override
+  void dispose() {
+    // Dispose variables here if necessary
+    selectedStates = [];
+    selectedParameter = '';
+    selectedUser = '';
+    selectedUserId = '';
+    currentPath = [];
+    selectedItemsByRow = {};
+    _isRefreshing = false;
+    selectedHierarchyUser = false;
+    dropdownPairs = [];
+    super.dispose();
   }
 
   static const List<String> images = [
@@ -233,6 +252,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
+//   void _handleNodeTap(String nodeName, String nodeId,
+//       Map<String, List<String>> parentIdToChildren) {
+//     setState(() {
+//       if (currentPath.contains(nodeId)) {
+//         _removeDescendants(nodeId, parentIdToChildren);
+//         selectedUserId = currentPath.isNotEmpty ? currentPath.last : '';
+//         selectedHierarchyUser = currentPath.isNotEmpty;
+//       } else {
+//         final parent = parentIdToChildren.entries
+//             .firstWhere(
+//               (entry) => entry.value.contains(nodeId),
+//               orElse: () => MapEntry('', []),
+//             )
+//             .key;
+
+//         // Unselect the previously selected node in the same row
+//         if (parent.isNotEmpty) {
+//           parentIdToChildren[parent]?.forEach((child) {
+//             currentPath.remove(child);
+//           });
+//         }
+
+//         selectedUserId = nodeId;
+//         currentPath.add(nodeId);
+//         selectedHierarchyUser = true;
+//       }
+//     });
+//   }
+
+// // Function to remove descendants of a node
+//   void _removeDescendants(
+//       String nodeId, Map<String, List<String>> parentIdToChildren) {
+//     final nodesToRemove = _getDescendants(nodeId, parentIdToChildren);
+//     currentPath.removeWhere((id) => nodesToRemove.contains(id));
+//     currentPath.remove(nodeId);
+//   }
+
+//   List<String> _getDescendants(
+//       String nodeId, Map<String, List<String>> parentIdToChildren) {
+//     final List<String> descendants = [];
+//     void addDescendants(String id) {
+//       if (parentIdToChildren.containsKey(id)) {
+//         parentIdToChildren[id]!.forEach((childId) {
+//           descendants.add(childId);
+//           addDescendants(childId);
+//         });
+//       }
+//     }
+
+//     addDescendants(nodeId);
+//     return descendants;
+//   }
   void _handleNodeTap(String nodeName, String nodeId,
       Map<String, List<String>> parentIdToChildren) {
     setState(() {
@@ -262,7 +333,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
-// Function to remove descendants of a node
   void _removeDescendants(
       String nodeId, Map<String, List<String>> parentIdToChildren) {
     final nodesToRemove = _getDescendants(nodeId, parentIdToChildren);
@@ -430,6 +500,115 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           child: Text('No Parameters Added'),
                         ),
                       ),
+                      // if (selectedParameter.isNotEmpty)
+                      //   hierarchyAsync.when(
+                      //     data: (hierarchy) {
+                      //       final nodes = hierarchy.nodes;
+                      //       final edges = hierarchy.edges;
+
+                      //       final Map<String, String> nodeIdToLabel =
+                      //           Map.fromEntries(
+                      //         nodes.map(
+                      //             (node) => MapEntry(node.id, node.label.name)),
+                      //       );
+
+                      //       final Map<String, List<String>> parentIdToChildren =
+                      //           {};
+
+                      //       for (var edge in edges) {
+                      //         parentIdToChildren.putIfAbsent(
+                      //             edge.from, () => []);
+                      //         parentIdToChildren[edge.from]!.add(edge.to);
+                      //       }
+
+                      //       return Container(
+                      //         alignment:
+                      //             Alignment.centerLeft, // Align to the left
+                      //         margin: EdgeInsets.symmetric(
+                      //           horizontal:
+                      //               MediaQuery.of(context).size.width * 0.02,
+                      //         ).copyWith(
+                      //           top: MediaQuery.of(context).size.height * 0.005,
+                      //         ),
+                      //         child: Column(
+                      //           crossAxisAlignment: CrossAxisAlignment.start,
+                      //           children: [
+                      //             SingleChildScrollView(
+                      //               scrollDirection: Axis.horizontal,
+                      //               child: Row(
+                      //                 mainAxisAlignment:
+                      //                     MainAxisAlignment.start,
+                      //                 children: [
+                      //                   SelectableSubGroupWidget(
+                      //                     text: nodes[0].label.name.isNotEmpty
+                      //                         ? nodes[0].label.name
+                      //                         : '-',
+                      //                     isSelected:
+                      //                         currentPath.contains(nodes[0].id),
+                      //                     onTap: () => _handleNodeTap(
+                      //                         nodes[0].label.name,
+                      //                         nodes[0].id,
+                      //                         parentIdToChildren),
+                      //                   ),
+                      //                 ],
+                      //               ),
+                      //             ),
+                      //             ...currentPath.map((parentId) {
+                      //               final children =
+                      //                   parentIdToChildren[parentId] ?? [];
+                      //               return Padding(
+                      //                 padding: EdgeInsets.only(
+                      //                     top: MediaQuery.of(context)
+                      //                             .size
+                      //                             .height *
+                      //                         0.005),
+                      //                 child: SingleChildScrollView(
+                      //                   scrollDirection: Axis.horizontal,
+                      //                   child: Row(
+                      //                     mainAxisAlignment:
+                      //                         MainAxisAlignment.start,
+                      //                     children: children.map((childId) {
+                      //                       return SelectableSubGroupWidget(
+                      //                         text:
+                      //                             nodeIdToLabel[childId] ?? '',
+                      //                         isSelected:
+                      //                             currentPath.contains(childId),
+                      //                         onTap: () => _handleNodeTap(
+                      //                             nodeIdToLabel[childId]!,
+                      //                             childId,
+                      //                             parentIdToChildren),
+                      //                       );
+                      //                     }).toList(),
+                      //                   ),
+                      //                 ),
+                      //               );
+                      //             }).toList(),
+                      //           ],
+                      //         ),
+                      //       );
+                      //     },
+                      //     loading: () =>
+                      //         const Center(child: CircularProgressIndicator()),
+                      //     error: (error, stackTrace) => Center(
+                      //       child: Column(
+                      //         mainAxisSize: MainAxisSize.min,
+                      //         children: [
+                      //           Lottie.asset(
+                      //               'assets/animations/empty_list.json',
+                      //               height: 200,
+                      //               width: 200),
+                      //           const Text(
+                      //             "Nothing to display",
+                      //             style: TextStyle(
+                      //               color: Colors.grey,
+                      //               fontSize: 14,
+                      //               fontWeight: FontWeight.w600,
+                      //             ),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ),
+                      //   ),
                       if (selectedParameter.isNotEmpty)
                         hierarchyAsync.when(
                           data: (hierarchy) {
@@ -450,6 +629,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   edge.from, () => []);
                               parentIdToChildren[edge.from]!.add(edge.to);
                             }
+
+                            bool isRootSelected =
+                                currentPath.contains(nodes[0].id);
 
                             return Container(
                               alignment:
@@ -483,36 +665,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       ],
                                     ),
                                   ),
-                                  ...currentPath.map((parentId) {
-                                    final children =
-                                        parentIdToChildren[parentId] ?? [];
-                                    return Padding(
-                                      padding: EdgeInsets.only(
-                                          top: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.005),
-                                      child: SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: children.map((childId) {
-                                            return SelectableSubGroupWidget(
-                                              text:
-                                                  nodeIdToLabel[childId] ?? '',
-                                              isSelected:
-                                                  currentPath.contains(childId),
-                                              onTap: () => _handleNodeTap(
-                                                  nodeIdToLabel[childId]!,
-                                                  childId,
-                                                  parentIdToChildren),
-                                            );
-                                          }).toList(),
+                                  if (isRootSelected)
+                                    ...currentPath.map((parentId) {
+                                      final children =
+                                          parentIdToChildren[parentId] ?? [];
+                                      return Padding(
+                                        padding: EdgeInsets.only(
+                                            top: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.005),
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: children.map((childId) {
+                                              return SelectableSubGroupWidget(
+                                                text: nodeIdToLabel[childId] ??
+                                                    '',
+                                                isSelected: currentPath
+                                                    .contains(childId),
+                                                onTap: () => _handleNodeTap(
+                                                    nodeIdToLabel[childId]!,
+                                                    childId,
+                                                    parentIdToChildren),
+                                              );
+                                            }).toList(),
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  }).toList(),
+                                      );
+                                    }).toList(),
                                 ],
                               ),
                             );
