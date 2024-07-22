@@ -1723,86 +1723,114 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                UserHierarchy(businessId: businessId)));
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: primaryColor.withOpacity(0.8),
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: SvgPicture.asset(
-                          "assets/svgs/hierarchy.svg",
-                          semanticsLabel: 'Acme Logo',
-                          height: 25,
-                          width: width * 0.1,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                BusinessRequestsPage(businessId: businessId),
-                          ),
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final userRoleAsyncValue = ref.watch(userRoleProvider);
+                        return userRoleAsyncValue.when(
+                          data: (role) {
+                            if (role == 'Admin' || role == 'MiniAdmin') {
+                              return Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  UserHierarchy(
+                                                      businessId: businessId)));
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        color: primaryColor.withOpacity(0.8),
+                                        borderRadius: BorderRadius.circular(50),
+                                      ),
+                                      child: SvgPicture.asset(
+                                        "assets/svgs/hierarchy.svg",
+                                        semanticsLabel: 'Acme Logo',
+                                        height: 25,
+                                        width: width * 0.1,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              BusinessRequestsPage(
+                                                  businessId: businessId),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 16),
+                                      backgroundColor: lightblue,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                        side: BorderSide(
+                                            color: primaryColor, width: 2),
+                                      ),
+                                    ),
+                                    child: acceptCounter > 0
+                                        ? badges.Badge(
+                                            badgeContent: Text(
+                                              '$acceptCounter',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            child: Text(
+                                              'Accept Users',
+                                              style: TextStyle(
+                                                  color: primaryColor),
+                                            ),
+                                          )
+                                        : Text(
+                                            'Accept Users',
+                                            style:
+                                                TextStyle(color: primaryColor),
+                                          ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const GroupScreen(),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 16),
+                                      backgroundColor: lightblue,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                        side: BorderSide(
+                                            color: primaryColor, width: 2),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Group',
+                                      style: TextStyle(color: primaryColor),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            } else {
+                              return const SizedBox.shrink();
+                            }
+                          },
+                          loading: () => const SizedBox.shrink(),
+                          error: (error, stack) => const SizedBox.shrink(),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 16),
-                        backgroundColor: lightblue,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          side: BorderSide(color: primaryColor, width: 2),
-                        ),
-                      ),
-                      child: acceptCounter > 0
-                          ? badges.Badge(
-                              badgeContent: Text(
-                                '$acceptCounter',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              child: Text(
-                                'Accept Users',
-                                style: TextStyle(color: primaryColor),
-                              ),
-                            )
-                          : Text(
-                              'Accept Users',
-                              style: TextStyle(color: primaryColor),
-                            ),
-                    ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const GroupScreen(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 16),
-                        backgroundColor: lightblue,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          side: BorderSide(color: primaryColor, width: 2),
-                        ),
-                      ),
-                      child: Text(
-                        'Group',
-                        style: TextStyle(color: primaryColor),
-                      ),
                     ),
                   ],
                 ),
@@ -1896,6 +1924,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                                                     .read(demoteUserProvider)
                                                     .demoteUser(businessId,
                                                         user.userId, context);
+                                                break;
                                               case 4:
                                                 ref
                                                     .read(removeUserProvider)
@@ -1957,9 +1986,10 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                                         );
                                       }
                                     },
-                                    loading: () => const SizedBox.shrink(),
+                                    loading: () =>
+                                        const CircularProgressIndicator(),
                                     error: (error, stack) =>
-                                        const SizedBox.shrink(),
+                                        Text('Error: $error'),
                                   );
                                 },
                               ),
@@ -1971,8 +2001,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                   ),
                 ),
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stackTrace) =>
-                    Center(child: Text('Error: $error')),
+                error: (error, stack) => Center(child: Text('Error: $error')),
               ),
             ],
           ],
