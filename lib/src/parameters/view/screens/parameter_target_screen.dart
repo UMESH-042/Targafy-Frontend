@@ -1862,8 +1862,8 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
     final filteredUsers = ref.watch(userProvider1);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    // print(AssingSelectedUserIds);
-    print(selectedUserIds);
+    print('This is AssignedUsers List :- $AssingSelectedUserIds');
+    print('This is selectedUsers list $selectedUserIds');
     print('This is the  map:- $userTargetData');
 
     return Scaffold(
@@ -1924,15 +1924,15 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                               onChanged: (value) {
                                 if (value == 'select_all') {
                                   setState(() {
-                                    AssingSelectedUserIds = sortedUserList
+                                    selectedUserIds = sortedUserList
                                         .map((user) => user.userId)
                                         .toList();
                                     additionalAllSelected = true;
                                   });
                                 } else if (value != null &&
-                                    !AssingSelectedUserIds.contains(value)) {
+                                    !selectedUserIds.contains(value)) {
                                   setState(() {
-                                    AssingSelectedUserIds.add(value);
+                                    selectedUserIds.add(value);
                                     additionalAllSelected = false;
                                   });
                                 }
@@ -1946,13 +1946,13 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                         label: const Text('All Selected'),
                                         onDeleted: () {
                                           setState(() {
-                                            AssingSelectedUserIds.clear();
+                                            selectedUserIds.clear();
                                             additionalAllSelected = false;
                                           });
                                         },
                                       ),
                                     ]
-                                  : AssingSelectedUserIds.map((userId) {
+                                  : selectedUserIds.map((userId) {
                                       return Chip(
                                         label: Text(userList
                                             .firstWhere(
@@ -1960,8 +1960,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                             .name),
                                         onDeleted: () {
                                           setState(() {
-                                            AssingSelectedUserIds.remove(
-                                                userId);
+                                            selectedUserIds.remove(userId);
                                           });
                                         },
                                       );
@@ -1987,7 +1986,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                   targetValue: _targetValueController.text,
                                   paramName: widget.parameterName,
                                   comment: _commentController.text,
-                                  userIds: AssingSelectedUserIds,
+                                  userIds: selectedUserIds,
                                   monthIndex: DateTime.now().month.toString(),
                                 );
                                 try {
@@ -2040,15 +2039,15 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                               onChanged: (value) {
                                 if (value == 'select_all') {
                                   setState(() {
-                                    selectedUserIds = sortedUserList
+                                    AssingSelectedUserIds = sortedUserList
                                         .map((user) => user.userId)
                                         .toList();
                                     allSelected = true;
                                   });
                                 } else if (value != null &&
-                                    !selectedUserIds.contains(value)) {
+                                    !AssingSelectedUserIds.contains(value)) {
                                   setState(() {
-                                    selectedUserIds.add(value);
+                                    AssingSelectedUserIds.add(value);
                                     allSelected = false;
                                   });
                                 }
@@ -2062,13 +2061,13 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                         label: const Text('All Selected'),
                                         onDeleted: () {
                                           setState(() {
-                                            selectedUserIds.clear();
+                                            AssingSelectedUserIds.clear();
                                             allSelected = false;
                                           });
                                         },
                                       ),
                                     ]
-                                  : selectedUserIds.map((userId) {
+                                  : AssingSelectedUserIds.map((userId) {
                                       return Chip(
                                         label: Text(users.when(
                                           data: (userList) => userList
@@ -2080,7 +2079,8 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                         )),
                                         onDeleted: () {
                                           setState(() {
-                                            selectedUserIds.remove(userId);
+                                            AssingSelectedUserIds.remove(
+                                                userId);
                                           });
                                         },
                                       );
@@ -2095,17 +2095,18 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                     ),
                     SizedBox(height: height * 0.05),
                     CustomSmallButton(
-                        title: 'Get Targets',
-                        onPressed: () {
-                          setState(() {
-                            showTargets = true;
-                          });
+                      title: 'Get Targets',
+                      onPressed: () {
+                        setState(() {
+                          showTargets = true;
+                        });
 
-                          // Fetch target data for each selected user
-                          for (final userId in selectedUserIds) {
-                            _fetchTargetDataForUser(userId);
-                          }
-                        }),
+                        // Fetch target data for each selected user
+                        for (final userId in AssingSelectedUserIds) {
+                          _fetchTargetDataForUser(userId);
+                        }
+                      },
+                    ),
                     SizedBox(
                       height: 20,
                     ),
@@ -2130,7 +2131,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
     void saveTargets() async {
       List<Map<String, String>> updatedTargets = [];
 
-      for (final userId in selectedUserIds) {
+      for (final userId in AssingSelectedUserIds) {
         if (userTargetData.containsKey(userId)) {
           // Check if the user target is being edited
           if (isEditing.containsKey(userId)) {
@@ -2234,7 +2235,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
               ),
             ],
             rows: [
-              for (final userId in selectedUserIds)
+              for (final userId in AssingSelectedUserIds)
                 if (userTargetData.containsKey(userId) &&
                     userTargetData[userId]!.length >= 2)
                   DataRow(cells: [

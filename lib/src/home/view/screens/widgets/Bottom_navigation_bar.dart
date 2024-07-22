@@ -510,7 +510,7 @@ class _BottomNavigationAndAppBarState
                         alignment: Alignment.topRight,
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
-                          child: Text("1.0.2"),
+                          child: Text("1.0.3"),
                         ),
                       ),
                       DrawerHeader(

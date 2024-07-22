@@ -815,6 +815,12 @@ class _AddscreenState extends ConsumerState<Addscreen> {
   final Map<String, TextEditingController> dataControllers = {};
   final Map<String, TextEditingController> commentControllers = {};
   String? selectedDate;
+  
+  @override
+  void initState() {
+    super.initState();
+    selectedDate = "${DateTime.now().toLocal()}".split(' ')[0];
+  }
 
   @override
   void dispose() {

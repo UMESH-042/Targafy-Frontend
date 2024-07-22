@@ -445,6 +445,7 @@ import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/src/home/view/screens/controller/add_charts_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/get_drop_downfield_pair.dart';
+import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
 import 'package:targafy/src/home/view/screens/home_screen.dart';
 import 'package:targafy/src/parameters/view/widgets/small_button.dart';
 import '../../../../../core/shared/components/back_button.dart';
@@ -941,63 +942,91 @@ class _AddChartsMainPageState extends ConsumerState<AddChartsMainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(height: getScreenheight(context) * 0.03),
-          Expanded(
-            child: ListView.builder(
-              itemCount: dropdownPairs.length,
-              itemBuilder: (context, index) {
-                return DropdownPairWidget(
-                  pair: dropdownPairs[index],
-                  index: index,
-                  onFirstItemSelected: onFirstItemSelected,
-                  onSecondItemSelected: onSecondItemSelected,
-                  onBenchmarkChanged: onBenchmarkChanged,
-                  onAddBenchmark: addBenchmark,
-                  onRemoveBenchmark: removeBenchmark,
-                  onDeletePressed: () => deleteDropdownPair(index),
-                );
-              },
+    return Consumer(
+      builder: (context, ref, _) {
+        final userRoleAsyncValue = ref.watch(userRoleProvider);
+        return userRoleAsyncValue.when(
+          data: (role) {
+            if (role == 'User') {
+              return Scaffold(
+                body: Center(
+                  child: Text('You don\'t have access to this page'),
+                ),
+              );
+            }
+
+            return Scaffold(
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(height: getScreenheight(context) * 0.03),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: dropdownPairs.length,
+                      itemBuilder: (context, index) {
+                        return DropdownPairWidget(
+                          pair: dropdownPairs[index],
+                          index: index,
+                          onFirstItemSelected: onFirstItemSelected,
+                          onSecondItemSelected: onSecondItemSelected,
+                          onBenchmarkChanged: onBenchmarkChanged,
+                          onAddBenchmark: addBenchmark,
+                          onRemoveBenchmark: removeBenchmark,
+                          onDeletePressed: () => deleteDropdownPair(index),
+                        );
+                      },
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      'Previous Added Data',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: fetchedDropdownPairs.length,
+                      itemBuilder: (context, index) {
+                        return ParamPairWidget(
+                          paramPair: fetchedDropdownPairs[index],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              floatingActionButton: FloatingActionButton(
+                backgroundColor: primaryColor,
+                onPressed: addNewDropdownPair,
+                tooltip: 'Add New Pair',
+                child: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat,
+              bottomNavigationBar: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: CustomSmallButton(
+                  onPressed: savePairs,
+                  title: 'Save',
+                ),
+              ),
+            );
+          },
+          loading: () => const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
             ),
           ),
-          Center(
-            child: Text(
-              'Previous Added Data',
-              style: TextStyle(fontSize: 18),
+          error: (error, stack) => Scaffold(
+            body: Center(
+              child: Text('Failed to load user role: $error'),
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: fetchedDropdownPairs.length,
-              itemBuilder: (context, index) {
-                return ParamPairWidget(
-                  paramPair: fetchedDropdownPairs[index],
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        onPressed: addNewDropdownPair,
-        tooltip: 'Add New Pair',
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: CustomSmallButton(
-          onPressed: savePairs,
-          title: 'Save',
-        ),
-      ),
+        );
+      },
     );
   }
 }

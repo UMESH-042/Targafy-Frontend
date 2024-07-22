@@ -8,12 +8,10 @@ class BusinessUserHierarchy {
   });
 
   factory BusinessUserHierarchy.fromJson(Map<String, dynamic> json) {
-    final List<NodeData> nodes = (json['nodes'] as List)
-        .map((node) => NodeData.fromJson(node))
-        .toList();
-    final List<EdgeData> edges = (json['edges'] as List)
-        .map((edge) => EdgeData.fromJson(edge))
-        .toList();
+    final List<NodeData> nodes =
+        (json['nodes'] as List).map((node) => NodeData.fromJson(node)).toList();
+    final List<EdgeData> edges =
+        (json['edges'] as List).map((edge) => EdgeData.fromJson(edge)).toList();
 
     return BusinessUserHierarchy(nodes: nodes, edges: edges);
   }

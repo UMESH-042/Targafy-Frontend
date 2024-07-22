@@ -10,7 +10,8 @@ final demoteUserProvider =
 String domain = AppRemoteRoutes.baseUrl;
 
 class DemoteUserController {
-  Future<void> demoteUser(String businessId, String userId, BuildContext context) async {
+  Future<void> demoteUser(
+      String businessId, String userId, BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
     final url = '${domain}business/demote/$businessId';
@@ -24,11 +25,18 @@ class DemoteUserController {
         },
         body: '{"userIdToDemote": "$userId"}',
       );
-
+      print(response.body);
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('User demoted successfully'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else if (response.statusCode == 400) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Only admin allowed to perform this operation'),
             duration: Duration(seconds: 2),
           ),
         );
