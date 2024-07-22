@@ -409,7 +409,9 @@ class _UserProfileState extends ConsumerState<UserProfile> {
 
   Future<void> _updateProfile() async {
     try {
-      await ref.read(nameControllerProvider.notifier).updateName(_nameController.text);
+      await ref
+          .read(nameControllerProvider.notifier)
+          .updateName(_nameController.text);
       // Add other updates here if there are additional fields
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profile updated successfully')),
@@ -439,7 +441,8 @@ class _UserProfileState extends ConsumerState<UserProfile> {
       body: asyncValue.when(
         data: (user) {
           _user = user;
-          _nameController.text = user.name; // Initialize the text controller with the current name
+          _nameController.text =
+              user.name; // Initialize the text controller with the current name
           return _buildUserProfile();
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -491,7 +494,8 @@ class _UserProfileState extends ConsumerState<UserProfile> {
               ? FileImage(File(_profileImage!.path))
               : (_profileImageUrl != null
                       ? NetworkImage(_profileImageUrl!)
-                      : const AssetImage("assets/images/placeholder.png"))
+                      : NetworkImage(
+                          'https://randomuser.me/api/portraits/lego/2.jpg'))
                   as ImageProvider,
         ),
         if (_uploading)
@@ -504,7 +508,8 @@ class _UserProfileState extends ConsumerState<UserProfile> {
     );
   }
 
-  Widget _buildEditableInfoTile(String label, TextEditingController controller, IconData icon) {
+  Widget _buildEditableInfoTile(
+      String label, TextEditingController controller, IconData icon) {
     return ListTile(
       leading: Icon(icon),
       title: Column(

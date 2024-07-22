@@ -952,7 +952,7 @@ class _BottomNavigationAndAppBarState
           child: CircleAvatar(
             radius: getScreenWidth(context) * 0.09,
             backgroundImage: const NetworkImage(
-              'https://codeskulptor-demos.commondatastorage.googleapis.com/pang/LdTCEUo.png',
+              'https://randomuser.me/api/portraits/lego/2.jpg',
             ),
             child: null,
           ),
