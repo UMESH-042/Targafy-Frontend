@@ -22,7 +22,7 @@ class BusinessController
 
     try {
       final response = await http.get(
-        Uri.parse('${domain}business/get-sub-hierarchy/$businessId'),
+        Uri.parse('${domain}business/get-sub-hierarchy-new/$businessId'),
         headers: {'Authorization': 'Bearer $token'},
       );
 

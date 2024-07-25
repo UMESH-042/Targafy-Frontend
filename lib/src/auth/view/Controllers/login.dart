@@ -78,6 +78,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
     if (state.number.isNotEmpty && state.number.length == 10) {
       String res = await sendLoginRequest();
+      print(res);
 
       if (res == "Login request sent successfully") {
         debugPrint("Done");
@@ -107,7 +108,8 @@ class LoginNotifier extends StateNotifier<LoginState> {
     );
 
     final data = jsonDecode(response.responceString!);
-
+    print(response.message);
+    print(response.responseCode);
     if (response.responseCode == 200) {
       state = state.copyWith(isRequestSent: true);
       res = "Login request sent successfully";

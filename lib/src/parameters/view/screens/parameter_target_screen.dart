@@ -2000,6 +2000,17 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                   );
                                   widget.onDataAdded();
                                   _clearFields();
+                                  await ref
+                                      .read(userProvider1.notifier)
+                                      .fetchFilteredUsers(
+                                          widget.businessId,
+                                          widget.parameterName,
+                                          DateTime.now().month.toString());
+                                  // refreshing the list
+                                  await ref
+                                      .read(userProvider.notifier)
+                                      .fetchUsers(widget.parameterName,
+                                          widget.businessId);
                                 } catch (error) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -2122,7 +2133,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
   }
 
   Widget buildTargetTable() {
-    final users = ref.watch(userProvider).when(
+    final users = ref.watch(userProvider1).when(
           data: (userList) => userList,
           loading: () => [],
           error: (error, stackTrace) => [],
@@ -2241,7 +2252,13 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                   DataRow(cells: [
                     DataCell(
                       Text(
-                        users.firstWhere((user) => user.userId == userId).name,
+                        users
+                            .firstWhere(
+                              (user) => user.userId == userId,
+                              orElse: () =>
+                                  User(userId: userId, name: 'Unknown User'),
+                            )
+                            .name,
                         textAlign: TextAlign.center,
                         overflow: TextOverflow.ellipsis,
                       ),

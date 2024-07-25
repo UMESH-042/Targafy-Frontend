@@ -143,6 +143,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:targafy/utils/notificationservices.dart';
 import 'package:targafy/utils/socketsServices.dart';
 import 'firebase_options.dart';
@@ -218,12 +219,27 @@ void main() async {
   final isTokenValid = true;
   print(token);
 
+  await checkForUpdate();
+
   runApp(ProviderScope(
       child: MyApp(
     token: token,
     hasSeenOnboarding: hasSeenOnboarding,
     isTokenValid: isTokenValid,
   )));
+}
+
+Future<void> checkForUpdate() async {
+  try {
+    AppUpdateInfo updateInfo = await InAppUpdate.checkForUpdate();
+    if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
+      await InAppUpdate.performImmediateUpdate();
+    } else {
+      print("No update available.");
+    }
+  } catch (e) {
+    print("Failed to check for update: $e");
+  }
 }
 
 class MyApp extends StatelessWidget {

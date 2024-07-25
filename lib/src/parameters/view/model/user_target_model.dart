@@ -19,7 +19,6 @@ class Target {
   final List<String> userIds;
   final String monthIndex;
 
-
   Target({
     required this.targetValue,
     required this.paramName,

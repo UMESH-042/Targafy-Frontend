@@ -725,6 +725,120 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       //       ),
                       //     ),
                       //   ),
+                      // if (selectedParameter.isNotEmpty)
+                      //   hierarchyAsync.when(
+                      //     data: (hierarchy) {
+                      //       final nodes = hierarchy.nodes;
+                      //       final edges = hierarchy.edges;
+
+                      //       final Map<String, String> nodeIdToLabel =
+                      //           Map.fromEntries(
+                      //         nodes.map((node) => MapEntry(
+                      //             node.id, _formatName(node.label.name))),
+                      //       );
+
+                      //       final Map<String, List<String>> parentIdToChildren =
+                      //           {};
+
+                      //       for (var edge in edges) {
+                      //         parentIdToChildren.putIfAbsent(
+                      //             edge.from, () => []);
+                      //         parentIdToChildren[edge.from]!.add(edge.to);
+                      //       }
+
+                      //       bool isRootSelected =
+                      //           currentPath.contains(nodes[0].id);
+
+                      //       return Container(
+                      //         alignment: Alignment
+                      //             .center, // Align everything to the center
+                      //         margin: EdgeInsets.symmetric(
+                      //           horizontal:
+                      //               MediaQuery.of(context).size.width * 0.02,
+                      //         ).copyWith(
+                      //           top: MediaQuery.of(context).size.height * 0.005,
+                      //         ),
+                      //         child: Column(
+                      //           crossAxisAlignment: CrossAxisAlignment
+                      //               .center, // Center the column content
+                      //           children: [
+                      //             SingleChildScrollView(
+                      //               scrollDirection: Axis.horizontal,
+                      //               child: Row(
+                      //                 mainAxisAlignment: MainAxisAlignment
+                      //                     .center, // Center the root node
+                      //                 children: [
+                      //                   SelectableSubGroupWidget(
+                      //                     text:
+                      //                         nodeIdToLabel[nodes[0].id] ?? '-',
+                      //                     isSelected:
+                      //                         currentPath.contains(nodes[0].id),
+                      //                     onTap: () => _handleNodeTap(
+                      //                         nodeIdToLabel[nodes[0].id]!,
+                      //                         nodes[0].id,
+                      //                         parentIdToChildren),
+                      //                   ),
+                      //                 ],
+                      //               ),
+                      //             ),
+                      //             if (isRootSelected)
+                      //               ...currentPath.map((parentId) {
+                      //                 final children =
+                      //                     parentIdToChildren[parentId] ?? [];
+                      //                 return Padding(
+                      //                   padding: EdgeInsets.only(
+                      //                       top: MediaQuery.of(context)
+                      //                               .size
+                      //                               .height *
+                      //                           0.005),
+                      //                   child: SingleChildScrollView(
+                      //                     scrollDirection: Axis.horizontal,
+                      //                     child: Row(
+                      //                       mainAxisAlignment: MainAxisAlignment
+                      //                           .center, // Center the children nodes
+                      //                       children: children.map((childId) {
+                      //                         return SelectableSubGroupWidget(
+                      //                           text: nodeIdToLabel[childId] ??
+                      //                               '',
+                      //                           isSelected: currentPath
+                      //                               .contains(childId),
+                      //                           onTap: () => _handleNodeTap(
+                      //                               nodeIdToLabel[childId]!,
+                      //                               childId,
+                      //                               parentIdToChildren),
+                      //                         );
+                      //                       }).toList(),
+                      //                     ),
+                      //                   ),
+                      //                 );
+                      //               }).toList(),
+                      //           ],
+                      //         ),
+                      //       );
+                      //     },
+                      //     loading: () =>
+                      //         const Center(child: CircularProgressIndicator()),
+                      //     error: (error, stackTrace) => Center(
+                      //       child: Column(
+                      //         mainAxisSize: MainAxisSize.min,
+                      //         children: [
+                      //           Lottie.asset(
+                      //               'assets/animations/empty_list.json',
+                      //               height: 200,
+                      //               width: 200),
+                      //           const Text(
+                      //             "Nothing to display",
+                      //             style: TextStyle(
+                      //               color: Colors.grey,
+                      //               fontSize: 14,
+                      //               fontWeight: FontWeight.w600,
+                      //             ),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ),
+                      //   ),
+
                       if (selectedParameter.isNotEmpty)
                         hierarchyAsync.when(
                           data: (hierarchy) {
@@ -734,7 +848,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             final Map<String, String> nodeIdToLabel =
                                 Map.fromEntries(
                               nodes.map((node) => MapEntry(
-                                  node.id, _formatName(node.label.name))),
+                                    node.id,
+                                    _formatNameWithCount(node.label.name,
+                                        node.label.allSubordinatesCount),
+                                  )),
                             );
 
                             final Map<String, List<String>> parentIdToChildren =
@@ -750,8 +867,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 currentPath.contains(nodes[0].id);
 
                             return Container(
-                              alignment: Alignment
-                                  .center, // Align everything to the center
+                              alignment: Alignment.center,
                               margin: EdgeInsets.symmetric(
                                 horizontal:
                                     MediaQuery.of(context).size.width * 0.02,
@@ -759,14 +875,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 top: MediaQuery.of(context).size.height * 0.005,
                               ),
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment
-                                    .center, // Center the column content
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .center, // Center the root node
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         SelectableSubGroupWidget(
                                           text:
@@ -774,9 +889,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           isSelected:
                                               currentPath.contains(nodes[0].id),
                                           onTap: () => _handleNodeTap(
-                                              nodeIdToLabel[nodes[0].id]!,
-                                              nodes[0].id,
-                                              parentIdToChildren),
+                                            nodeIdToLabel[nodes[0].id]!,
+                                            nodes[0].id,
+                                            parentIdToChildren,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -787,15 +903,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           parentIdToChildren[parentId] ?? [];
                                       return Padding(
                                         padding: EdgeInsets.only(
-                                            top: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.005),
+                                          top: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.005,
+                                        ),
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment
-                                                .center, // Center the children nodes
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: children.map((childId) {
                                               return SelectableSubGroupWidget(
                                                 text: nodeIdToLabel[childId] ??
@@ -803,9 +920,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                 isSelected: currentPath
                                                     .contains(childId),
                                                 onTap: () => _handleNodeTap(
-                                                    nodeIdToLabel[childId]!,
-                                                    childId,
-                                                    parentIdToChildren),
+                                                  nodeIdToLabel[childId]!,
+                                                  childId,
+                                                  parentIdToChildren,
+                                                ),
                                               );
                                             }).toList(),
                                           ),
@@ -821,7 +939,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           error: (error, stackTrace) => Center(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
-                              children: [ 
+                              children: [
                                 Lottie.asset(
                                     'assets/animations/empty_list.json',
                                     height: 200,
@@ -838,7 +956,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                           ),
                         ),
-
                       // SizedBox(
                       //   height: MediaQuery.of(context).size.height * 0.05,
                       // ),
@@ -2011,6 +2128,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     } else {
       return fullName; // Single-word name
     }
+  }
+
+  String _formatNameWithCount(String name, int count) {
+    return '$name ($count)';
   }
 
   final List<Color> colors = [

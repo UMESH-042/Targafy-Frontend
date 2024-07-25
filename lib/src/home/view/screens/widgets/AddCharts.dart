@@ -441,6 +441,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/src/home/view/screens/controller/add_charts_controller.dart';
@@ -849,32 +850,10 @@ class AddChartsMainPage extends ConsumerStatefulWidget {
 
 class _AddChartsMainPageState extends ConsumerState<AddChartsMainPage> {
   List<DropdownFieldPair> dropdownPairs = [];
-  List<ParamPair> fetchedDropdownPairs = [];
 
   @override
   void initState() {
     super.initState();
-    fetchParamPairs();
-  }
-
-  Future<void> fetchParamPairs() async {
-    try {
-      final paramPairs = await ref.read(paramPairsProvider.future);
-
-      setState(() {
-        fetchedDropdownPairs = paramPairs
-            .map((paramPair) => ParamPair(
-                  firstSelectedItem: paramPair.firstSelectedItem,
-                  secondSelectedItem: paramPair.secondSelectedItem,
-                  values: paramPair.values,
-                ))
-            .toList();
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to fetch param pairs: $e')),
-      );
-    }
   }
 
   void addNewDropdownPair() {
@@ -929,6 +908,7 @@ class _AddChartsMainPageState extends ConsumerState<AddChartsMainPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Pairs saved successfully')),
       );
+      await ref.read(paramPairsProvider.future);
       setState(() {
         dropdownPairs.clear();
       });
@@ -956,6 +936,23 @@ class _AddChartsMainPageState extends ConsumerState<AddChartsMainPage> {
             }
 
             return Scaffold(
+              appBar: AppBar(
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: IconButton(
+                      icon: Icon(Icons.history),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PreviousDataHistory(
+                                    businessId: widget.businessId)));
+                      },
+                    ),
+                  ),
+                ],
+              ),
               body: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -973,22 +970,6 @@ class _AddChartsMainPageState extends ConsumerState<AddChartsMainPage> {
                           onAddBenchmark: addBenchmark,
                           onRemoveBenchmark: removeBenchmark,
                           onDeletePressed: () => deleteDropdownPair(index),
-                        );
-                      },
-                    ),
-                  ),
-                  Center(
-                    child: Text(
-                      'Previous Added Data',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: fetchedDropdownPairs.length,
-                      itemBuilder: (context, index) {
-                        return ParamPairWidget(
-                          paramPair: fetchedDropdownPairs[index],
                         );
                       },
                     ),
@@ -1027,6 +1008,77 @@ class _AddChartsMainPageState extends ConsumerState<AddChartsMainPage> {
           ),
         );
       },
+    );
+  }
+}
+
+final paramPairsProvider = FutureProvider<List<ParamPair>>((ref) {
+  final repository = ref.watch(paramRepositoryProvider);
+  final selectedBusinessData = ref.watch(currentBusinessProvider);
+  final businessId = selectedBusinessData?['business']?.id;
+  return repository.fetchParamPairs(businessId);
+});
+
+class PreviousDataHistory extends ConsumerWidget {
+  final String? businessId;
+
+  const PreviousDataHistory({
+    Key? key,
+    required this.businessId,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userRoleAsyncValue = ref.watch(userRoleProvider);
+    final paramPairsAsyncValue = ref.watch(paramPairsProvider);
+
+    return userRoleAsyncValue.when(
+      data: (role) {
+        if (role == 'User') {
+          return Scaffold(
+            body: Center(
+              child: Text('You don\'t have access to this page'),
+            ),
+          );
+        }
+
+        return Scaffold(
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              CustomBackButton(text: 'Previous Charts'),
+              Expanded(
+                child: paramPairsAsyncValue.when(
+                  data: (paramPairs) {
+                    return ListView.builder(
+                      itemCount: paramPairs.length,
+                      itemBuilder: (context, index) {
+                        return ParamPairWidget(
+                          paramPair: paramPairs[index],
+                        );
+                      },
+                    );
+                  },
+                  loading: () => Center(child: CircularProgressIndicator()),
+                  error: (error, stack) => Center(
+                    child: Text('Failed to load param pairs: $error'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (error, stack) => Scaffold(
+        body: Center(
+          child: Text('Failed to load user role: $error'),
+        ),
+      ),
     );
   }
 }

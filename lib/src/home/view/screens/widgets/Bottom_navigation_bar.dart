@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -90,12 +91,19 @@ class _BottomNavigationAndAppBarState
     _getToken1();
     _refreshParameters();
     _initializeSocket();
-
+    _fetchAppVersion();
     // WidgetsBinding.instance!.addPostFrameCallback((_) {
     //   Future.delayed(Duration(seconds: 5), () {
     //     _fetchCounters();
     //   });
     // });
+  }
+
+  Future<void> _fetchAppVersion() async {
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _appVersion = '${packageInfo.version}';
+    });
   }
 
   void _initializeSocket() async {
@@ -510,7 +518,7 @@ class _BottomNavigationAndAppBarState
                         alignment: Alignment.topRight,
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
-                          child: Text("1.0.3"),
+                          child: Text(_appVersion),
                         ),
                       ),
                       DrawerHeader(

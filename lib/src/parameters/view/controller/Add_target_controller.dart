@@ -16,14 +16,16 @@ class UserNotifier extends StateNotifier<AsyncValue<List<User>>> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('authToken');
       final response = await http.get(
-        Uri.parse('${domain}params/get-assign-user/$paramName/$businessId'),
+        Uri.parse(
+            '${domain}target/get-not-target-assigned-users/$businessId/$paramName/${DateTime.now().month.toString()}'),
         headers: {
           'Authorization': 'Bearer $token',
         },
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body)['data'] as List;
+        final data =
+            json.decode(response.body)['data']['usersNotInTarget'] as List;
         state =
             AsyncValue.data(data.map((user) => User.fromJson(user)).toList());
       } else {
