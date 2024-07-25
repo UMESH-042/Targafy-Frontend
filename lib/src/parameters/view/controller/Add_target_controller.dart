@@ -29,7 +29,7 @@ class UserNotifier extends StateNotifier<AsyncValue<List<User>>> {
         state =
             AsyncValue.data(data.map((user) => User.fromJson(user)).toList());
       } else {
-        state = AsyncValue.error('Failed to load users', StackTrace.current);
+        state = AsyncValue.data([]);
       }
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
