@@ -940,9 +940,17 @@ class CustomChart extends StatelessWidget {
                 //     style: TextStyle(color: Colors.black));
                 double value = point.y;
                 // Format the label text based on value
-                String labelText = value >= 100
-                    ? value.toStringAsFixed(0)
-                    : value.toStringAsFixed(2);
+                // String labelText = value >= 100
+                //     ? value.toStringAsFixed(0)
+                //     : value.toStringAsFixed(2);
+                String labelText;
+                if (value < 10) {
+                  labelText = value.toStringAsFixed(2);
+                } else if (value < 100) {
+                  labelText = value.toStringAsFixed(1);
+                } else {
+                  labelText = value.toStringAsFixed(0);
+                }
                 return Text(labelText, style: TextStyle(color: Colors.black));
               }
               return SizedBox.shrink();
