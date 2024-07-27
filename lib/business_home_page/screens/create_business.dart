@@ -217,7 +217,9 @@
 // }
 
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -269,6 +271,32 @@ class _CreateBusinessPageState extends ConsumerState<CreateBusinessPage> {
       });
     }
   }
+
+  Future<File> compressImage(File imageFile) async {
+  // Define the target file size in bytes (100 KB in this example)
+  int targetSize = 100 * 1024;
+
+  Uint8List? compressedBytes = await FlutterImageCompress.compressWithFile(
+    imageFile.path,
+    minWidth: 800,
+    minHeight: 600,
+    quality: 85,
+  );
+
+  if (compressedBytes!.lengthInBytes > targetSize) {
+    compressedBytes = await FlutterImageCompress.compressWithList(
+      compressedBytes,
+      minWidth: 800,
+      minHeight: 600,
+      quality: 70,
+    );
+  }
+
+  File compressedFile = File(imageFile.path)..writeAsBytesSync(compressedBytes);
+
+  return compressedFile;
+}
+
 
   @override
   Widget build(BuildContext context) {

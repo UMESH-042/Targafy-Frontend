@@ -181,15 +181,14 @@ class DataTableForRatioWidget extends StatelessWidget {
   //   }
   // }
   String _formatRatio(double ratio) {
-  if (ratio >= 1000) {
-    return '${(ratio / 1000).toStringAsFixed(1)}k';
-  } else if (ratio < 10) {
-    return ratio.toStringAsFixed(2);
-  } else if (ratio < 100) {
-    return ratio.toStringAsFixed(1);
-  } else {
-    return ratio.toStringAsFixed(0);
+    if (ratio >= 1000) {
+      return '${(ratio / 1000).toStringAsFixed(1)}k';
+    } else if (ratio < 10) {
+      return ratio.toStringAsFixed(2);
+    } else if (ratio < 100) {
+      return ratio.toStringAsFixed(1);
+    } else {
+      return ratio.toStringAsFixed(0);
+    }
   }
-}
-
 }

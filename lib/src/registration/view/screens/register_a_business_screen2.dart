@@ -357,7 +357,9 @@
 // }
 
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/controller/create_business_controller.dart';
@@ -390,17 +392,56 @@ class _RegisterABusinessScreen2State extends State<RegisterABusinessScreen2> {
   final CreateBusinessController _createBusinessController =
       CreateBusinessController();
 
+  // Future<void> _getImage() async {
+  //   final XFile? pickedFile =
+  //       await _picker.pickImage(source: ImageSource.gallery);
+  //   setState(() {
+  //     _image = pickedFile;
+  //     if (_image != null) {
+  //       String fileName = _image!.name;
+  //       _imageName =
+  //           fileName.length > 10 ? '${fileName.substring(0, 20)}...' : fileName;
+  //     }
+  //   });
+  // }
   Future<void> _getImage() async {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      _image = pickedFile;
-      if (_image != null) {
+    if (pickedFile != null) {
+      File compressedFile = await compressImage(File(pickedFile.path));
+      setState(() {
+        _image = XFile(compressedFile.path);
         String fileName = _image!.name;
         _imageName =
-            fileName.length > 10 ? '${fileName.substring(0, 20)}...' : fileName;
-      }
-    });
+            fileName.length > 10 ? '${fileName.substring(0, 10)}...' : fileName;
+      });
+    }
+  }
+
+  Future<File> compressImage(File imageFile) async {
+    // Define the target file size in bytes (100 KB in this example)
+    int targetSize = 100 * 1024;
+
+    Uint8List? compressedBytes = await FlutterImageCompress.compressWithFile(
+      imageFile.path,
+      minWidth: 800,
+      minHeight: 600,
+      quality: 85,
+    );
+
+    if (compressedBytes!.lengthInBytes > targetSize) {
+      compressedBytes = await FlutterImageCompress.compressWithList(
+        compressedBytes,
+        minWidth: 800,
+        minHeight: 600,
+        quality: 70,
+      );
+    }
+
+    File compressedFile = File(imageFile.path)
+      ..writeAsBytesSync(compressedBytes);
+
+    return compressedFile;
   }
 
   Future<void> _createBusiness() async {

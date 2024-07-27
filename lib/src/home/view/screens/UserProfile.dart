@@ -362,7 +362,9 @@
 //   }
 // }
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -546,6 +548,57 @@ class _UserProfileState extends ConsumerState<UserProfile> {
     );
   }
 
+  // Future<void> _changePicture() async {
+  //   final picker = ImagePicker();
+  //   final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+
+  //   if (pickedImage != null) {
+  //     setState(() {
+  //       _profileImage = pickedImage;
+  //       _uploading = true;
+  //     });
+
+  //     final controller = ref.read(userProfileLogoControllerProvider);
+
+  //     try {
+  //       final imageUrl = await controller.uploadLogo(File(pickedImage.path));
+  //       await controller.updateUserProfileLogo(imageUrl);
+  //       setState(() {
+  //         _uploading = false;
+  //       });
+  //     } catch (e) {
+  //       setState(() {
+  //         _uploading = false;
+  //       });
+  //       print('Error uploading image: $e');
+  //     }
+  //   }
+  // }
+   Future<File> compressImage(File imageFile) async {
+  // Define the target file size in bytes (100 KB in this example)
+  int targetSize = 100 * 1024;
+
+  Uint8List? compressedBytes = await FlutterImageCompress.compressWithFile(
+    imageFile.path,
+    minWidth: 800,
+    minHeight: 600,
+    quality: 85,
+  );
+
+  if (compressedBytes!.lengthInBytes > targetSize) {
+    compressedBytes = await FlutterImageCompress.compressWithList(
+      compressedBytes,
+      minWidth: 800,
+      minHeight: 600,
+      quality: 70,
+    );
+  }
+
+  File compressedFile = File(imageFile.path)..writeAsBytesSync(compressedBytes);
+
+  return compressedFile;
+}
+
   Future<void> _changePicture() async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
@@ -559,7 +612,8 @@ class _UserProfileState extends ConsumerState<UserProfile> {
       final controller = ref.read(userProfileLogoControllerProvider);
 
       try {
-        final imageUrl = await controller.uploadLogo(File(pickedImage.path));
+        final compressedImage = await compressImage(File(pickedImage.path));
+        final imageUrl = await controller.uploadLogo(compressedImage);
         await controller.updateUserProfileLogo(imageUrl);
         setState(() {
           _uploading = false;
@@ -572,6 +626,8 @@ class _UserProfileState extends ConsumerState<UserProfile> {
       }
     }
   }
+
+
 }
 
 
