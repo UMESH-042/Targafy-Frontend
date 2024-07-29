@@ -1268,32 +1268,34 @@ class _EditParamPairDialogState extends State<EditParamPairDialog> {
   //   });
   // }
   void _submitEdit() {
-  final updatedParamPair = ParamPair(
-    id: widget.paramPair.id,
-    firstSelectedItem: widget.paramPair.firstSelectedItem,
-    secondSelectedItem: widget.paramPair.secondSelectedItem,
-    values: _benchmarkControllers.map((controller) => controller.text).toList(),
-  );
+    final updatedParamPair = ParamPair(
+      id: widget.paramPair.id,
+      firstSelectedItem: widget.paramPair.firstSelectedItem,
+      secondSelectedItem: widget.paramPair.secondSelectedItem,
+      values:
+          _benchmarkControllers.map((controller) => controller.text).toList(),
+    );
 
-  _updateParamPair(updatedParamPair, widget.businessId).then((_) {
-    if (mounted) { // Check if the widget is still mounted
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Parameter pair updated successfully'),
-        ),
-      );
-    }
-  }).catchError((e) {
-    if (mounted) { // Check if the widget is still mounted
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to update parameter pair'),
-        ),
-      );
-    }
-  });
-}
-
+    _updateParamPair(updatedParamPair, widget.businessId).then((_) {
+      if (mounted) {
+        // Check if the widget is still mounted
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Parameter pair updated successfully'),
+          ),
+        );
+      }
+    }).catchError((e) {
+      if (mounted) {
+        // Check if the widget is still mounted
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update parameter pair'),
+          ),
+        );
+      }
+    });
+  }
 
   Future<void> _updateParamPair(ParamPair paramPair, String businessId) async {
     final prefs = await SharedPreferences.getInstance();
