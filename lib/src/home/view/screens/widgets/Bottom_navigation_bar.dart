@@ -415,20 +415,21 @@ class _BottomNavigationAndAppBarState
                                   .copyWith(topRight: const Radius.circular(0)),
                             ),
                             onSelected: (value) async {
-                              if (value == 1) {
+                              // if (value == 1) {
                                 // Handle action for "Add Charts"
-                                final result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AddCharts(
-                                      businessId: businessId,
-                                    ),
-                                  ),
-                                );
-                              } else if (value == 2) {
+                                // final result = await Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (context) => AddCharts(
+                                //       businessId: businessId,
+                                //     ),
+                                //   ),
+                                // );
+                              // } else
+                               if (value == 1) {
                                 // Handle action for "Refresh"
                                 Restart.restartApp();
-                              } else if (value == 3) {
+                              } else if (value == 2) {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -442,17 +443,17 @@ class _BottomNavigationAndAppBarState
                             itemBuilder: (BuildContext context) =>
                                 <PopupMenuEntry<int>>[
                               if (role != 'User')
-                                PopupMenuItem<int>(
-                                  value: 1,
-                                  child: CustomText(
-                                    text: 'Add Charts',
-                                    fontSize: getScreenWidth(context) * 0.04,
-                                    fontWeight: FontWeight.w600,
-                                    color: primaryColor,
-                                  ),
-                                ),
+                                // PopupMenuItem<int>(
+                                //   value: 1,
+                                //   child: CustomText(
+                                //     text: 'Add Charts',
+                                //     fontSize: getScreenWidth(context) * 0.04,
+                                //     fontWeight: FontWeight.w600,
+                                //     color: primaryColor,
+                                //   ),
+                                // ),
                               PopupMenuItem<int>(
-                                value: 2,
+                                value: 1,
                                 child: CustomText(
                                   text: 'Refresh',
                                   fontSize: getScreenWidth(context) * 0.04,
@@ -461,7 +462,7 @@ class _BottomNavigationAndAppBarState
                                 ),
                               ),
                               PopupMenuItem<int>(
-                                value: 3,
+                                value: 2,
                                 child: CustomText(
                                   text: 'Business Profile',
                                   fontSize: getScreenWidth(context) * 0.04,

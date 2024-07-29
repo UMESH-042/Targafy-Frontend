@@ -244,8 +244,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _isRefreshing = true;
     });
 
-    // Perform your refresh logic here
-    await Future.delayed(Duration(seconds: 2)); // Simulating delay
+    ref.invalidate(parameterListProvider);
+    // ref.invalidate(currentBusinessProvider);
+    ref.invalidate(dataAddedControllerProvider);
+    // ref.invalidate(businessHierarchyProvider);
+    ref.invalidate(paramPairsProvider);
+
+    await Future.delayed(Duration(seconds: 2));
 
     setState(() {
       _isRefreshing = false;

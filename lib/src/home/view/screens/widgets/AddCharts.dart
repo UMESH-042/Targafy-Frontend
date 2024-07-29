@@ -441,6 +441,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
@@ -448,178 +449,182 @@ import 'package:targafy/src/home/view/screens/controller/add_charts_controller.d
 import 'package:targafy/src/home/view/screens/controller/get_drop_downfield_pair.dart';
 import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
 import 'package:targafy/src/home/view/screens/home_screen.dart';
+import 'package:targafy/src/home/view/widgets/paramPairwidget.dart';
 import 'package:targafy/src/parameters/view/widgets/small_button.dart';
 import '../../../../../core/shared/components/back_button.dart';
 import '../../../../parameters/view/controller/add_parameter_controller.dart';
+import 'package:http/http.dart' as http;
 
-class AddCharts extends ConsumerStatefulWidget {
-  final String? businessId;
-  const AddCharts({
-    Key? key,
-    required this.businessId,
-  }) : super(key: key);
+// class AddCharts extends ConsumerStatefulWidget {
+//   final String? businessId;
+//   const AddCharts({
+//     Key? key,
+//     required this.businessId,
+//   }) : super(key: key);
 
-  @override
-  ConsumerState<AddCharts> createState() => _AddChartsState();
-}
+//   @override
+//   ConsumerState<AddCharts> createState() => _AddChartsState();
+// }
 
-class _AddChartsState extends ConsumerState<AddCharts> {
-  List<DropdownFieldPair> dropdownPairs = [];
-  List<ParamPair> fetchedDropdownPairs = [];
+// class _AddChartsState extends ConsumerState<AddCharts> {
+//   List<DropdownFieldPair> dropdownPairs = [];
+//   List<ParamPair> fetchedDropdownPairs = [];
 
-  @override
-  void initState() {
-    super.initState();
-    fetchParamPairs();
-  }
+//   @override
+//   void initState() {
+//     super.initState();
+//     fetchParamPairs();
+//   }
 
-  Future<void> fetchParamPairs() async {
-    try {
-      final paramPairs = await ref.read(paramPairsProvider.future);
+//   Future<void> fetchParamPairs() async {
+//     try {
+//       final paramPairs = await ref.read(paramPairsProvider.future);
 
-      setState(() {
-        fetchedDropdownPairs = paramPairs
-            .map((paramPair) => ParamPair(
-                  firstSelectedItem: paramPair.firstSelectedItem,
-                  secondSelectedItem: paramPair.secondSelectedItem,
-                  values: paramPair.values,
-                ))
-            .toList();
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to fetch param pairs: $e')),
-      );
-    }
-  }
+//       setState(() {
+//         fetchedDropdownPairs = paramPairs
+//             .map((paramPair) => ParamPair(
+//                   id: paramPair.id,
+//                   firstSelectedItem: paramPair.firstSelectedItem,
+//                   secondSelectedItem: paramPair.secondSelectedItem,
+//                   values: paramPair.values,
+//                 ))
+//             .toList();
+//       });
+//     } catch (e) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Failed to fetch param pairs: $e')),
+//       );
+//     }
+//   }
 
-  void addNewDropdownPair() {
-    setState(() {
-      dropdownPairs.add(DropdownFieldPair());
-    });
-  }
+//   void addNewDropdownPair() {
+//     setState(() {
+//       dropdownPairs.add(DropdownFieldPair());
+//     });
+//   }
 
-  void deleteDropdownPair(int index) {
-    setState(() {
-      dropdownPairs.removeAt(index);
-    });
-  }
+//   void deleteDropdownPair(int index) {
+//     setState(() {
+//       dropdownPairs.removeAt(index);
+//     });
+//   }
 
-  void onFirstItemSelected(int index, String selectedItem) {
-    setState(() {
-      dropdownPairs[index].firstSelectedItem = selectedItem;
-    });
-  }
+//   void onFirstItemSelected(int index, String selectedItem) {
+//     setState(() {
+//       dropdownPairs[index].firstSelectedItem = selectedItem;
+//     });
+//   }
 
-  void onSecondItemSelected(int index, String selectedItem) {
-    setState(() {
-      dropdownPairs[index].secondSelectedItem = selectedItem;
-    });
-  }
+//   void onSecondItemSelected(int index, String selectedItem) {
+//     setState(() {
+//       dropdownPairs[index].secondSelectedItem = selectedItem;
+//     });
+//   }
 
-  void onBenchmarkChanged(int index, int benchmarkIndex, String value) {
-    setState(() {
-      dropdownPairs[index].benchMarks[benchmarkIndex] = value;
-    });
-  }
+//   void onBenchmarkChanged(int index, int benchmarkIndex, String value) {
+//     setState(() {
+//       dropdownPairs[index].benchMarks[benchmarkIndex] = value;
+//     });
+//   }
 
-  void addBenchmark(int index) {
-    setState(() {
-      dropdownPairs[index].benchMarks.add('');
-      dropdownPairs[index].controllers.add(TextEditingController());
-    });
-  }
+//   void addBenchmark(int index) {
+//     setState(() {
+//       dropdownPairs[index].benchMarks.add('');
+//       dropdownPairs[index].controllers.add(TextEditingController());
+//     });
+//   }
 
-  void removeBenchmark(int index, int benchmarkIndex) {
-    setState(() {
-      dropdownPairs[index].benchMarks.removeAt(benchmarkIndex);
-      dropdownPairs[index].controllers.removeAt(benchmarkIndex);
-    });
-  }
+//   void removeBenchmark(int index, int benchmarkIndex) {
+//     setState(() {
+//       dropdownPairs[index].benchMarks.removeAt(benchmarkIndex);
+//       dropdownPairs[index].controllers.removeAt(benchmarkIndex);
+//     });
+//   }
 
-  Future<void> savePairs() async {
-    try {
-      await ref
-          .read(addChartsControllerProvider)
-          .savePairs(widget.businessId!, dropdownPairs);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pairs saved successfully')),
-      );
-      setState(() {
-        dropdownPairs.clear();
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save pairs: $e')),
-      );
-    }
-  }
+//   Future<void> savePairs() async {
+//     try {
+//       await ref
+//           .read(addChartsControllerProvider)
+//           .savePairs(widget.businessId!, dropdownPairs);
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Pairs saved successfully')),
+//       );
+//       setState(() {
+//         dropdownPairs.clear();
+//       });
+//     } catch (e) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Failed to save pairs: $e')),
+//       );
+//     }
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const CustomBackButton(
-            text: 'Add Charts',
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView.builder(
-              itemCount: dropdownPairs.length,
-              itemBuilder: (context, index) {
-                return DropdownPairWidget(
-                  pair: dropdownPairs[index],
-                  index: index,
-                  onFirstItemSelected: onFirstItemSelected,
-                  onSecondItemSelected: onSecondItemSelected,
-                  onBenchmarkChanged: onBenchmarkChanged,
-                  onAddBenchmark: addBenchmark,
-                  onRemoveBenchmark: removeBenchmark,
-                  onDeletePressed: () => deleteDropdownPair(index),
-                );
-              },
-            ),
-          ),
-          Center(
-            child: Text(
-              'Previous Added Data',
-              style: TextStyle(fontSize: 18),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: fetchedDropdownPairs.length,
-              itemBuilder: (context, index) {
-                return ParamPairWidget(
-                  paramPair: fetchedDropdownPairs[index],
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        onPressed: addNewDropdownPair,
-        tooltip: 'Add New Pair',
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: CustomSmallButton(
-          onPressed: savePairs,
-          title: 'Save',
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Column(
+//         crossAxisAlignment: CrossAxisAlignment.stretch,
+//         children: [
+//           const CustomBackButton(
+//             text: 'Add Charts',
+//           ),
+//           const SizedBox(height: 20),
+//           Expanded(
+//             child: ListView.builder(
+//               itemCount: dropdownPairs.length,
+//               itemBuilder: (context, index) {
+//                 return DropdownPairWidget(
+//                   pair: dropdownPairs[index],
+//                   index: index,
+//                   onFirstItemSelected: onFirstItemSelected,
+//                   onSecondItemSelected: onSecondItemSelected,
+//                   onBenchmarkChanged: onBenchmarkChanged,
+//                   onAddBenchmark: addBenchmark,
+//                   onRemoveBenchmark: removeBenchmark,
+//                   onDeletePressed: () => deleteDropdownPair(index),
+//                 );
+//               },
+//             ),
+//           ),
+//           Center(
+//             child: Text(
+//               'Previous Added Data',
+//               style: TextStyle(fontSize: 18),
+//             ),
+//           ),
+//           Expanded(
+//             child: ListView.builder(
+//               itemCount: fetchedDropdownPairs.length,
+//               itemBuilder: (context, index) {
+//                 return ParamPairWidget(
+//                   businessId: widget.businessId!,
+//                   paramPair: fetchedDropdownPairs[index],
+//                 );
+//               },
+//             ),
+//           ),
+//         ],
+//       ),
+//       floatingActionButton: FloatingActionButton(
+//         backgroundColor: primaryColor,
+//         onPressed: addNewDropdownPair,
+//         tooltip: 'Add New Pair',
+//         child: const Icon(
+//           Icons.add,
+//           color: Colors.white,
+//         ),
+//       ),
+//       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+//       bottomNavigationBar: Padding(
+//         padding: const EdgeInsets.all(16.0),
+//         child: CustomSmallButton(
+//           onPressed: savePairs,
+//           title: 'Save',
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class DropdownFieldPair {
   String? firstSelectedItem;
@@ -789,53 +794,53 @@ class DropdownPairWidget extends ConsumerWidget {
   }
 }
 
-class ParamPairWidget extends StatelessWidget {
-  final ParamPair paramPair;
+// class ParamPairWidget extends StatelessWidget {
+//   final ParamPair paramPair;
 
-  const ParamPairWidget({
-    Key? key,
-    required this.paramPair,
-  }) : super(key: key);
+//   const ParamPairWidget({
+//     Key? key,
+//     required this.paramPair,
+//   }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      elevation: 2,
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '${paramPair.firstSelectedItem} VS ${paramPair.secondSelectedItem}',
-              style: TextStyle(fontSize: 18),
-            ),
-            SizedBox(height: 4),
-            Text(
-              'Benchmark Values:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[600],
-              ),
-            ),
-            SizedBox(height: 4),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: paramPair.values
-                  .map((value) => Padding(
-                        padding: EdgeInsets.symmetric(vertical: 2),
-                        child: Text('- $value'),
-                      ))
-                  .toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Card(
+//       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+//       elevation: 2,
+//       child: Padding(
+//         padding: EdgeInsets.all(16),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Text(
+//               '${paramPair.firstSelectedItem} VS ${paramPair.secondSelectedItem}',
+//               style: TextStyle(fontSize: 18),
+//             ),
+//             SizedBox(height: 4),
+//             Text(
+//               'Benchmark Values:',
+//               style: TextStyle(
+//                 fontSize: 16,
+//                 fontWeight: FontWeight.bold,
+//                 color: Colors.grey[600],
+//               ),
+//             ),
+//             SizedBox(height: 4),
+//             Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: paramPair.values
+//                   .map((value) => Padding(
+//                         padding: EdgeInsets.symmetric(vertical: 2),
+//                         child: Text('- $value'),
+//                       ))
+//                   .toList(),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class AddChartsMainPage extends ConsumerStatefulWidget {
   final String? businessId;
@@ -1013,7 +1018,7 @@ class _AddChartsMainPageState extends ConsumerState<AddChartsMainPage> {
 }
 
 final paramPairsProvider = FutureProvider<List<ParamPair>>((ref) {
-  final repository = ref.watch(paramRepositoryProvider);
+  final repository = ref.read(paramRepositoryProvider);
   final selectedBusinessData = ref.watch(currentBusinessProvider);
   final businessId = selectedBusinessData?['business']?.id;
   return repository.fetchParamPairs(businessId);
@@ -1055,6 +1060,70 @@ class PreviousDataHistory extends ConsumerWidget {
                       itemBuilder: (context, index) {
                         return ParamPairWidget(
                           paramPair: paramPairs[index],
+                          businessId: businessId!,
+                          onEdit: () async {
+                            final result = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => EditParamPairDialog(
+                                paramPair: paramPairs[index],
+                                businessId: businessId!,
+                              ),
+                            );
+                            if (result == true) {
+                              ref.invalidate(paramPairsProvider);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Parameter pair updated successfully'),
+                                ),
+                              );
+                            }
+                          },
+                          onDelete: () async {
+                            final shouldDelete = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('Confirm Deletion'),
+                                content: Text(
+                                    'Are you sure you want to delete this parameter pair?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, false),
+                                    child: Text('No'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, true),
+                                    child: Text('Yes'),
+                                  ),
+                                ],
+                              ),
+                            );
+
+                            if (shouldDelete == true) {
+                              try {
+                                final paramController =
+                                    ref.read(paramControllerProvider);
+                                await paramController.deleteParamPair(
+                                    businessId!, paramPairs[index].id);
+                                ref.invalidate(paramPairsProvider);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        'Parameter pair deleted successfully'),
+                                  ),
+                                );
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content:
+                                        Text('Failed to delete parameter pair'),
+                                  ),
+                                );
+                              }
+                            }
+                          },
                         );
                       },
                     );
@@ -1080,5 +1149,176 @@ class PreviousDataHistory extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+class EditParamPairDialog extends StatefulWidget {
+  final ParamPair paramPair;
+  final String businessId;
+
+  const EditParamPairDialog({
+    Key? key,
+    required this.paramPair,
+    required this.businessId,
+  }) : super(key: key);
+
+  @override
+  _EditParamPairDialogState createState() => _EditParamPairDialogState();
+}
+
+class _EditParamPairDialogState extends State<EditParamPairDialog> {
+  late List<TextEditingController> _benchmarkControllers;
+
+  @override
+  void initState() {
+    super.initState();
+    _benchmarkControllers = widget.paramPair.values
+        .map((value) => TextEditingController(text: value))
+        .toList();
+  }
+
+  @override
+  void dispose() {
+    _benchmarkControllers.forEach((controller) => controller.dispose());
+    super.dispose();
+  }
+
+  void _removeBenchmark(int index) {
+    setState(() {
+      _benchmarkControllers.removeAt(index);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Edit Benchmark Values'),
+      content: SingleChildScrollView(
+        child: Column(
+          children: [
+            Text('Benchmark Values:'),
+            ..._benchmarkControllers.asMap().entries.map((entry) {
+              int index = entry.key;
+              TextEditingController controller = entry.value;
+              return Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: controller,
+                      decoration: InputDecoration(labelText: 'Value'),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.clear),
+                    onPressed: () => _removeBenchmark(index),
+                  ),
+                ],
+              );
+            }).toList(),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _benchmarkControllers.add(TextEditingController());
+                });
+              },
+              child: Text('Add Benchmark'),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+          child: Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            _submitEdit();
+            Navigator.of(context).pop(true);
+          },
+          child: Text('Save'),
+        ),
+      ],
+    );
+  }
+
+  //  void _submitEdit() {
+  //   final updatedParamPair = ParamPair(
+  //     id: widget.paramPair.id,
+  //     firstSelectedItem: widget.paramPair.firstSelectedItem,
+  //     secondSelectedItem: widget.paramPair.secondSelectedItem,
+  //     values:
+  //         _benchmarkControllers.map((controller) => controller.text).toList(),
+  //   );
+
+  //   _updateParamPair(updatedParamPair, widget.businessId).then((_) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Parameter pair updated successfully'),
+  //       ),
+  //     );
+  //   }).catchError((e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Failed to update parameter pair'),
+  //       ),
+  //     );
+  //   });
+  // }
+  void _submitEdit() {
+  final updatedParamPair = ParamPair(
+    id: widget.paramPair.id,
+    firstSelectedItem: widget.paramPair.firstSelectedItem,
+    secondSelectedItem: widget.paramPair.secondSelectedItem,
+    values: _benchmarkControllers.map((controller) => controller.text).toList(),
+  );
+
+  _updateParamPair(updatedParamPair, widget.businessId).then((_) {
+    if (mounted) { // Check if the widget is still mounted
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Parameter pair updated successfully'),
+        ),
+      );
+    }
+  }).catchError((e) {
+    if (mounted) { // Check if the widget is still mounted
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update parameter pair'),
+        ),
+      );
+    }
+  });
+}
+
+
+  Future<void> _updateParamPair(ParamPair paramPair, String businessId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+    if (token == null) {
+      throw Exception('Auth token is null');
+    }
+    final url =
+        'http://13.234.163.59/api/v1/params/edit-typeBParams/$businessId/${widget.paramPair.id}'; // Update URL format as required
+
+    final response = await http.put(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'newparamName1': paramPair.firstSelectedItem,
+        'newparamName2': paramPair.secondSelectedItem,
+        'newbenchMarks': paramPair.values,
+      }),
+    );
+    print(response.body);
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update param pair');
+    }
   }
 }
