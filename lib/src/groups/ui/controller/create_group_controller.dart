@@ -83,7 +83,7 @@ String domain = AppRemoteRoutes.baseUrl;
 class GroupController {
   Future<void> createGroup(
       GroupModel group, String businessId, String token) async {
-    final url = Uri.parse('${domain}group/create/$businessId');
+    final url = Uri.parse('${domain}groups/create-head-group/$businessId');
     final headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
@@ -94,7 +94,7 @@ class GroupController {
       url,
       headers: headers,
       body: json.encode({
-        'headOfficeName': group.groupName,
+        'headGroupName': group.groupName,
         'logo': group.logo,
         'usersIds': group.usersIds,
         // 'parameterAssigned': "Sales",
@@ -103,7 +103,7 @@ class GroupController {
     print(group.groupName);
     print(group.logo);
     print(group.usersIds);
-
+    print(response.body);
     if (response.statusCode == 201) {
       print('Group Created Successfully');
     } else {

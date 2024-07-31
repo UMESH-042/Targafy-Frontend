@@ -20,16 +20,16 @@ class SubgroupUsersController {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('authToken');
       final url =
-          Uri.parse('${domain}group/get-above-group-users/$businessId/$groupId');
+          Uri.parse('${domain}groups/get-group-users/$businessId/$groupId');
       final headers = {
         'Authorization': 'Bearer $token',
       };
 
       final response = await http.get(url, headers: headers);
-
+      print(response.body);
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        final List<SubgroupUserModel> users = (jsonData['data'] as List)
+        final List<SubgroupUserModel> users = (jsonData['data']['users'] as List)
             .map((user) => SubgroupUserModel.fromJson(user))
             .toList();
         return users;

@@ -30,6 +30,7 @@ import 'package:targafy/src/home/view/screens/controller/pending_approval_contro
 import 'package:targafy/src/home/view/screens/controller/user_profile_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
 import 'package:targafy/src/home/view/screens/home_screen.dart';
+import 'package:targafy/src/home/view/screens/home_screen_new.dart';
 import 'package:targafy/src/home/view/screens/widgets/AddCharts.dart';
 import 'package:targafy/src/parameters/view/controller/add_parameter_controller.dart';
 import 'package:targafy/src/parameters/view/screens/add_parameter_target_screen.dart';
@@ -59,13 +60,7 @@ class BottomNavigationAndAppBar extends ConsumerStatefulWidget {
 class _BottomNavigationAndAppBarState
     extends ConsumerState<BottomNavigationAndAppBar> {
   int _selectedIndex = 0;
-  // static final List<Widget> _widgetOptions = <Widget>[
-  //   const HomeScreen(),
-  //   const UsersScreen(),
-  //   const Addscreen(),
-  //   const ActivityScreen(),
-  //   const FeedbackScreen(token:,)
-  // ];
+
   late final List<Widget> _widgetOptions;
   bool _isRefreshing = false;
   late IO.Socket socket;
@@ -78,7 +73,7 @@ class _BottomNavigationAndAppBarState
     _requestNotificationPermissions();
     super.initState();
     _widgetOptions = <Widget>[
-      const HomeScreen(),
+      AllTwoImpPage(),
       AllFourImpPage(),
       // const UsersScreen(),
       const Addscreen(),
@@ -385,26 +380,26 @@ class _BottomNavigationAndAppBarState
                     data: (role) {
                       return Row(
                         children: [
-                          if (role == 'Admin' || role == 'MiniAdmin')
-                            GestureDetector(
-                              onTap: () async {
-                                final result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const AddParameterTargetScreen(),
-                                  ),
-                                );
-                                if (result == true) {
-                                  _refreshParameters();
-                                }
-                              },
-                              child: CircleAvatar(
-                                backgroundImage:
-                                    AssetImage('assets/img/3d-target.png'),
-                                radius: 15,
-                              ),
-                            ),
+                          // if (role == 'Admin' || role == 'MiniAdmin')
+                          //   GestureDetector(
+                          //     onTap: () async {
+                          //       final result = await Navigator.push(
+                          //         context,
+                          //         MaterialPageRoute(
+                          //           builder: (context) =>
+                          //               const AddParameterTargetScreen(),
+                          //         ),
+                          //       );
+                          //       if (result == true) {
+                          //         _refreshParameters();
+                          //       }
+                          //     },
+                          //     // child: CircleAvatar(
+                          //     //   backgroundImage:
+                          //     //       AssetImage('assets/img/3d-target.png'),
+                          //     //   radius: 15,
+                          //     // ),
+                          //   ),
                           PopupMenuButton<int>(
                             icon: const Icon(Icons.more_vert),
                             color: Colors.white,
@@ -416,17 +411,17 @@ class _BottomNavigationAndAppBarState
                             ),
                             onSelected: (value) async {
                               // if (value == 1) {
-                                // Handle action for "Add Charts"
-                                // final result = await Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => AddCharts(
-                                //       businessId: businessId,
-                                //     ),
-                                //   ),
-                                // );
+                              // Handle action for "Add Charts"
+                              // final result = await Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => AddCharts(
+                              //       businessId: businessId,
+                              //     ),
+                              //   ),
+                              // );
                               // } else
-                               if (value == 1) {
+                              if (value == 1) {
                                 // Handle action for "Refresh"
                                 Restart.restartApp();
                               } else if (value == 2) {
@@ -452,15 +447,15 @@ class _BottomNavigationAndAppBarState
                                 //     color: primaryColor,
                                 //   ),
                                 // ),
-                              PopupMenuItem<int>(
-                                value: 1,
-                                child: CustomText(
-                                  text: 'Refresh',
-                                  fontSize: getScreenWidth(context) * 0.04,
-                                  fontWeight: FontWeight.w600,
-                                  color: primaryColor,
+                                PopupMenuItem<int>(
+                                  value: 1,
+                                  child: CustomText(
+                                    text: 'Refresh',
+                                    fontSize: getScreenWidth(context) * 0.04,
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                  ),
                                 ),
-                              ),
                               PopupMenuItem<int>(
                                 value: 2,
                                 child: CustomText(

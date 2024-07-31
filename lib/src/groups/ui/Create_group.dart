@@ -9,6 +9,7 @@ import 'package:targafy/src/groups/ui/controller/create_group_controller.dart';
 import 'package:targafy/src/groups/ui/model/create_group_model.dart';
 import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
 import 'package:targafy/src/users/ui/model/business_user_list_model.dart';
+import 'package:targafy/widgets/sort_dropdown_list.dart';
 import 'package:targafy/widgets/submit_button.dart';
 
 class CreateGroupPage extends ConsumerStatefulWidget {
@@ -21,7 +22,7 @@ class CreateGroupPage extends ConsumerStatefulWidget {
 class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
   late final List<String> _selectedUsers = [];
   final Map<String, String> _userNames = {};
-  bool selectAll = false;
+  bool _selectAll = false;
   File? _logoImage;
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _groupNameController = TextEditingController();
@@ -38,7 +39,7 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
 
   Future<void> _submitGroup() async {
     final groupName = _groupNameController.text;
-    if (groupName.isEmpty || _logoImage == null || _selectedUsers.isEmpty) {
+    if (groupName.isEmpty || _selectedUsers.isEmpty) {
       setState(() {
         _errorMessage = 'Please fill in all required fields.';
       });
@@ -52,14 +53,17 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
       final selectedBusiness = selectedBusinessData?['business'] as Business?;
       final businessId = selectedBusiness?.id;
 
-      final logoUrl =
-          await ref.read(groupControllerProvider).uploadLogo(_logoImage!);
+      String? logoUrl;
+      if (_logoImage != null) {
+        logoUrl =
+            await ref.read(groupControllerProvider).uploadLogo(_logoImage!);
+      }
+
       final group = GroupModel(
         groupName: groupName,
-        logo: logoUrl,
+        logo: logoUrl ?? '',
         usersIds: _selectedUsers,
       );
-
       await ref
           .read(groupControllerProvider)
           .createGroup(group, businessId!, token!);
@@ -81,6 +85,7 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
     final selectedBusiness = selectedBusinessData?['business'] as Business?;
     final businessId = selectedBusiness?.id;
     final usersStream = ref.watch(businessUsersStreamProvider(businessId!));
+    print(_selectedUsers);
 
     return SafeArea(
       child: Stack(
@@ -140,49 +145,49 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: height * 0.02),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      child: const Row(
-                        children: [
-                          Text(
-                            "Add Logo Image: ",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontFamily: "Poppins",
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: height * 0.01),
-                    GestureDetector(
-                      onTap: _pickImage,
-                      child: Container(
-                        height: 150,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.0),
-                          border: Border.all(color: Colors.grey),
-                        ),
-                        child: _logoImage == null
-                            ? const Icon(
-                                Icons.add_a_photo,
-                                color: Colors.grey,
-                                size: 50,
-                              )
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(15.0),
-                                child: Image.file(
-                                  _logoImage!,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                      ),
-                    ),
+                    // SizedBox(height: height * 0.02),
+                    // Container(
+                    //   alignment: Alignment.centerLeft,
+                    //   child: const Row(
+                    //     children: [
+                    //       Text(
+                    //         "Add Logo Image: ",
+                    //         style: TextStyle(
+                    //           color: Colors.black,
+                    //           fontFamily: "Poppins",
+                    //           fontSize: 14,
+                    //           fontWeight: FontWeight.w600,
+                    //         ),
+                    //         textAlign: TextAlign.left,
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    // SizedBox(height: height * 0.01),
+                    // GestureDetector(
+                    //   onTap: _pickImage,
+                    //   child: Container(
+                    //     height: 150,
+                    //     width: double.infinity,
+                    //     decoration: BoxDecoration(
+                    //       borderRadius: BorderRadius.circular(15.0),
+                    //       border: Border.all(color: Colors.grey),
+                    //     ),
+                    //     child: _logoImage == null
+                    //         ? const Icon(
+                    //             Icons.add_a_photo,
+                    //             color: Colors.grey,
+                    //             size: 50,
+                    //           )
+                    //         : ClipRRect(
+                    //             borderRadius: BorderRadius.circular(15.0),
+                    //             child: Image.file(
+                    //               _logoImage!,
+                    //               fit: BoxFit.cover,
+                    //             ),
+                    //           ),
+                    //   ),
+                    // ),
                     SizedBox(height: height * 0.02),
                     Container(
                       alignment: Alignment.centerLeft,
@@ -202,23 +207,95 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
                       ),
                     ),
                     SizedBox(height: height * 0.02),
+                    // usersStream.when(
+                    //   data: (users) {
+                    //     final sortedUsers =
+                    //         sortList(users, (user) => user.name);
+                    //     return DropdownButtonFormField<String>(
+                    //       items: sortedUsers.map((BusinessUserModel user) {
+                    //         return DropdownMenuItem<String>(
+                    //           value: user.userId,
+                    //           child: Text(user.name),
+                    //         );
+                    //       }).toList(),
+                    //       onChanged: (String? newValue) {
+                    //         setState(() {
+                    //           if (newValue != null &&
+                    //               !_selectedUsers.contains(newValue)) {
+                    //             _selectedUsers.add(newValue);
+                    //             final selectedUser = users.firstWhere(
+                    //                 (user) => user.userId == newValue);
+                    //             _userNames[newValue] = selectedUser.name;
+                    //           }
+                    //         });
+                    //       },
+                    //       hint: const Text('Choose Users'),
+                    //       decoration: InputDecoration(
+                    //         contentPadding: const EdgeInsets.symmetric(
+                    //             vertical: 15, horizontal: 10),
+                    //         border: OutlineInputBorder(
+                    //           borderRadius: BorderRadius.circular(15.0),
+                    //         ),
+                    //       ),
+                    //     );
+                    //   },
+                    //   loading: () => const CircularProgressIndicator(),
+                    //   error: (error, stackTrace) => Text('Error: $error'),
+                    // ),
+                    // SizedBox(height: height * 0.02),
+                    // Wrap(
+                    //   spacing: 8,
+                    //   children: _selectedUsers.map((userId) {
+                    //     return Padding(
+                    //       padding: const EdgeInsets.symmetric(horizontal: 4),
+                    //       child: Chip(
+                    //         label: Text(_userNames[userId]!),
+                    //         onDeleted: () {
+                    //           setState(() {
+                    //             _selectedUsers.remove(userId);
+                    //             _userNames.remove(userId);
+                    //           });
+                    //         },
+                    //       ),
+                    //     );
+                    //   }).toList(),
+                    // ),
                     usersStream.when(
                       data: (users) {
+                        final sortedUsers =
+                            sortList(users, (user) => user.name);
                         return DropdownButtonFormField<String>(
-                          items: users.map((BusinessUserModel user) {
-                            return DropdownMenuItem<String>(
-                              value: user.userId,
-                              child: Text(user.name),
-                            );
-                          }).toList(),
+                          items: [
+                            DropdownMenuItem<String>(
+                              value: 'SelectAll',
+                              child: Text('Select All'),
+                            ),
+                            ...sortedUsers.map((BusinessUserModel user) {
+                              return DropdownMenuItem<String>(
+                                value: user.userId,
+                                child: Text(user.name),
+                              );
+                            }).toList(),
+                          ],
                           onChanged: (String? newValue) {
                             setState(() {
-                              if (newValue != null &&
+                              if (newValue == 'SelectAll') {
+                                _selectedUsers.clear();
+                                _userNames.clear();
+                                _selectedUsers
+                                    .addAll(users.map((user) => user.userId));
+                                users.forEach((user) {
+                                  _userNames[user.userId] = user.name;
+                                });
+                                _selectAll = true;
+                              } else if (newValue != null &&
                                   !_selectedUsers.contains(newValue)) {
                                 _selectedUsers.add(newValue);
                                 final selectedUser = users.firstWhere(
                                     (user) => user.userId == newValue);
                                 _userNames[newValue] = selectedUser.name;
+                                _selectAll =
+                                    _selectedUsers.length == users.length;
                               }
                             });
                           },
@@ -238,21 +315,39 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
                     SizedBox(height: height * 0.02),
                     Wrap(
                       spacing: 8,
-                      children: _selectedUsers.map((userId) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Chip(
-                            label: Text(_userNames[userId]!),
-                            onDeleted: () {
-                              setState(() {
-                                _selectedUsers.remove(userId);
-                                _userNames.remove(userId);
-                              });
-                            },
-                          ),
-                        );
-                      }).toList(),
+                      children: _selectedUsers.isEmpty
+                          ? []
+                          : _selectAll
+                              ? [
+                                  Chip(
+                                    label: Text('All Selected'),
+                                    onDeleted: () {
+                                      setState(() {
+                                        _selectedUsers.clear();
+                                        _userNames.clear();
+                                        _selectAll = false;
+                                      });
+                                    },
+                                  )
+                                ]
+                              : _selectedUsers.map((userId) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4),
+                                    child: Chip(
+                                      label: Text(_userNames[userId]!),
+                                      onDeleted: () {
+                                        setState(() {
+                                          _selectedUsers.remove(userId);
+                                          _userNames.remove(userId);
+                                          _selectAll = false;
+                                        });
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
                     ),
+
                     SizedBox(height: height * 0.02),
                     if (_errorMessage.isNotEmpty)
                       Text(

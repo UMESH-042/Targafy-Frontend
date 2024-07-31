@@ -16,9 +16,9 @@ final SubgroupControllerProvider = Provider<SubGroupController>((ref) {
 });
 
 class SubGroupController {
-  Future<void> createSubGroup(
-      SubGroupModel subgroup, String parentGroupId, String token) async {
-    final url = Uri.parse('${domain}group/create-subgroups/$parentGroupId');
+  Future<void> createSubGroup(SubGroupModel subgroup, String parentGroupId,
+      String token, String businessId) async {
+    final url = Uri.parse('${domain}groups/create-subgroups/$businessId');
     print('This is ParentGroupId :- $parentGroupId');
     final headers = {
       'Content-Type': 'application/json',
@@ -30,15 +30,15 @@ class SubGroupController {
       url,
       headers: headers,
       body: json.encode({
-        'subOfficeName': subgroup.subOfficeName,
-        // 'logo': subgroup.logo,
-        'usersIds': subgroup.usersIds
+        'groupName': subgroup.groupName,
+        'userIds': subgroup.usersIds,
+        'parentGroupId': parentGroupId,
       }),
     );
-    print(subgroup.subOfficeName);
+    print(subgroup.groupName);
     // print(subgroup.logo);
     print(subgroup.usersIds);
-
+    print(response.body);
     if (response.statusCode == 201) {
       print('Sub Group Created Successfully');
     } else {

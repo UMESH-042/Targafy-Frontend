@@ -78,8 +78,7 @@ final businessUsersStreamProvider = StreamProvider.autoDispose
       .toList();
   yield users;
 
-  // Simulate real-time updates
-  await for (final _ in Stream.periodic(const Duration(seconds: 1))) {
+  await for (final _ in Stream.periodic(const Duration(seconds: 10))) {
     final response = await http.get(
       Uri.parse('${domain}business/get/all/users/$businessId'),
       headers: {
@@ -130,7 +129,7 @@ final businessUsersStreamProvider2 = StreamProvider.autoDispose
   yield users;
 
   // Simulate real-time updates
-  await for (final _ in Stream.periodic(const Duration(seconds: 1))) {
+  await for (final _ in Stream.periodic(const Duration(seconds: 10))) {
     final response = await http.get(
       Uri.parse(
           '${domain}business/get-all-subordinate-businessusers/$businessId'),
