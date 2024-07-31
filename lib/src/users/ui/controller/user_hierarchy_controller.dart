@@ -38,4 +38,27 @@ class BusinessController
       state = AsyncValue.error('Error: $e', stackTrace);
     }
   }
+
+  Future<void> fetchBusinessGroupHierarchy(String businessId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+
+    try {
+      final response = await http.get(
+        Uri.parse('${domain}groups/get-group-hierarchy/$businessId'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      print(response.body);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body)['data']['data'];
+        final GroupHierarchy = BusinessUserHierarchy.fromJson(data);
+        state = AsyncValue.data(GroupHierarchy);
+      } else {
+        state =
+            AsyncValue.error('Failed to fetch hierarchy', StackTrace.current);
+      }
+    } catch (e, stackTrace) {
+      state = AsyncValue.error('Error: $e', stackTrace);
+    }
+  }
 }

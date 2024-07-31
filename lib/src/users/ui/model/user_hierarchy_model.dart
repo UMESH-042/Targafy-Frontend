@@ -2,7 +2,6 @@ class BusinessUserHierarchy {
   final List<NodeData> nodes;
   final List<EdgeData> edges;
 
-
   BusinessUserHierarchy({
     required this.nodes,
     required this.edges,
@@ -45,7 +44,7 @@ class Label {
     required this.name,
     required this.userId,
     required this.role,
-     required this.allSubordinatesCount,
+    required this.allSubordinatesCount,
   });
 
   factory Label.fromJson(Map<String, dynamic> json) {
@@ -53,7 +52,7 @@ class Label {
       name: json['name'] ?? '',
       userId: json['userId'] ?? '',
       role: json['role'] ?? '',
-       allSubordinatesCount: json['allSubordinatesCount'] ?? 0,
+      allSubordinatesCount: json['allSubordinatesCount'] ?? 0,
     );
   }
 }

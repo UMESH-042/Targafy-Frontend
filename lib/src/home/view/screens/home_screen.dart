@@ -2104,6 +2104,27 @@ class _HomeScreenEmployeesState extends ConsumerState<HomeScreenEmployees> {
   }
 }
 
+final GroupHierarchyProvider =
+    FutureProvider.autoDispose<BusinessUserHierarchy>((ref) async {
+  final selectedBusinessData = ref.watch(currentBusinessProvider);
+  final businessId = selectedBusinessData?['business']?.id;
+
+  if (businessId != null) {
+    final notifier = ref.read(businessControllerProvider.notifier);
+    await notifier.fetchBusinessGroupHierarchy(businessId);
+    final result = ref.watch(businessControllerProvider);
+
+    if (result is AsyncData<BusinessUserHierarchy>) {
+      return result.value; // Return the fetched BusinessUserHierarchy
+    } else {
+      throw StateError('Failed to fetch business hierarchy');
+    }
+  } else {
+    throw StateError(
+        'Business ID is null'); // Throw an error if businessId is null
+  }
+});
+
 class HomeScreenGroups extends ConsumerStatefulWidget {
   const HomeScreenGroups({super.key});
 
@@ -2278,7 +2299,7 @@ class _HomeScreenGroupsState extends ConsumerState<HomeScreenGroups> {
     final dataAddedController = ref.watch(dataAddedControllerProvider);
 
     final businessId = selectedBusinessData?['business']?.id;
-    final hierarchyAsync = ref.watch(businessHierarchyProvider);
+    final hierarchyAsync = ref.watch(GroupHierarchyProvider);
     final paramPairsAsync = ref.watch(paramPairsProvider);
 
     if (parameterListAsync == null ||
