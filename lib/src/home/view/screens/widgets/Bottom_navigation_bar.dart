@@ -29,7 +29,7 @@ import 'package:targafy/src/home/view/screens/controller/notification_counter_co
 import 'package:targafy/src/home/view/screens/controller/pending_approval_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_profile_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
-import 'package:targafy/src/home/view/screens/home_screen.dart';
+import 'package:targafy/src/home/view/screens/home_screen_groups.dart';
 import 'package:targafy/src/home/view/screens/home_screen_new.dart';
 import 'package:targafy/src/home/view/screens/widgets/AddCharts.dart';
 import 'package:targafy/src/parameters/view/controller/add_parameter_controller.dart';

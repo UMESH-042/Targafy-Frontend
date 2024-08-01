@@ -448,7 +448,7 @@ import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/src/home/view/screens/controller/add_charts_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/get_drop_downfield_pair.dart';
 import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart';
-import 'package:targafy/src/home/view/screens/home_screen.dart';
+import 'package:targafy/src/home/view/screens/home_screen_groups.dart';
 import 'package:targafy/src/home/view/widgets/paramPairwidget.dart';
 import 'package:targafy/src/parameters/view/widgets/small_button.dart';
 import '../../../../../core/shared/components/back_button.dart';

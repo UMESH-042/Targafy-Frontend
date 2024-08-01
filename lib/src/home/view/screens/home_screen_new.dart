@@ -58,7 +58,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
-import 'package:targafy/src/home/view/screens/home_screen.dart';
+import 'package:targafy/src/home/view/screens/home_screen_groups.dart';
+import 'package:targafy/src/home/view/screens/home_screen_employees.dart';
 
 class AllTwoImpPage extends ConsumerStatefulWidget {
   const AllTwoImpPage({super.key});
