@@ -2272,6 +2272,96 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                         ),
                       ),
                     ),
+                    // DataCell(
+                    //   GestureDetector(
+                    //     onTap: () {
+                    //       toggleEditing(userId);
+                    //     },
+                    //     child: isEditing.containsKey(userId) &&
+                    //             isEditing[userId]!
+                    //         ? Center(
+                    //             child: TextFormField(
+                    //               initialValue:
+                    //                   userTargetData[userId]![0].targetValue,
+                    //               onChanged: (newValue) {
+                    //                 setState(() {
+                    //                   userTargetData[userId]![0].targetValue =
+                    //                       newValue;
+                    //                 });
+                    //               },
+                    //               onFieldSubmitted: (value) {
+                    //                 toggleEditing(userId);
+                    //               },
+                    //               keyboardType: TextInputType.number,
+                    //               textAlign: TextAlign.center,
+                    //             ),
+                    //           )
+                    //         : Center(
+                    //             child: Text(
+                    //               _formatNumber(
+                    //                   userTargetData[userId]![0].targetValue),
+                    //               textAlign: TextAlign.center,
+                    //               overflow: TextOverflow.ellipsis,
+                    //             ),
+                    //           ),
+                    //   ),
+                    // ),
+                    // DataCell(
+                    //   GestureDetector(
+                    //     onTap: () {
+                    //       toggleEditing(userId);
+                    //     },
+                    //     child: isEditing.containsKey(userId) &&
+                    //             isEditing[userId]!
+                    //         ? Row(
+                    //             mainAxisAlignment: MainAxisAlignment.center,
+                    //             children: [
+                    //               Expanded(
+                    //                 child: TextFormField(
+                    //                   initialValue: userTargetData[userId]![0]
+                    //                       .targetValue,
+                    //                   onChanged: (newValue) {
+                    //                     setState(() {
+                    //                       userTargetData[userId]![0]
+                    //                           .targetValue = newValue;
+                    //                     });
+                    //                   },
+                    //                   onFieldSubmitted: (value) {
+                    //                     toggleEditing(userId);
+                    //                   },
+                    //                   keyboardType: TextInputType.number,
+                    //                   textAlign: TextAlign.center,
+                    //                 ),
+                    //               ),
+                    //               IconButton(
+                    //                 icon: Icon(Icons.check),
+                    //                 onPressed: () {
+                    //                   toggleEditing(userId);
+                    //                 },
+                    //               ),
+                    //             ],
+                    //           )
+                    //         : Row(
+                    //             mainAxisAlignment: MainAxisAlignment.center,
+                    //             children: [
+                    //               Expanded(
+                    //                 child: Text(
+                    //                   _formatNumber(userTargetData[userId]![0]
+                    //                       .targetValue),
+                    //                   textAlign: TextAlign.center,
+                    //                   overflow: TextOverflow.ellipsis,
+                    //                 ),
+                    //               ),
+                    //               IconButton(
+                    //                 icon: Icon(Icons.edit),
+                    //                 onPressed: () {
+                    //                   toggleEditing(userId);
+                    //                 },
+                    //               ),
+                    //             ],
+                    //           ),
+                    //   ),
+                    // ),
                     DataCell(
                       GestureDetector(
                         onTap: () {
@@ -2279,30 +2369,63 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                         },
                         child: isEditing.containsKey(userId) &&
                                 isEditing[userId]!
-                            ? Center(
-                                child: TextFormField(
-                                  initialValue:
-                                      userTargetData[userId]![0].targetValue,
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      userTargetData[userId]![0].targetValue =
-                                          newValue;
-                                    });
-                                  },
-                                  onFieldSubmitted: (value) {
-                                    toggleEditing(userId);
-                                  },
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                ),
+                            ? Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      initialValue: userTargetData[userId]![0]
+                                          .targetValue,
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          userTargetData[userId]![0]
+                                              .targetValue = newValue;
+                                        });
+                                      },
+                                      onFieldSubmitted: (value) {
+                                        toggleEditing(userId);
+                                      },
+                                      keyboardType: TextInputType.number,
+                                      textAlign: TextAlign.center,
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 8.0),
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.check),
+                                    iconSize:
+                                        18.0, // Adjust the icon size as needed
+                                    onPressed: () {
+                                      toggleEditing(userId);
+                                    },
+                                  ),
+                                ],
                               )
-                            : Center(
-                                child: Text(
-                                  _formatNumber(
-                                      userTargetData[userId]![0].targetValue),
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                            : Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      _formatNumber(userTargetData[userId]![0]
+                                          .targetValue),
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.edit),
+                                    iconSize:
+                                        18.0, 
+                                    onPressed: () {
+                                      toggleEditing(userId);
+                                    },
+                                  ),
+                                ],
                               ),
                       ),
                     ),
