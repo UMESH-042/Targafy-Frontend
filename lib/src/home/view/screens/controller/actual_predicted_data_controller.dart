@@ -133,13 +133,13 @@ class DataAddedController {
       String businessId, String parameterName, String month) async {
     final String url =
         '${domain}data/get-param-data/$businessId/$parameterName/$month';
-    final authToken = await _getAuthToken(); // Get the auth token
+    final authToken = await _getAuthToken();
     print('This is business Id :- $businessId');
     print('This is parameterName :- $parameterName');
     try {
       final response = await http
           .get(Uri.parse(url), headers: {'Authorization': 'Bearer $authToken'});
-
+      print(response.body);
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         if (responseData.containsKey('data')) {

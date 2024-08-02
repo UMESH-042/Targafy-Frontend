@@ -10,6 +10,7 @@ import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/src/home/view/screens/controller/Comment_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/actual_predicted_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/get_drop_downfield_pair.dart';
+import 'package:targafy/src/home/view/screens/controller/group_data_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_hierarchy_comments_controller.dart';
 import 'package:targafy/src/home/view/screens/controller/user_hierarchy_data_controller.dart';
 import 'package:targafy/src/home/view/screens/widgets/AddCharts.dart';
@@ -81,26 +82,26 @@ final GroupHierarchyProvider =
   }
 });
 
-final userDataFutureProvider =
-    FutureProvider.family<UserData, Tuple4<String, String, String, String>>(
+final groupDataFutureProvider =
+    FutureProvider.family<GroupData, Tuple4<String, String, String, String>>(
         (ref, params) async {
   final businessId = params.item1;
   final userId = params.item2;
   final selectedParameter = params.item3;
   final month = params.item4;
 
-  final controller = ref.read(userDataProvider.notifier);
-  await controller.fetchUserData(businessId, userId, selectedParameter, month);
-  final result = ref.watch(userDataProvider);
+  final controller = ref.read(groupDataProvider.notifier);
+  await controller.fetchGroupData(businessId, userId, selectedParameter, month);
+  final result = ref.watch(groupDataProvider);
 
-  if (result is AsyncData<UserData>) {
+  if (result is AsyncData<GroupData>) {
     return result.value; // Return the fetched UserData
   } else {
     throw StateError('Failed to fetch user data');
   }
 });
 
-final combinedUserDataFutureProvider = FutureProvider.family<List<UserData>,
+final combinedUserDataFutureProvider = FutureProvider.family<List<GroupData>,
     Tuple5<String, String, String, String, String>>((ref, tuple) async {
   final businessId = tuple.item1;
   final selectedUserId = tuple.item2;
@@ -109,10 +110,10 @@ final combinedUserDataFutureProvider = FutureProvider.family<List<UserData>,
   final currentMonth = tuple.item5;
 
   final futures = [
-    ref.read(userDataFutureProvider(
+    ref.read(groupDataFutureProvider(
             Tuple4(businessId, selectedUserId, firstSelectedItem, currentMonth))
         .future),
-    ref.read(userDataFutureProvider(Tuple4(
+    ref.read(groupDataFutureProvider(Tuple4(
             businessId, selectedUserId, secondSelectedItem, currentMonth))
         .future),
   ];
@@ -120,7 +121,7 @@ final combinedUserDataFutureProvider = FutureProvider.family<List<UserData>,
   return Future.wait(futures);
 });
 
-final userCommentsFutureProvider = FutureProvider.family<List<Comment>,
+final groupCommentsFutureProvider = FutureProvider.family<List<Comment>,
     Tuple4<String, String, String, String>>((ref, params) async {
   final businessId = params.item1;
   final userId = params.item2;
@@ -128,7 +129,8 @@ final userCommentsFutureProvider = FutureProvider.family<List<Comment>,
   final month = params.item4;
 
   final controller = ref.read(commentsDataProvider.notifier);
-  await controller.fetchComments(businessId, userId, selectedParameter, month);
+  await controller.fetchGroupComments(
+      businessId, userId, selectedParameter, month);
   final result = ref.watch(commentsDataProvider);
 
   if (result is AsyncData<List<Comment>>) {
@@ -138,7 +140,7 @@ final userCommentsFutureProvider = FutureProvider.family<List<Comment>,
   }
 });
 
-final userPieDataFutureProvider =
+final groupPieDataFutureProvider =
     FutureProvider.family<UserPieData, Tuple4<String, String, String, String>>(
         (ref, params) async {
   final businessId = params.item1;
@@ -146,10 +148,10 @@ final userPieDataFutureProvider =
   final selectedParameter = params.item3;
   final currentMonth = params.item4;
 
-  final controller = ref.read(userPieDataProvider.notifier);
-  await controller.fetchUserPieData(
+  final controller = ref.read(groupPieDataProvider.notifier);
+  await controller.fetchGroupPieData(
       businessId, userId, selectedParameter, currentMonth);
-  final result = ref.watch(userPieDataProvider);
+  final result = ref.watch(groupPieDataProvider);
 
   if (result is AsyncData<UserPieData>) {
     return result.value; // Return the fetched UserData
@@ -640,7 +642,7 @@ class _HomeScreenGroupsState extends ConsumerState<HomeScreenGroups> {
                           selectedHierarchyUser &&
                           selectedStates[0])
                         ref
-                            .watch(userDataFutureProvider(Tuple4(
+                            .watch(groupDataFutureProvider(Tuple4(
                                 businessId,
                                 selectedUserId,
                                 selectedParameter,
@@ -697,7 +699,7 @@ class _HomeScreenGroupsState extends ConsumerState<HomeScreenGroups> {
                           selectedUserId.isNotEmpty &&
                           selectedStates[2])
                         ref
-                            .watch(userDataFutureProvider(Tuple4(
+                            .watch(groupDataFutureProvider(Tuple4(
                                 businessId,
                                 selectedUserId,
                                 selectedParameter,
@@ -811,7 +813,7 @@ class _HomeScreenGroupsState extends ConsumerState<HomeScreenGroups> {
                           selectedUserId.isNotEmpty &&
                           selectedStates[1])
                         ref
-                            .watch(userPieDataFutureProvider(Tuple4(
+                            .watch(groupPieDataFutureProvider(Tuple4(
                                 businessId,
                                 selectedUserId,
                                 selectedParameter,
@@ -854,7 +856,7 @@ class _HomeScreenGroupsState extends ConsumerState<HomeScreenGroups> {
                           selectedUserId.isNotEmpty &&
                           selectedStates[3])
                         ref
-                            .watch(userCommentsFutureProvider(Tuple4(
+                            .watch(groupCommentsFutureProvider(Tuple4(
                                 businessId,
                                 selectedUserId,
                                 selectedParameter,

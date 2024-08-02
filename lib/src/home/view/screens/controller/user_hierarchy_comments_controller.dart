@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:targafy/utils/remote_routes.dart';
+
+String domain = AppRemoteRoutes.baseUrl;
 
 final commentsDataProvider =
     StateNotifierProvider<CommentsDataController, AsyncValue<List<Comment>>>(
@@ -16,8 +19,37 @@ class CommentsDataController extends StateNotifier<AsyncValue<List<Comment>>> {
   Future<void> fetchComments(
       String businessId, String userId, String parameter, String month) async {
     final String url =
-        'http://13.234.163.59/api/v1/data/get-level-comments/$businessId/$userId/$parameter/$month';
-    final authToken = await _getAuthToken(); // Get the auth token
+        '${domain}data/get-level-comments/$businessId/$userId/$parameter/$month';
+    final authToken = await _getAuthToken();
+    print('This is business Id :- $businessId');
+    print('This is userId :- $userId');
+    print('This is Parameter :- $parameter');
+    try {
+      final response = await http
+          .get(Uri.parse(url), headers: {'Authorization': 'Bearer $authToken'});
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        if (responseData.containsKey('data')) {
+          final List<dynamic> commentsData = responseData['data']['comments'];
+          List<Comment> comments = commentsData
+              .map((commentData) => Comment.fromJson(commentData))
+              .toList();
+          state = AsyncValue.data(comments);
+          return;
+        }
+      }
+    } catch (e) {
+      print('Error fetching comments: $e');
+    }
+    state = AsyncValue.data([]);
+  }
+
+  Future<void> fetchGroupComments(
+      String businessId, String userId, String parameter, String month) async {
+    final String url =
+        '${domain}groups/get-group-comments/$businessId/$parameter/$month/$userId';
+    final authToken = await _getAuthToken();
     print('This is business Id :- $businessId');
     print('This is userId :- $userId');
     print('This is Parameter :- $parameter');
@@ -85,7 +117,7 @@ class TodaysComment {
       todaysComment: json['todaysComment'] ?? '',
       addedBy: json['addedBy'] ?? '',
       date: json['date'] ?? '',
-      time: json['time']??'',
+      time: json['time'] ?? '',
     );
   }
 }

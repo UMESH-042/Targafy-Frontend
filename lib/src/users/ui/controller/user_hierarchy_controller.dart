@@ -41,41 +41,6 @@ class BusinessController
   }
 }
 
-// final businessGroupControllerProvider =
-//     StateNotifierProvider<BusinessGroupController, AsyncValue<GroupHierarchy>>(
-//         (ref) {
-//   return BusinessGroupController();
-// });
-
-// class BusinessGroupController
-//     extends StateNotifier<AsyncValue<GroupHierarchy>> {
-//   BusinessGroupController() : super(const AsyncLoading());
-
-//   Future<void> fetchGroupHierarchy(String businessId) async {
-//     final prefs = await SharedPreferences.getInstance();
-//     final token = prefs.getString('authToken');
-
-//     try {
-//       final response = await http.get(
-//         Uri.parse('${domain}groups/get-group-hierarchy/$businessId'),
-//         headers: {'Authorization': 'Bearer $token'},
-//       );
-//       // print(response.body);
-//       if (response.statusCode == 200) {
-//         final data = json.decode(response.body)['data']['data'];
-//         print('This is $data');
-//         final groupHierarchy = GroupHierarchy.fromJson(data);
-//         print('This is group hierarchy data :- $groupHierarchy');
-//         state = AsyncValue.data(groupHierarchy);
-//       } else {
-//         state =
-//             AsyncValue.error('Failed to fetch hierarchy', StackTrace.current);
-//       }
-//     } catch (e, stackTrace) {
-//       state = AsyncValue.error('Error: $e', stackTrace);
-//     }
-//   }
-// }
 
 
 

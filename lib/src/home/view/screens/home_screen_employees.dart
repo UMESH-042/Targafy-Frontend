@@ -71,13 +71,12 @@ final businessHierarchyProvider =
     final result = ref.watch(businessControllerProvider);
 
     if (result is AsyncData<BusinessUserHierarchy>) {
-      return result.value; 
+      return result.value;
     } else {
       throw StateError('Failed to fetch business hierarchy');
     }
   } else {
-    throw StateError(
-        'Business ID is null'); 
+    throw StateError('Business ID is null');
   }
 });
 
