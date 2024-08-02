@@ -836,13 +836,19 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class CustomChart extends StatelessWidget {
+  final int currentMonth;
   final String parameter;
+  final int totalTargetAchieved;
+  final int actualTotalTarget;
   final List<List<dynamic>> actualData;
   final List<List<dynamic>> predictedData;
 
   const CustomChart({
     Key? key,
+    required this.currentMonth,
     required this.parameter,
+    required this.totalTargetAchieved,
+    required this.actualTotalTarget,
     required this.actualData,
     required this.predictedData,
   }) : super(key: key);
@@ -862,11 +868,22 @@ class CustomChart extends StatelessWidget {
     DateTime maxDate =
         _findMaxDate(formattedActualData, formattedPredictedData);
 
+    double maxValue =
+        _findMaxValue(formattedActualData, formattedPredictedData);
+
+    int currentYear = DateTime.now().year;
+    DateTime currentDateTime = DateTime(currentYear, currentMonth);
+
     return SfCartesianChart(
       primaryXAxis: DateTimeAxis(
+        // title: AxisTitle(
+        //   text:
+        //       '${DateFormat("MMMM").format(maxDate)} \'${DateFormat("yy").format(maxDate)}',
+        //   textStyle: const TextStyle(fontWeight: FontWeight.bold),
+        // ),
         title: AxisTitle(
           text:
-              '${DateFormat("MMMM").format(maxDate)} \'${DateFormat("yy").format(maxDate)}',
+              '${DateFormat("MMMM").format(currentDateTime)} \'${DateFormat("yy").format(currentDateTime)}',
           textStyle: const TextStyle(fontWeight: FontWeight.bold),
         ),
         minimum: minDate,
@@ -904,6 +921,7 @@ class CustomChart extends StatelessWidget {
         ),
         numberFormat: NumberFormat.compact(),
         axisLine: const AxisLine(width: 1),
+        maximum: maxValue,
       ),
       // title: ChartTitle(text: '$parameter Analysis'),
       title: ChartTitle(text: ''),
@@ -920,17 +938,17 @@ class CustomChart extends StatelessWidget {
           dataSource: formattedActualData,
           xValueMapper: (data, _) => DateTime.parse(data[0].toString()),
           yValueMapper: (data, _) => double.parse(data[1].toString()),
-          name: 'Achievement',
-          dataLabelSettings: const DataLabelSettings(isVisible: true),
+          name: 'Achievement ($totalTargetAchieved)',
+          dataLabelSettings: const DataLabelSettings(isVisible: false),
           color: Colors.red,
         ),
         LineSeries<dynamic, DateTime>(
           dataSource: formattedPredictedData,
           xValueMapper: (data, _) => DateTime.parse(data[0].toString()),
           yValueMapper: (data, _) => double.parse(data[1].toString()),
-          name: 'Target',
+          name: 'Target ($actualTotalTarget)',
           dataLabelSettings: DataLabelSettings(
-            isVisible: true,
+            isVisible: false,
             labelPosition: ChartDataLabelPosition.inside,
             useSeriesColor: true,
             builder: (dynamic data, dynamic point, dynamic series,
@@ -1028,5 +1046,26 @@ class CustomChart extends StatelessWidget {
     int daysInMonth = DateTime(maxDate.year, maxDate.month + 1, 0).day;
     return DateTime(
         maxDate.year, maxDate.month, daysInMonth); // End of the month
+  }
+
+  double _findMaxValue(
+      List<List<dynamic>> actualData, List<List<dynamic>> predictedData) {
+    double maxValue = 0;
+
+    for (var data in actualData) {
+      double value = double.parse(data[1].toString());
+      if (value > maxValue) {
+        maxValue = value;
+      }
+    }
+
+    for (var data in predictedData) {
+      double value = double.parse(data[1].toString());
+      if (value > maxValue) {
+        maxValue = value;
+      }
+    }
+
+    return maxValue;
   }
 }
