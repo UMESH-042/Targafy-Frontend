@@ -99,3 +99,35 @@ class User {
     };
   }
 }
+
+
+
+
+// department.dart
+class department {
+  final String departmentId;
+  final String departmentName;
+  final String role;
+
+  department({
+    required this.departmentId,
+    required this.departmentName,
+    required this.role,
+  });
+
+  factory department.fromJson(Map<String, dynamic> json) {
+    return department(
+      departmentId: json['departmentId'],
+      departmentName: json['departmentName'],
+      role: json['role'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'departmentId': departmentId,
+      'departmentName': departmentName,
+      'role': role,
+    };
+  }
+}

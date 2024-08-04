@@ -439,9 +439,12 @@
 // }
 
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/core/constants/colors.dart';
 import 'package:targafy/core/constants/dimensions.dart';
@@ -451,9 +454,9 @@ import 'package:targafy/src/home/view/screens/controller/user_role_controller.da
 import 'package:targafy/src/home/view/screens/home_screen_groups.dart';
 import 'package:targafy/src/home/view/widgets/paramPairwidget.dart';
 import 'package:targafy/src/parameters/view/widgets/small_button.dart';
+
 import '../../../../../core/shared/components/back_button.dart';
 import '../../../../parameters/view/controller/add_parameter_controller.dart';
-import 'package:http/http.dart' as http;
 
 // class AddCharts extends ConsumerStatefulWidget {
 //   final String? businessId;
@@ -844,9 +847,11 @@ class DropdownPairWidget extends ConsumerWidget {
 
 class AddChartsMainPage extends ConsumerStatefulWidget {
   final String? businessId;
+  final String departmentId;
   const AddChartsMainPage({
     Key? key,
     required this.businessId,
+    required this.departmentId,
   }) : super(key: key);
 
   @override

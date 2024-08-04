@@ -24,6 +24,7 @@ final businessAndUserProvider = StreamProvider.autoDispose
       final data = json.decode(response.body);
       final List businesses = data['data']['businesses'];
       final user = data['data']['user'];
+      final List departments = data['data']['result'];
 
       // print('Fetched User: $user');
       // print('Fetched Businesses: $businesses');
@@ -31,11 +32,13 @@ final businessAndUserProvider = StreamProvider.autoDispose
       yield {
         'businesses': businesses.map((e) => Business.fromJson(e)).toList(),
         'user': User.fromJson(user),
+        'departments': departments.map((e) => department.fromJson(e)).toList(),
       };
     } else if (response.statusCode == 400) {
       final data = json.decode(response.body);
       final List businesses = data['data']['businesses'];
       final user = data['data']['user'];
+      final List departments = data['data']['result'];
 
       // print('Fetched User: $user');
       // print('Fetched Businesses: $businesses');
@@ -43,6 +46,7 @@ final businessAndUserProvider = StreamProvider.autoDispose
       yield {
         'businesses': businesses.map((e) => Business.fromJson(e)).toList(),
         'user': User.fromJson(user),
+        'departments': departments.map((e) => department.fromJson(e)).toList(),
       };
     } else {
       throw Exception('Failed to fetch business details');

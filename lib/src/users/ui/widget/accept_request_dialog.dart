@@ -1,8 +1,16 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 // user_selection_dialog.dart
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:targafy/src/home/view/screens/controller/Department_controller.dart';
+
 import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
 import 'package:targafy/src/users/ui/model/business_user_list_model.dart';
+import 'package:targafy/utils/remote_routes.dart';
+import 'package:tuple/tuple.dart';
 
 // class UserSelectionDialog extends ConsumerStatefulWidget {
 //   final String userId;
@@ -219,6 +227,578 @@ import 'package:targafy/src/users/ui/model/business_user_list_model.dart';
 //   }
 // }
 
+// class UserSelectionDialog extends ConsumerStatefulWidget {
+//   final String userId;
+//   final Function(bool) userRequestCallback;
+//   final String businessId;
+//   final String? departmentId;
+
+//   const UserSelectionDialog({
+//     required this.userId,
+//     required this.userRequestCallback,
+//     required this.businessId,
+//     required this.departmentId,
+//   });
+
+//   @override
+//   _UserSelectionDialogState createState() => _UserSelectionDialogState();
+// }
+
+// class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
+//   List<String> roles = ["MiniAdmin", "User"];
+//   BusinessUserModel? selectedUserListItem;
+//   String? selectedRole;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       ref
+//           .read(businessUsersProvider.notifier)
+//           .fetchBusinessUsers(widget.businessId);
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final usersListState = ref.watch(businessUsersProvider);
+//     final userRequestState = ref.watch(userRequestProvider);
+
+//     double height = MediaQuery.of(context).size.height;
+//     double width = MediaQuery.of(context).size.width;
+
+//     return Dialog(
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.circular(10.0),
+//       ),
+//       child: Padding(
+//         padding: const EdgeInsets.all(16.0),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           crossAxisAlignment: CrossAxisAlignment.stretch,
+//           children: [
+//             const Text(
+//               "Select Manager and Role",
+//               style: TextStyle(
+//                 fontSize: 18,
+//                 fontWeight: FontWeight.bold,
+//               ),
+//             ),
+//             const SizedBox(height: 16),
+//             const Row(
+//               children: [
+//                 SizedBox(width: 5),
+//                 Text(
+//                   "Select role",
+//                   style: TextStyle(
+//                       color: Colors.black,
+//                       fontFamily: "Poppins",
+//                       fontSize: 14,
+//                       fontWeight: FontWeight.w600),
+//                 ),
+//               ],
+//             ),
+//             SizedBox(height: height * 0.01),
+//             Container(
+//               height: height * 0.06,
+//               width: double.maxFinite - 10,
+//               decoration: BoxDecoration(
+//                 border: Border.all(
+//                   style: BorderStyle.solid,
+//                   color: Colors.grey,
+//                 ),
+//                 borderRadius: BorderRadius.circular(12),
+//               ),
+//               child: DropdownButtonHideUnderline(
+//                 child: DropdownButton<String>(
+//                   icon: const Align(
+//                     alignment: Alignment.centerRight,
+//                     child: Icon(
+//                       Icons.keyboard_arrow_down_sharp,
+//                       color: Colors.grey,
+//                     ),
+//                   ),
+//                   elevation: 4,
+//                   style: const TextStyle(color: Colors.black, fontSize: 14),
+//                   value: selectedRole,
+//                   onChanged: (String? newValue) {
+//                     setState(() {
+//                       selectedRole = newValue;
+//                     });
+//                   },
+//                   items: roles.map<DropdownMenuItem<String>>((String s) {
+//                     return DropdownMenuItem<String>(
+//                       value: s,
+//                       child: Text("  $s"),
+//                     );
+//                   }).toList(),
+//                 ),
+//               ),
+//             ),
+//             SizedBox(height: height * 0.02),
+//             const Row(
+//               children: [
+//                 SizedBox(width: 5),
+//                 Text(
+//                   "Assign To",
+//                   style: TextStyle(
+//                       color: Colors.black,
+//                       fontFamily: "Poppins",
+//                       fontSize: 14,
+//                       fontWeight: FontWeight.w600),
+//                 ),
+//               ],
+//             ),
+//             SizedBox(height: height * 0.01),
+//             Container(
+//               height: height * 0.06,
+//               width: width - 41,
+//               decoration: BoxDecoration(
+//                 border: Border.all(
+//                   style: BorderStyle.solid,
+//                   color: Colors.grey,
+//                 ),
+//                 borderRadius: BorderRadius.circular(12),
+//               ),
+//               child: usersListState.when(
+//                 data: (usersList) => DropdownButtonHideUnderline(
+//                   child: DropdownButton<BusinessUserModel>(
+//                     icon: const Align(
+//                       alignment: Alignment.centerRight,
+//                       child: Icon(
+//                         Icons.keyboard_arrow_down_sharp,
+//                         color: Colors.grey,
+//                       ),
+//                     ),
+//                     elevation: 4,
+//                     style: const TextStyle(color: Colors.black, fontSize: 14),
+//                     value: selectedUserListItem,
+//                     onChanged: (BusinessUserModel? newValue) {
+//                       setState(() {
+//                         selectedUserListItem = newValue;
+//                       });
+//                     },
+//                     items: usersList.map<DropdownMenuItem<BusinessUserModel>>(
+//                         (BusinessUserModel user) {
+//                       return DropdownMenuItem<BusinessUserModel>(
+//                         value: user,
+//                         child: Text("  ${user.name}"),
+//                       );
+//                     }).toList(),
+//                   ),
+//                 ),
+//                 loading: () => const Center(
+//                   child: CircularProgressIndicator(),
+//                 ),
+//                 error: (error, stackTrace) => Center(
+//                   child: Text('Error: $error'),
+//                 ),
+//               ),
+//             ),
+//             const SizedBox(height: 16),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.end,
+//               children: [
+//                 TextButton(
+//                   onPressed: () {
+//                     Navigator.pop(context);
+//                   },
+//                   child: const Text("Close"),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: userRequestState is AsyncLoading
+//                       ? null
+//                       : () async {
+//                           if (selectedUserListItem != null &&
+//                               selectedRole != null) {
+//                             try {
+//                               await ref
+//                                   .read(userRequestProvider.notifier)
+//                                   .submitUserRequest(
+//                                     widget.businessId,
+//                                     widget.userId,
+//                                     selectedRole!,
+//                                     selectedUserListItem!.userId,
+//                                   );
+//                               Navigator.pop(context);
+//                               widget.userRequestCallback(
+//                                   true); // Notify parent widget
+//                             } catch (e) {
+//                               widget.userRequestCallback(false);
+//                             }
+//                           } else {
+//                             // Show error or validation message
+//                             showDialog(
+//                               context: context,
+//                               builder: (context) => AlertDialog(
+//                                 title: const Text("Error"),
+//                                 content: const Text(
+//                                     "Please select a user and role."),
+//                                 actions: [
+//                                   TextButton(
+//                                     onPressed: () {
+//                                       Navigator.of(context).pop();
+//                                     },
+//                                     child: const Text("OK"),
+//                                   ),
+//                                 ],
+//                               ),
+//                             );
+//                           }
+//                         },
+//                   child: userRequestState is AsyncLoading
+//                       ? const CircularProgressIndicator()
+//                       : const Text("Submit"),
+//                 ),
+//               ],
+//             ),
+//             if (userRequestState is AsyncError)
+//               Text(
+//                 'Error: ${userRequestState.error}',
+//                 style: const TextStyle(color: Colors.red),
+//               ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// class UserSelectionDialog extends ConsumerStatefulWidget {
+//   final String userId;
+//   final Function(bool) userRequestCallback;
+//   final String businessId;
+//   final String? departmentId;
+
+//   const UserSelectionDialog({
+//     required this.userId,
+//     required this.userRequestCallback,
+//     required this.businessId,
+//     required this.departmentId,
+//   });
+
+//   @override
+//   _UserSelectionDialogState createState() => _UserSelectionDialogState();
+// }
+
+// class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
+//   List<String> roles = ["MiniAdmin", "User"];
+//   BusinessUserModel? selectedUserListItem;
+//   String? selectedRole;
+//   Department? selectedDepartment;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       ref
+//           .read(businessUsersProvider.notifier)
+//           .fetchBusinessUsers(widget.businessId);
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final usersListState = ref.watch(businessUsersProvider);
+//     final userRequestState = ref.watch(userRequestProvider);
+//     final departmentState = ref.watch(departmentProvider(widget.businessId));
+
+//     double height = MediaQuery.of(context).size.height;
+//     double width = MediaQuery.of(context).size.width;
+
+//     return Dialog(
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.circular(10.0),
+//       ),
+//       child: Padding(
+//         padding: const EdgeInsets.all(16.0),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           crossAxisAlignment: CrossAxisAlignment.stretch,
+//           children: [
+//             const Text(
+//               "Select Manager and Role",
+//               style: TextStyle(
+//                 fontSize: 18,
+//                 fontWeight: FontWeight.bold,
+//               ),
+//             ),
+//             const SizedBox(height: 16),
+//             const Row(
+//               children: [
+//                 SizedBox(width: 5),
+//                 Text(
+//                   "Select role",
+//                   style: TextStyle(
+//                       color: Colors.black,
+//                       fontFamily: "Poppins",
+//                       fontSize: 14,
+//                       fontWeight: FontWeight.w600),
+//                 ),
+//               ],
+//             ),
+//             SizedBox(height: height * 0.01),
+//             Container(
+//               height: height * 0.06,
+//               width: double.maxFinite - 10,
+//               decoration: BoxDecoration(
+//                 border: Border.all(
+//                   style: BorderStyle.solid,
+//                   color: Colors.grey,
+//                 ),
+//                 borderRadius: BorderRadius.circular(12),
+//               ),
+//               child: DropdownButtonHideUnderline(
+//                 child: DropdownButton<String>(
+//                   icon: const Align(
+//                     alignment: Alignment.centerRight,
+//                     child: Icon(
+//                       Icons.keyboard_arrow_down_sharp,
+//                       color: Colors.grey,
+//                     ),
+//                   ),
+//                   elevation: 4,
+//                   style: const TextStyle(color: Colors.black, fontSize: 14),
+//                   value: selectedRole,
+//                   onChanged: (String? newValue) {
+//                     setState(() {
+//                       selectedRole = newValue;
+//                     });
+//                   },
+//                   items: roles.map<DropdownMenuItem<String>>((String s) {
+//                     return DropdownMenuItem<String>(
+//                       value: s,
+//                       child: Text("  $s"),
+//                     );
+//                   }).toList(),
+//                 ),
+//               ),
+//             ),
+//             SizedBox(height: height * 0.02),
+//             const Row(
+//               children: [
+//                 SizedBox(width: 5),
+//                 Text(
+//                   "Select Department",
+//                   style: TextStyle(
+//                       color: Colors.black,
+//                       fontFamily: "Poppins",
+//                       fontSize: 14,
+//                       fontWeight: FontWeight.w600),
+//                 ),
+//               ],
+//             ),
+//             SizedBox(height: height * 0.01),
+//             Container(
+//               height: height * 0.06,
+//               width: double.maxFinite - 10,
+//               decoration: BoxDecoration(
+//                 border: Border.all(
+//                   style: BorderStyle.solid,
+//                   color: Colors.grey,
+//                 ),
+//                 borderRadius: BorderRadius.circular(12),
+//               ),
+//               child: departmentState.when(
+//                 data: (departments) => DropdownButtonHideUnderline(
+//                   child: DropdownButton<Department>(
+//                     icon: const Align(
+//                       alignment: Alignment.centerRight,
+//                       child: Icon(
+//                         Icons.keyboard_arrow_down_sharp,
+//                         color: Colors.grey,
+//                       ),
+//                     ),
+//                     elevation: 4,
+//                     style: const TextStyle(color: Colors.black, fontSize: 14),
+//                     value: selectedDepartment,
+//                     onChanged: (Department? newValue) {
+//                       setState(() {
+//                         selectedDepartment = newValue;
+//                       });
+//                     },
+//                     items: departments.map<DropdownMenuItem<Department>>(
+//                         (Department department) {
+//                       return DropdownMenuItem<Department>(
+//                         value: department,
+//                         child: Text("  ${department.name}"),
+//                       );
+//                     }).toList(),
+//                   ),
+//                 ),
+//                 loading: () => const Center(
+//                   child: CircularProgressIndicator(),
+//                 ),
+//                 error: (error, stackTrace) => Center(
+//                   child: Text('Error: $error'),
+//                 ),
+//               ),
+//             ),
+//             SizedBox(height: height * 0.02),
+//             const Row(
+//               children: [
+//                 SizedBox(width: 5),
+//                 Text(
+//                   "Assign To",
+//                   style: TextStyle(
+//                       color: Colors.black,
+//                       fontFamily: "Poppins",
+//                       fontSize: 14,
+//                       fontWeight: FontWeight.w600),
+//                 ),
+//               ],
+//             ),
+//             SizedBox(height: height * 0.01),
+//             Container(
+//               height: height * 0.06,
+//               width: width - 41,
+//               decoration: BoxDecoration(
+//                 border: Border.all(
+//                   style: BorderStyle.solid,
+//                   color: Colors.grey,
+//                 ),
+//                 borderRadius: BorderRadius.circular(12),
+//               ),
+//               child: usersListState.when(
+//                 data: (usersList) => DropdownButtonHideUnderline(
+//                   child: DropdownButton<BusinessUserModel>(
+//                     icon: const Align(
+//                       alignment: Alignment.centerRight,
+//                       child: Icon(
+//                         Icons.keyboard_arrow_down_sharp,
+//                         color: Colors.grey,
+//                       ),
+//                     ),
+//                     elevation: 4,
+//                     style: const TextStyle(color: Colors.black, fontSize: 14),
+//                     value: selectedUserListItem,
+//                     onChanged: (BusinessUserModel? newValue) {
+//                       setState(() {
+//                         selectedUserListItem = newValue;
+//                       });
+//                     },
+//                     items: usersList.map<DropdownMenuItem<BusinessUserModel>>(
+//                         (BusinessUserModel user) {
+//                       return DropdownMenuItem<BusinessUserModel>(
+//                         value: user,
+//                         child: Text("  ${user.name}"),
+//                       );
+//                     }).toList(),
+//                   ),
+//                 ),
+//                 loading: () => const Center(
+//                   child: CircularProgressIndicator(),
+//                 ),
+//                 error: (error, stackTrace) => Center(
+//                   child: Text('Error: $error'),
+//                 ),
+//               ),
+//             ),
+//             const SizedBox(height: 16),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.end,
+//               children: [
+//                 TextButton(
+//                   onPressed: () {
+//                     Navigator.pop(context);
+//                   },
+//                   child: const Text("Close"),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: userRequestState is AsyncLoading
+//                       ? null
+//                       : () async {
+//                           if (selectedUserListItem != null &&
+//                               selectedRole != null &&
+//                               selectedDepartment != null) {
+//                             try {
+//                               await ref
+//                                   .read(userRequestProvider.notifier)
+//                                   .submitUserRequest(
+//                                     widget.businessId,
+//                                     widget.userId,
+//                                     selectedRole!,
+//                                     selectedUserListItem!.userId,
+//                                   );
+//                               Navigator.pop(context);
+//                               widget.userRequestCallback(
+//                                   true); // Notify parent widget
+//                             } catch (e) {
+//                               widget.userRequestCallback(false);
+//                             }
+//                           } else {
+//                             // Show error or validation message
+//                             showDialog(
+//                               context: context,
+//                               builder: (context) => AlertDialog(
+//                                 title: const Text("Error"),
+//                                 content: const Text(
+//                                     "Please select a role, department, and user."),
+//                                 actions: [
+//                                   TextButton(
+//                                     onPressed: () {
+//                                       Navigator.of(context).pop();
+//                                     },
+//                                     child: const Text("OK"),
+//                                   ),
+//                                 ],
+//                               ),
+//                             );
+//                           }
+//                         },
+//                   child: userRequestState is AsyncLoading
+//                       ? const CircularProgressIndicator()
+//                       : const Text("Submit"),
+//                 ),
+//               ],
+//             ),
+//             if (userRequestState is AsyncError)
+//               Text(
+//                 'Error: ${userRequestState.error}',
+//                 style: const TextStyle(color: Colors.red),
+//               ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+import 'package:http/http.dart' as http;
+
+String domain = AppRemoteRoutes.baseUrl;
+
+final businessUsersProviderByDepartment =
+    FutureProvider.family<List<BusinessUserModel2>, Tuple2<String, String?>>(
+  (ref, params) async {
+    final businessId = params.item1;
+    final departmentId = params.item2;
+
+    // Retrieve the token from SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+
+    if (token == null) {
+      throw Exception('Authorization token not found');
+    }
+
+    final response = await http.get(
+      Uri.parse(
+          '${domain}business/get-all-subordinate-businessusers/$businessId/$departmentId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to load users');
+    }
+
+    final data = json.decode(response.body);
+    return (data['data']['users'] as List)
+        .map((user) => BusinessUserModel2.fromJson(user))
+        .toList();
+  },
+);
 
 class UserSelectionDialog extends ConsumerStatefulWidget {
   final String userId;
@@ -226,7 +806,6 @@ class UserSelectionDialog extends ConsumerStatefulWidget {
   final String businessId;
 
   const UserSelectionDialog({
-    super.key,
     required this.userId,
     required this.userRequestCallback,
     required this.businessId,
@@ -238,8 +817,9 @@ class UserSelectionDialog extends ConsumerStatefulWidget {
 
 class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
   List<String> roles = ["MiniAdmin", "User"];
-  BusinessUserModel? selectedUserListItem;
+  BusinessUserModel2? selectedUserListItem;
   String? selectedRole;
+  Department? selectedDepartment;
 
   @override
   void initState() {
@@ -255,6 +835,11 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
   Widget build(BuildContext context) {
     final usersListState = ref.watch(businessUsersProvider);
     final userRequestState = ref.watch(userRequestProvider);
+    final departmentState = ref.watch(departmentProvider(widget.businessId));
+    final userListByDepartmentState = ref.watch(
+      businessUsersProviderByDepartment(
+          Tuple2(widget.businessId, selectedDepartment?.id)),
+    );
 
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
@@ -269,13 +854,13 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              "Select Manager and Role",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            // const Text(
+            //   "Select Manager and Role",
+            //   style: TextStyle(
+            //     fontSize: 18,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            // ),
             const SizedBox(height: 16),
             const Row(
               children: [
@@ -332,6 +917,66 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
               children: [
                 SizedBox(width: 5),
                 Text(
+                  "Select Department",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: "Poppins",
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+            SizedBox(height: height * 0.01),
+            Container(
+              height: height * 0.06,
+              width: double.maxFinite - 10,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  style: BorderStyle.solid,
+                  color: Colors.grey,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: departmentState.when(
+                data: (departments) => DropdownButtonHideUnderline(
+                  child: DropdownButton<Department>(
+                    icon: const Align(
+                      alignment: Alignment.centerRight,
+                      child: Icon(
+                        Icons.keyboard_arrow_down_sharp,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    elevation: 4,
+                    style: const TextStyle(color: Colors.black, fontSize: 14),
+                    value: selectedDepartment,
+                    onChanged: (Department? newValue) {
+                      setState(() {
+                        selectedDepartment = newValue;
+                      });
+                    },
+                    items: departments.map<DropdownMenuItem<Department>>(
+                        (Department department) {
+                      return DropdownMenuItem<Department>(
+                        value: department,
+                        child: Text("  ${department.name}"),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                loading: () => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                error: (error, stackTrace) => Center(
+                  child: Text('Error: $error'),
+                ),
+              ),
+            ),
+            SizedBox(height: height * 0.02),
+            const Row(
+              children: [
+                SizedBox(width: 5),
+                Text(
                   "Assign To",
                   style: TextStyle(
                       color: Colors.black,
@@ -352,9 +997,9 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: usersListState.when(
+              child: userListByDepartmentState.when(
                 data: (usersList) => DropdownButtonHideUnderline(
-                  child: DropdownButton<BusinessUserModel>(
+                  child: DropdownButton<BusinessUserModel2>(
                     icon: const Align(
                       alignment: Alignment.centerRight,
                       child: Icon(
@@ -365,14 +1010,14 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                     elevation: 4,
                     style: const TextStyle(color: Colors.black, fontSize: 14),
                     value: selectedUserListItem,
-                    onChanged: (BusinessUserModel? newValue) {
+                    onChanged: (BusinessUserModel2? newValue) {
                       setState(() {
                         selectedUserListItem = newValue;
                       });
                     },
-                    items: usersList.map<DropdownMenuItem<BusinessUserModel>>(
-                        (BusinessUserModel user) {
-                      return DropdownMenuItem<BusinessUserModel>(
+                    items: usersList.map<DropdownMenuItem<BusinessUserModel2>>(
+                        (BusinessUserModel2 user) {
+                      return DropdownMenuItem<BusinessUserModel2>(
                         value: user,
                         child: Text("  ${user.name}"),
                       );
@@ -383,62 +1028,11 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                   child: CircularProgressIndicator(),
                 ),
                 error: (error, stackTrace) => Center(
-                  child: Text('Error: $error'),
+                  child: Text('No Users'),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            // const Row(
-            //   children: [
-            //     SizedBox(width: 5),
-            //     Text(
-            //       "Select role",
-            //       style: TextStyle(
-            //           color: Colors.black,
-            //           fontFamily: "Poppins",
-            //           fontSize: 14,
-            //           fontWeight: FontWeight.w600),
-            //     ),
-            //   ],
-            // ),
-            // SizedBox(height: height * 0.01),
-            // Container(
-            //   height: height * 0.06,
-            //   width: double.maxFinite - 10,
-            //   decoration: BoxDecoration(
-            //     border: Border.all(
-            //       style: BorderStyle.solid,
-            //       color: Colors.grey,
-            //     ),
-            //     borderRadius: BorderRadius.circular(12),
-            //   ),
-            //   child: DropdownButtonHideUnderline(
-            //     child: DropdownButton<String>(
-            //       icon: const Align(
-            //         alignment: Alignment.centerRight,
-            //         child: Icon(
-            //           Icons.keyboard_arrow_down_sharp,
-            //           color: Colors.grey,
-            //         ),
-            //       ),
-            //       elevation: 4,
-            //       style: const TextStyle(color: Colors.black, fontSize: 14),
-            //       value: selectedRole,
-            //       onChanged: (String? newValue) {
-            //         setState(() {
-            //           selectedRole = newValue;
-            //         });
-            //       },
-            //       items: roles.map<DropdownMenuItem<String>>((String s) {
-            //         return DropdownMenuItem<String>(
-            //           value: s,
-            //           child: Text("  $s"),
-            //         );
-            //       }).toList(),
-            //     ),
-            //   ),
-            // ),
-            // SizedBox(height: height * 0.02),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -453,20 +1047,20 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                       ? null
                       : () async {
                           if (selectedUserListItem != null &&
-                              selectedRole != null) {
+                              selectedRole != null &&
+                              selectedDepartment != null) {
                             try {
                               await ref
                                   .read(userRequestProvider.notifier)
                                   .submitUserRequest(
-                                    widget.businessId,
-                                    widget.userId,
-                                    selectedRole!,
-                                    selectedUserListItem!.userId,
-                                  );
+                                      widget.businessId,
+                                      widget.userId,
+                                      selectedRole!,
+                                      selectedUserListItem!.userId,
+                                      selectedDepartment!.id);
                               Navigator.pop(context);
                               widget.userRequestCallback(
                                   true); // Notify parent widget
-                                  
                             } catch (e) {
                               widget.userRequestCallback(false);
                             }
@@ -477,11 +1071,11 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                               builder: (context) => AlertDialog(
                                 title: const Text("Error"),
                                 content: const Text(
-                                    "Please select a user and role."),
+                                    "Please select a role, department, and user."),
                                 actions: [
                                   TextButton(
                                     onPressed: () {
-                                      Navigator.of(context).pop();
+                                      Navigator.pop(context);
                                     },
                                     child: const Text("OK"),
                                   ),
@@ -490,23 +1084,17 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                             );
                           }
                         },
-                  child: userRequestState is AsyncLoading
-                      ? const CircularProgressIndicator()
-                      : const Text("Submit"),
+                  child: const Text("Submit"),
                 ),
               ],
             ),
-            if (userRequestState is AsyncError)
-              Text(
-                'Error: ${userRequestState.error}',
-                style: const TextStyle(color: Colors.red),
-              ),
           ],
         ),
       ),
     );
   }
 }
+
 
 // class UserSelectionDialog extends ConsumerStatefulWidget {
 //   final String userId;

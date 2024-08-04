@@ -670,7 +670,8 @@ class CustomRatioChart extends StatelessWidget {
 
   double roundDown(double value) {
     if (value <= 0) return 0.0;
-    return (value).floorToDouble();
+    // return (value).floorToDouble();
+    return value;
   }
 
   double roundUp(double value) {

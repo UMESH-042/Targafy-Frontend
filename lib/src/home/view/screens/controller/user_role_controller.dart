@@ -21,7 +21,7 @@ final userRoleProvider = FutureProvider<String>((ref) async {
       'Authorization': 'Bearer $authToken',
     },
   );
-
+  print(response.body);
   if (response.statusCode == 200) {
     final role = json.decode(response.body)['data']['role'] as String;
     return role;

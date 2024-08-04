@@ -656,8 +656,10 @@ class _HomeScreenGroupsState extends ConsumerState<HomeScreenGroups> {
                                       child: CustomChart(
                                         currentMonth: currentMonth,
                                         parameter: selectedParameter,
-                                         totalTargetAchieved: userData.totalTargetAchieved,
-                                      actualTotalTarget: userData.actualTotalTarget,
+                                        totalTargetAchieved:
+                                            userData.totalTargetAchieved,
+                                        actualTotalTarget:
+                                            userData.actualTotalTarget,
                                         actualData: userData.userEntries,
                                         predictedData:
                                             userData.dailyTargetAccumulated,
@@ -916,14 +918,13 @@ class _HomeScreenGroupsState extends ConsumerState<HomeScreenGroups> {
                       if (selectedStates.isNotEmpty &&
                           selectedStates[0] &&
                           selectedParameter.isEmpty)
-                         Padding(
+                        Padding(
                           padding: EdgeInsets.all(8.0),
                           child: CustomChart(
                             currentMonth: currentMonth,
-
                             parameter: '',
-                             totalTargetAchieved: 0,
-                                      actualTotalTarget: 0,
+                            totalTargetAchieved: 0,
+                            actualTotalTarget: 0,
                             actualData: [],
                             predictedData: [],
                           ),
@@ -971,7 +972,8 @@ class _HomeScreenGroupsState extends ConsumerState<HomeScreenGroups> {
                                     child: CustomChart(
                                       currentMonth: currentMonth,
                                       parameter: selectedParameter,
-                                      totalTargetAchieved: data.totalTargetAchieved,
+                                      totalTargetAchieved:
+                                          data.totalTargetAchieved,
                                       actualTotalTarget: data.actualTotalTarget,
                                       actualData: data.userEntries,
                                       predictedData:

@@ -156,3 +156,34 @@ class GroupController {
     }
   }
 }
+
+final createDepartmentProvider = Provider<CreateDepartmentController>((ref) {
+  return CreateDepartmentController(ref);
+});
+
+class CreateDepartmentController {
+  final ProviderRef ref;
+
+  CreateDepartmentController(this.ref);
+
+  Future<void> createDepartments(
+      List<String> departmentNames, String businessId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+    final url = Uri.parse('${domain}department/create/$businessId');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'names': departmentNames}),
+    );
+
+    print(response.body);
+    if (response.statusCode != 201) {
+      throw Exception('Failed to create departments');
+    }
+  }
+}

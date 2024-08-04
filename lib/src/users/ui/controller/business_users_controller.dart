@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:targafy/src/users/ui/model/business_user_list_model.dart';
 import 'package:targafy/utils/remote_routes.dart';
+import 'package:tuple/tuple.dart';
 
 String domain = AppRemoteRoutes.baseUrl;
 
@@ -99,8 +100,65 @@ final businessUsersStreamProvider = StreamProvider.autoDispose
   }
 });
 
+// final businessUsersStreamProvider2 = StreamProvider.autoDispose
+//     .family<List<BusinessUserModel2>, String>((ref, businessId) async* {
+//   // Retrieve the token from SharedPreferences
+//   final prefs = await SharedPreferences.getInstance();
+//   final token = prefs.getString('authToken');
+
+//   if (token == null) {
+//     throw Exception('Authorization token not found');
+//   }
+
+//   // Initial fetch
+//   final response = await http.get(
+//     Uri.parse(
+//         '${domain}business/get-all-subordinate-businessusers/$businessId'),
+//     headers: {
+//       'Authorization': 'Bearer $token',
+//     },
+//   );
+
+//   if (response.statusCode != 200) {
+//     throw Exception('Failed to load users');
+//   }
+
+//   final data = json.decode(response.body);
+//   final List<BusinessUserModel2> users = (data['data']['users'] as List)
+//       .map((user) => BusinessUserModel2.fromJson(user))
+//       .toList();
+//   yield users;
+
+//   // Simulate real-time updates
+//   await for (final _ in Stream.periodic(const Duration(seconds: 10))) {
+//     final response = await http.get(
+//       Uri.parse(
+//           '${domain}business/get-all-subordinate-businessusers/$businessId'),
+//       headers: {
+//         'Authorization': 'Bearer $token',
+//       },
+//     );
+
+//     if (response.statusCode == 200) {
+//       final data = json.decode(response.body);
+//       final List<BusinessUserModel2> updatedUsers =
+//           (data['data']['users'] as List)
+//               .map((user) => BusinessUserModel2.fromJson(user))
+//               .toList();
+//       yield updatedUsers;
+//     } else {
+//       throw Exception('Failed to load users');
+//     }
+//   }
+// });
 final businessUsersStreamProvider2 = StreamProvider.autoDispose
-    .family<List<BusinessUserModel2>, String>((ref, businessId) async* {
+    .family<List<BusinessUserModel2>, Tuple2<String, String?>>(
+        (ref, params) async* {
+  final businessId = params.item1;
+  final departmentId = params.item2;
+  print('This is departmentId :$departmentId');
+  print('This is businessId $businessId');
+
   // Retrieve the token from SharedPreferences
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('authToken');
@@ -112,7 +170,7 @@ final businessUsersStreamProvider2 = StreamProvider.autoDispose
   // Initial fetch
   final response = await http.get(
     Uri.parse(
-        '${domain}business/get-all-subordinate-businessusers/$businessId'),
+        '${domain}business/get-all-subordinate-businessusers/$businessId/$departmentId'),
     headers: {
       'Authorization': 'Bearer $token',
     },
@@ -132,7 +190,7 @@ final businessUsersStreamProvider2 = StreamProvider.autoDispose
   await for (final _ in Stream.periodic(const Duration(seconds: 10))) {
     final response = await http.get(
       Uri.parse(
-          '${domain}business/get-all-subordinate-businessusers/$businessId'),
+          '${domain}business/get-all-subordinate-businessusers/$businessId/$departmentId'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -159,9 +217,9 @@ final userRequestProvider =
 class UserRequestNotifier extends StateNotifier<AsyncValue<void>> {
   UserRequestNotifier() : super(const AsyncValue.data(null));
 
-  Future<void> submitUserRequest(
-      String businessId, String userId, String role, String parentId) async {
-    state = const AsyncValue.loading(); // Indicate loading state
+  Future<void> submitUserRequest(String businessId, String userId, String role,
+      String parentId, String departmentId) async {
+    state = const AsyncValue.loading();
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('authToken');
@@ -176,11 +234,13 @@ class UserRequestNotifier extends StateNotifier<AsyncValue<void>> {
           'role': role,
           'userId': userId,
           'parentId': parentId,
+          'departmentId': departmentId,
         }),
       );
       print('role :- $role');
       print('userId :- $userId');
       print('parentId :- $parentId');
+      print('departmentId :- $departmentId');
       print(response.body);
       if (response.statusCode != 200) {
         print(response.statusCode);

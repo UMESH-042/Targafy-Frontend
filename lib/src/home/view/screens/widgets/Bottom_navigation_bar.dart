@@ -281,8 +281,6 @@ class _BottomNavigationAndAppBarState
 
   @override
   Widget build(BuildContext context) {
-    // print(
-    //     'This is the final authToken which will be used for doing all functions :- ${widget.token}');
     final asyncValue = ref.watch(businessAndUserProvider(widget.token!));
     var selectedBusinessData = ref.read(currentBusinessProvider);
 
@@ -368,112 +366,54 @@ class _BottomNavigationAndAppBarState
             ),
             centerTitle: false,
             actions: [
-              Consumer(
-                builder: (context, ref, _) {
-                  final userRoleAsyncValue = ref.watch(userRoleProvider);
-
-                  if (userRoleAsyncValue == null) {
-                    return const SizedBox.shrink();
-                  }
-
-                  return userRoleAsyncValue.when(
-                    data: (role) {
-                      return Row(
-                        children: [
-                          // if (role == 'Admin' || role == 'MiniAdmin')
-                          //   GestureDetector(
-                          //     onTap: () async {
-                          //       final result = await Navigator.push(
-                          //         context,
-                          //         MaterialPageRoute(
-                          //           builder: (context) =>
-                          //               const AddParameterTargetScreen(),
-                          //         ),
-                          //       );
-                          //       if (result == true) {
-                          //         _refreshParameters();
-                          //       }
-                          //     },
-                          //     // child: CircleAvatar(
-                          //     //   backgroundImage:
-                          //     //       AssetImage('assets/img/3d-target.png'),
-                          //     //   radius: 15,
-                          //     // ),
-                          //   ),
-                          PopupMenuButton<int>(
-                            icon: const Icon(Icons.more_vert),
-                            color: Colors.white,
-                            surfaceTintColor: Colors.white,
-                            position: PopupMenuPosition.under,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)
-                                  .copyWith(topRight: const Radius.circular(0)),
+              Row(
+                children: [
+                  PopupMenuButton<int>(
+                    icon: const Icon(Icons.more_vert),
+                    color: Colors.white,
+                    surfaceTintColor: Colors.white,
+                    position: PopupMenuPosition.under,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)
+                          .copyWith(topRight: const Radius.circular(0)),
+                    ),
+                    onSelected: (value) async {
+                      if (value == 1) {
+                        Restart.restartApp();
+                      } else if (value == 2) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BusinessProfile(
+                              token: widget.token,
                             ),
-                            onSelected: (value) async {
-                              // if (value == 1) {
-                              // Handle action for "Add Charts"
-                              // final result = await Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => AddCharts(
-                              //       businessId: businessId,
-                              //     ),
-                              //   ),
-                              // );
-                              // } else
-                              if (value == 1) {
-                                // Handle action for "Refresh"
-                                Restart.restartApp();
-                              } else if (value == 2) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => BusinessProfile(
-                                      token: widget.token,
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                            itemBuilder: (BuildContext context) =>
-                                <PopupMenuEntry<int>>[
-                              if (role != 'User')
-                                // PopupMenuItem<int>(
-                                //   value: 1,
-                                //   child: CustomText(
-                                //     text: 'Add Charts',
-                                //     fontSize: getScreenWidth(context) * 0.04,
-                                //     fontWeight: FontWeight.w600,
-                                //     color: primaryColor,
-                                //   ),
-                                // ),
-                                PopupMenuItem<int>(
-                                  value: 1,
-                                  child: CustomText(
-                                    text: 'Refresh',
-                                    fontSize: getScreenWidth(context) * 0.04,
-                                    fontWeight: FontWeight.w600,
-                                    color: primaryColor,
-                                  ),
-                                ),
-                              PopupMenuItem<int>(
-                                value: 2,
-                                child: CustomText(
-                                  text: 'Business Profile',
-                                  fontSize: getScreenWidth(context) * 0.04,
-                                  fontWeight: FontWeight.w600,
-                                  color: primaryColor,
-                                ),
-                              ),
-                            ],
                           ),
-                        ],
-                      );
+                        );
+                      }
                     },
-                    loading: () => const SizedBox.shrink(),
-                    error: (error, stack) => const SizedBox.shrink(),
-                  );
-                },
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<int>>[
+                      PopupMenuItem<int>(
+                        value: 1,
+                        child: CustomText(
+                          text: 'Refresh',
+                          fontSize: getScreenWidth(context) * 0.04,
+                          fontWeight: FontWeight.w600,
+                          color: primaryColor,
+                        ),
+                      ),
+                      PopupMenuItem<int>(
+                        value: 2,
+                        child: CustomText(
+                          text: 'Business Profile',
+                          fontSize: getScreenWidth(context) * 0.04,
+                          fontWeight: FontWeight.w600,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
@@ -484,19 +424,19 @@ class _BottomNavigationAndAppBarState
         child: SingleChildScrollView(
           child: Consumer(
             builder: (context, ref, _) {
-              final userRoleAsyncValue = ref.watch(userRoleProvider);
-
-              if (userRoleAsyncValue == null) {
-                return const CircularProgressIndicator();
-              }
               return asyncValue.when(
                 data: (data) {
-                  // print('this is the :-$data');
-
-                  // final businesses = data['businesses'] as List<Business>?;
                   final businesses =
                       (data?['businesses'] as List<Business>?) ?? [];
                   final user = data?['user'] as User?;
+
+                  final departments =
+                      (data?['departments'] as List<department>?) ?? [];
+
+                  // Extract role from the first department
+                  final role = departments.isNotEmpty
+                      ? departments.first.role
+                      : 'No Role';
 
                   final notificationCountersMap =
                       ref.watch(notificationCountersProvider1);
@@ -576,19 +516,13 @@ class _BottomNavigationAndAppBarState
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                  userRoleAsyncValue.when(
-                                    data: (role) => Center(
-                                      child: CustomText(
-                                        text: role ?? 'No Role',
-                                        fontSize:
-                                            getScreenWidth(context) * 0.04,
-                                        color: primaryColor,
-                                        fontWeight: FontWeight.w400,
-                                      ),
+                                  Center(
+                                    child: CustomText(
+                                      text: role, // Display the role here
+                                      fontSize: getScreenWidth(context) * 0.04,
+                                      color: primaryColor,
+                                      fontWeight: FontWeight.w400,
                                     ),
-                                    loading: () => const SizedBox.shrink(),
-                                    error: (error, stack) =>
-                                        const SizedBox.shrink(),
                                   ),
                                 ],
                               ),
@@ -819,46 +753,6 @@ class _BottomNavigationAndAppBarState
             : _widgetOptions.elementAt(_selectedIndex),
       ),
 
-      // bottomNavigationBar: CurvedNavigationBar(
-      //   color: primaryColor,
-      //   backgroundColor: Colors.transparent,
-      //   buttonBackgroundColor: primaryColor,
-      //   height: 60,
-      //   animationCurve: Curves.easeInOut,
-      //   animationDuration: const Duration(milliseconds: 600),
-      //   index: _selectedIndex,
-      //   items: [
-      //     Icon(Icons.home, size: 30, color: Colors.white),
-      //     Icon(Icons.supervised_user_circle, size: 30, color: Colors.white),
-      //     Icon(Icons.add, size: 40, color: Colors.white),
-      //     // Icon(Icons.local_activity, size: 30, color: Colors.white),
-      //     ImageIcon(
-      //       AssetImage("assets/img/activity-icon-without-bg.png"),
-      //       size: 30,
-      //       color: Colors.white,
-      //     ),
-      //     // Icon(Icons.feedback, size: 30, color: Colors.white),
-      //     // Icon(
-      //     //   Icons.notifications,
-      //     //   size: 30,
-      //     //   color: Colors.white,
-      //     // ),
-      //     notificationCountersAsyncValue.when(
-      //       data: (counters) => badges.Badge(
-      //         badgeContent: Text(
-      //           counters.notificationCounter.toString(),
-      //           style: TextStyle(color: Colors.white),
-      //         ),
-      //         child: Icon(Icons.notifications, size: 30, color: Colors.white),
-      //       ),
-      //       loading: () =>
-      //           Icon(Icons.notifications, size: 30, color: Colors.white),
-      //       error: (error, stack) =>
-      //           Icon(Icons.notifications, size: 30, color: Colors.white),
-      //     ),
-      //   ],
-      //   onTap: _onItemTapped,
-      // ),
       bottomNavigationBar: CurvedNavigationBar(
         color: primaryColor,
         backgroundColor: Colors.transparent,
