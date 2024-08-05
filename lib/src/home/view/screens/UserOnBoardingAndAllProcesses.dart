@@ -246,8 +246,8 @@ class _AllFourImpPageState extends ConsumerState<AllFourImpPage>
             child: TabBarView(
               controller: _subTabController,
               children: [
-                // if (_selectedDepartmentId != null)
-                UsersScreen(departmentId: _selectedDepartmentId!),
+                if (_selectedDepartmentId != null)
+                  UsersScreen(departmentId: _selectedDepartmentId!),
                 if (_selectedDepartmentId != null)
                   AddParameterMainScreen(departmentId: _selectedDepartmentId!),
                 if (_selectedDepartmentId != null)

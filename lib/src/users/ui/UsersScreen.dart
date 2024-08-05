@@ -1736,8 +1736,10 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                         GestureDetector(
                           onTap: () {
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    UserHierarchy(businessId: businessId)));
+                                builder: (context) => UserHierarchy(
+                                      businessId: businessId,
+                                      departmentId: widget.departmentId,
+                                    )));
                           },
                           child: Container(
                             padding: const EdgeInsets.all(5),

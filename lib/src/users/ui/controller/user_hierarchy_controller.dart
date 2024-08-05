@@ -17,16 +17,18 @@ class BusinessController
     extends StateNotifier<AsyncValue<BusinessUserHierarchy>> {
   BusinessController() : super(const AsyncLoading());
 
-  Future<void> fetchBusinessUserHierarchy(String businessId) async {
+  Future<void> fetchBusinessUserHierarchy(
+      String businessId, String departmentId) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
     try {
       final response = await http.get(
-        Uri.parse('${domain}business/get-sub-hierarchy-new/$businessId'),
+        Uri.parse(
+            '${domain}business/get-sub-hierarchy-new/$businessId/$departmentId'),
         headers: {'Authorization': 'Bearer $token'},
       );
-
+      print(response.body);
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['data']['data'];
         final userHierarchy = BusinessUserHierarchy.fromJson(data);
@@ -40,9 +42,6 @@ class BusinessController
     }
   }
 }
-
-
-
 
 final businessGroupControllerProvider =
     StateNotifierProvider<BusinessGroupController, AsyncValue<GroupHierarchy>>(
@@ -77,11 +76,13 @@ class BusinessGroupController
           state = AsyncValue.data(groupHierarchy);
         } catch (e, stackTrace) {
           print('Error parsing GroupHierarchy: $e');
-          state = AsyncValue.error('Error parsing GroupHierarchy: $e', stackTrace);
+          state =
+              AsyncValue.error('Error parsing GroupHierarchy: $e', stackTrace);
         }
       } else {
         print('Failed to fetch hierarchy: ${response.body}');
-        state = AsyncValue.error('Failed to fetch hierarchy', StackTrace.current);
+        state =
+            AsyncValue.error('Failed to fetch hierarchy', StackTrace.current);
       }
     } catch (e, stackTrace) {
       print('Error: $e');
