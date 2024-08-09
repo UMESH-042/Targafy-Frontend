@@ -244,6 +244,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/business_home_page/models/fetch_business_data_mode.dart';
 import 'package:targafy/src/home/view/screens/controller/Department_controller.dart';
+import 'package:targafy/src/home/view/screens/home_screen_department.dart';
 
 class AllTwoImpPage extends ConsumerStatefulWidget {
   const AllTwoImpPage({super.key});
@@ -334,15 +335,15 @@ class _AllTwoImpPageState extends ConsumerState<AllTwoImpPage>
   }
 }
 
-class DepartmentPage extends StatelessWidget {
-  final Department department;
+// class DepartmentPage extends StatelessWidget {
+//   final Department department;
 
-  const DepartmentPage({Key? key, required this.department}) : super(key: key);
+//   const DepartmentPage({Key? key, required this.department}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Information for ${department.name}'),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Center(
+//       child: Text('Information for ${department.name}'),
+//     );
+//   }
+// }

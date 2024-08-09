@@ -286,7 +286,7 @@ class _UserHierarchyState extends ConsumerState<UserHierarchy> {
 
     ref
         .read(businessControllerProvider.notifier)
-        .fetchBusinessUserHierarchy(widget.businessId, widget.departmentId);
+        .fetchBusinessUserHierarchy(widget.businessId,);
   }
 
   @override

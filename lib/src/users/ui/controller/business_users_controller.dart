@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:targafy/src/home/view/screens/controller/pending_approval_controller.dart';
 
 import 'package:targafy/src/users/ui/model/business_user_list_model.dart';
 import 'package:targafy/utils/remote_routes.dart';
@@ -151,6 +152,7 @@ final businessUsersStreamProvider = StreamProvider.autoDispose
 //     }
 //   }
 // });
+
 final businessUsersStreamProvider2 = StreamProvider.autoDispose
     .family<List<BusinessUserModel2>, Tuple2<String, String?>>(
         (ref, params) async* {
@@ -175,7 +177,7 @@ final businessUsersStreamProvider2 = StreamProvider.autoDispose
       'Authorization': 'Bearer $token',
     },
   );
-
+  print(response.body);
   if (response.statusCode != 200) {
     throw Exception('Failed to load users');
   }
@@ -218,7 +220,7 @@ class UserRequestNotifier extends StateNotifier<AsyncValue<void>> {
   UserRequestNotifier() : super(const AsyncValue.data(null));
 
   Future<void> submitUserRequest(String businessId, String userId, String role,
-      String parentId, String departmentId) async {
+      String parentId, List<String> paramIds) async {
     state = const AsyncValue.loading();
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -234,13 +236,13 @@ class UserRequestNotifier extends StateNotifier<AsyncValue<void>> {
           'role': role,
           'userId': userId,
           'parentId': parentId,
-          'departmentId': departmentId,
+          'paramIds': paramIds,
         }),
       );
       print('role :- $role');
       print('userId :- $userId');
       print('parentId :- $parentId');
-      print('departmentId :- $departmentId');
+      print('ParamId :0 $paramIds');
       print(response.body);
       if (response.statusCode != 200) {
         print(response.statusCode);

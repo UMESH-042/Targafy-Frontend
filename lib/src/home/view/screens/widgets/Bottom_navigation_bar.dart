@@ -157,7 +157,7 @@ class _BottomNavigationAndAppBarState
     final selectedBusinessData = ref.read(currentBusinessProvider);
     final businessId = selectedBusinessData?['business']?.id;
     if (businessId != null) {
-      ref.watch(pendingBusinessProvider(widget.token!));
+      ref.invalidate(pendingBusinessProvider(widget.token!));
     }
   }
 
@@ -430,14 +430,6 @@ class _BottomNavigationAndAppBarState
                       (data?['businesses'] as List<Business>?) ?? [];
                   final user = data?['user'] as User?;
 
-                  final departments =
-                      (data?['departments'] as List<department>?) ?? [];
-
-                  // Extract role from the first department
-                  final role = departments.isNotEmpty
-                      ? departments.first.role
-                      : 'No Role';
-
                   final notificationCountersMap =
                       ref.watch(notificationCountersProvider1);
                   ref
@@ -518,7 +510,8 @@ class _BottomNavigationAndAppBarState
                                     ),
                                   Center(
                                     child: CustomText(
-                                      text: role, // Display the role here
+                                      // text: role, // Display the role here
+                                      text: '',
                                       fontSize: getScreenWidth(context) * 0.04,
                                       color: primaryColor,
                                       fontWeight: FontWeight.w400,

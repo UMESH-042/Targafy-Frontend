@@ -6,6 +6,7 @@ class Business {
   final String industryType;
   final String city;
   final String country;
+  final DateTime createdDate;
 
   Business({
     required this.id,
@@ -15,6 +16,7 @@ class Business {
     required this.industryType,
     required this.city,
     required this.country,
+    required this.createdDate
   });
 
   factory Business.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class Business {
       industryType: json['industryType'],
       city: json['city'],
       country: json['country'],
+      createdDate: DateTime.parse(json['createdDate']),
     );
   }
 
@@ -38,6 +41,7 @@ class Business {
       'industryType': industryType,
       'city': city,
       'country': country,
+       'createdDate': createdDate.toIso8601String(),
     };
   }
 }
@@ -99,9 +103,6 @@ class User {
     };
   }
 }
-
-
-
 
 // department.dart
 class department {

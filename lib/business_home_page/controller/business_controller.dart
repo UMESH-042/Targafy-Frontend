@@ -24,7 +24,6 @@ final businessAndUserProvider = StreamProvider.autoDispose
       final data = json.decode(response.body);
       final List businesses = data['data']['businesses'];
       final user = data['data']['user'];
-      final List departments = data['data']['result'];
 
       // print('Fetched User: $user');
       // print('Fetched Businesses: $businesses');
@@ -32,13 +31,11 @@ final businessAndUserProvider = StreamProvider.autoDispose
       yield {
         'businesses': businesses.map((e) => Business.fromJson(e)).toList(),
         'user': User.fromJson(user),
-        'departments': departments.map((e) => department.fromJson(e)).toList(),
       };
     } else if (response.statusCode == 400) {
       final data = json.decode(response.body);
       final List businesses = data['data']['businesses'];
       final user = data['data']['user'];
-      final List departments = data['data']['result'];
 
       // print('Fetched User: $user');
       // print('Fetched Businesses: $businesses');
@@ -46,7 +43,6 @@ final businessAndUserProvider = StreamProvider.autoDispose
       yield {
         'businesses': businesses.map((e) => Business.fromJson(e)).toList(),
         'user': User.fromJson(user),
-        'departments': departments.map((e) => department.fromJson(e)).toList(),
       };
     } else {
       throw Exception('Failed to fetch business details');
@@ -68,14 +64,14 @@ Future<void> selectBusiness(Business business, String userType,
   // };
   final Map<String, dynamic> selectedBusinessData = {
     'business': Business(
-      id: business.id,
-      businessCode: business.businessCode,
-      name: business.name,
-      logo: business.logo,
-      industryType: business.industryType,
-      city: business.city,
-      country: business.country,
-    ),
+        id: business.id,
+        businessCode: business.businessCode,
+        name: business.name,
+        logo: business.logo,
+        industryType: business.industryType,
+        city: business.city,
+        country: business.country,
+        createdDate: business.createdDate),
     'userType': userType,
     'businessCode': businessCode,
   };
@@ -86,14 +82,14 @@ Future<void> selectBusiness(Business business, String userType,
 Future<void> clearSelectedBusiness(WidgetRef ref) async {
   final Map<String, dynamic> selectedBusinessData = {
     'business': Business(
-      id: '',
-      businessCode: '',
-      name: '',
-      logo: '',
-      industryType: '',
-      city: '',
-      country: '',
-    ),
+        id: '',
+        businessCode: '',
+        name: '',
+        logo: '',
+        industryType: '',
+        city: '',
+        country: '',
+        createdDate: DateTime.now()),
     'userType': '',
     'businessCode': '',
   };

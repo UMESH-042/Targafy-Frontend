@@ -60,6 +60,7 @@
 //   }
 // }
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -121,10 +122,9 @@ class ParameterNotifier extends StateNotifier<List<Parameter>> {
   Future<bool> addParameter(
       String businessId,
       String parameterName,
-      List<String> userId,
-      String chartType,
-      String duration,
-      String description) async {
+      List<String> departmentIds,
+      String description,
+      BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
@@ -136,18 +136,29 @@ class ParameterNotifier extends StateNotifier<List<Parameter>> {
       },
       body: json.encode({
         'name': parameterName,
-        'charts': chartType,
-        'duration': duration,
         'description': description,
-        'userIds': userId,
+        'departmentIds': departmentIds,
       }),
     );
+    print(parameterName);
+    print(description);
+    print(departmentIds);
+    print(response.body);
 
     if (response.statusCode == 201) {
-      // Refresh the parameter list after adding a new parameter
-      await fetchParameters(businessId);
       return true;
+    } else if (response.statusCode == 400) {
+      final Map<String, dynamic> responseBody = json.decode(response.body);
+      final String errorMessage =
+          responseBody['message'] ?? 'Failed to add parameter';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+      return false;
     } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An unexpected error occurred')),
+      );
       return false;
     }
   }

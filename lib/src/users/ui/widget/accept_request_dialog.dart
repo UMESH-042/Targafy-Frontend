@@ -4,8 +4,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:targafy/src/home/view/screens/controller/Department_controller.dart';
+import 'package:targafy/src/parameters/view/controller/add_parameter_controller.dart';
 
 import 'package:targafy/src/users/ui/controller/business_users_controller.dart';
 import 'package:targafy/src/users/ui/model/business_user_list_model.dart';
@@ -767,13 +769,9 @@ import 'package:http/http.dart' as http;
 
 String domain = AppRemoteRoutes.baseUrl;
 
-final businessUsersProviderByDepartment =
-    FutureProvider.family<List<BusinessUserModel2>, Tuple2<String, String?>>(
-  (ref, params) async {
-    final businessId = params.item1;
-    final departmentId = params.item2;
-
-    // Retrieve the token from SharedPreferences
+final businessUsersProvider =
+    FutureProvider.family<List<BusinessUserModel2>, String>(
+  (ref, businessId) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
@@ -783,7 +781,7 @@ final businessUsersProviderByDepartment =
 
     final response = await http.get(
       Uri.parse(
-          '${domain}business/get-all-subordinate-businessusers/$businessId/$departmentId'),
+          '${domain}business/get-all-subordinate-businessusers/$businessId'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -819,27 +817,23 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
   List<String> roles = ["MiniAdmin", "User"];
   BusinessUserModel2? selectedUserListItem;
   String? selectedRole;
-  Department? selectedDepartment;
+  List<String> selectedParameterIds = [];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
-          .read(businessUsersProvider.notifier)
-          .fetchBusinessUsers(widget.businessId);
+          .read(parameterNotifierProvider.notifier)
+          .fetchParameters(widget.businessId);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final usersListState = ref.watch(businessUsersProvider);
+    final usersListState = ref.watch(businessUsersProvider(widget.businessId));
     final userRequestState = ref.watch(userRequestProvider);
-    final departmentState = ref.watch(departmentProvider(widget.businessId));
-    final userListByDepartmentState = ref.watch(
-      businessUsersProviderByDepartment(
-          Tuple2(widget.businessId, selectedDepartment?.id)),
-    );
+    final parametersState = ref.watch(parameterNotifierProvider);
 
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
@@ -854,19 +848,12 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // const Text(
-            //   "Select Manager and Role",
-            //   style: TextStyle(
-            //     fontSize: 18,
-            //     fontWeight: FontWeight.bold,
-            //   ),
-            // ),
             const SizedBox(height: 16),
             const Row(
               children: [
                 SizedBox(width: 5),
                 Text(
-                  "Select role",
+                  "Select Role",
                   style: TextStyle(
                       color: Colors.black,
                       fontFamily: "Poppins",
@@ -917,66 +904,6 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
               children: [
                 SizedBox(width: 5),
                 Text(
-                  "Select Department",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontFamily: "Poppins",
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600),
-                ),
-              ],
-            ),
-            SizedBox(height: height * 0.01),
-            Container(
-              height: height * 0.06,
-              width: double.maxFinite - 10,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  style: BorderStyle.solid,
-                  color: Colors.grey,
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: departmentState.when(
-                data: (departments) => DropdownButtonHideUnderline(
-                  child: DropdownButton<Department>(
-                    icon: const Align(
-                      alignment: Alignment.centerRight,
-                      child: Icon(
-                        Icons.keyboard_arrow_down_sharp,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    elevation: 4,
-                    style: const TextStyle(color: Colors.black, fontSize: 14),
-                    value: selectedDepartment,
-                    onChanged: (Department? newValue) {
-                      setState(() {
-                        selectedDepartment = newValue;
-                      });
-                    },
-                    items: departments.map<DropdownMenuItem<Department>>(
-                        (Department department) {
-                      return DropdownMenuItem<Department>(
-                        value: department,
-                        child: Text("  ${department.name}"),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                loading: () => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                error: (error, stackTrace) => Center(
-                  child: Text('Error: $error'),
-                ),
-              ),
-            ),
-            SizedBox(height: height * 0.02),
-            const Row(
-              children: [
-                SizedBox(width: 5),
-                Text(
                   "Assign To",
                   style: TextStyle(
                       color: Colors.black,
@@ -997,7 +924,7 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: userListByDepartmentState.when(
+              child: usersListState.when(
                 data: (usersList) => DropdownButtonHideUnderline(
                   child: DropdownButton<BusinessUserModel2>(
                     icon: const Align(
@@ -1033,6 +960,76 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
               ),
             ),
             const SizedBox(height: 16),
+            // const Row(
+            //   children: [
+            //     SizedBox(width: 5),
+            //     Text(
+            //       "Select Parameter List",
+            //       style: TextStyle(
+            //           color: Colors.black,
+            //           fontFamily: "Poppins",
+            //           fontSize: 14,
+            //           fontWeight: FontWeight.w600),
+            //     ),
+            //   ],
+            // ),
+
+            const Row(
+              children: [
+                SizedBox(width: 5),
+                Text(
+                  "Select Parameter List",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: "Poppins",
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+            SizedBox(height: height * 0.01),
+            Container(
+              height: height * 0.2,
+              width: width - 41,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  style: BorderStyle.solid,
+                  color: Colors.grey,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: MultiSelectDialogField<String>(
+                  items: parametersState
+                      .map((parameter) =>
+                          MultiSelectItem<String>(parameter.id, parameter.name))
+                      .toList(),
+                  listType: MultiSelectListType.CHIP,
+                  onConfirm: (values) {
+                    setState(() {
+                      selectedParameterIds = values;
+                    });
+                  },
+                  chipDisplay: MultiSelectChipDisplay(
+                    onTap: (value) {
+                      setState(() {
+                        selectedParameterIds.remove(value);
+                      });
+                    },
+                  ),
+                  buttonText: Text(
+                    "Select Parameters",
+                    style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: height * 0.01),
+            // Implement your parameter list dropdown here similar to the roles and users
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -1047,8 +1044,7 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                       ? null
                       : () async {
                           if (selectedUserListItem != null &&
-                              selectedRole != null &&
-                              selectedDepartment != null) {
+                              selectedRole != null) {
                             try {
                               await ref
                                   .read(userRequestProvider.notifier)
@@ -1057,7 +1053,7 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                                       widget.userId,
                                       selectedRole!,
                                       selectedUserListItem!.userId,
-                                      selectedDepartment!.id);
+                                      selectedParameterIds);
                               Navigator.pop(context);
                               widget.userRequestCallback(
                                   true); // Notify parent widget
@@ -1065,13 +1061,12 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                               widget.userRequestCallback(false);
                             }
                           } else {
-                            // Show error or validation message
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
                                 title: const Text("Error"),
                                 content: const Text(
-                                    "Please select a role, department, and user."),
+                                    "Please select a role and user."),
                                 actions: [
                                   TextButton(
                                     onPressed: () {
@@ -1094,6 +1089,7 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
     );
   }
 }
+
 
 
 // class UserSelectionDialog extends ConsumerStatefulWidget {

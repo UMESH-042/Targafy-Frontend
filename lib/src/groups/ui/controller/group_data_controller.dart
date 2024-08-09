@@ -65,7 +65,7 @@ class GroupDataController extends StateNotifier<List<GroupDataModel>> {
   Future<void> fetchGroups(String businessId) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
-    final url = Uri.parse('${domain}groups/get-all-head-groups/$businessId');
+    final url = Uri.parse('${domain}department/get/$businessId');
     final headers = {
       'Authorization': 'Bearer $token',
     };
@@ -75,7 +75,7 @@ class GroupDataController extends StateNotifier<List<GroupDataModel>> {
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       final List<GroupDataModel> groups =
-          (responseData['data']['headGroups'] as List)
+          (responseData['data']['departments'] as List)
               .map((data) => GroupDataModel.fromJson(data))
               .toList();
       state = groups;
@@ -84,56 +84,9 @@ class GroupDataController extends StateNotifier<List<GroupDataModel>> {
     }
   }
 
-  
-
   String? getGroupIdByName(String groupName) {
     try {
-      return state.firstWhere((group) => group.headGroupName == groupName).id;
-    } catch (e) {
-      return null; // or handle the error as needed
-    }
-  }
-}
-
-
-
-
-final SubGroupDataControllerProvider = StateNotifierProvider.autoDispose<
-    SubGroupDataController, List<SubGroupDataModel>>((ref) {
-  return SubGroupDataController();
-});
-
-
-class SubGroupDataController extends StateNotifier<List<SubGroupDataModel>> {
-  SubGroupDataController() : super([]);
-
-  
-
-  Future<void> fetchSubGroups(String parentGroupId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('authToken');
-    final url = Uri.parse('${domain}groups/get-all-subgroups/$parentGroupId');
-    final headers = {
-      'Authorization': 'Bearer $token',
-    };
-
-    final response = await http.get(url, headers: headers);
-    print(response.body);
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      final List<SubGroupDataModel> subGroups =
-          (responseData['data']['subGroups'] as List)
-              .map((data) => SubGroupDataModel.fromJson(data))
-              .toList();
-      state = subGroups;
-    } else {
-      throw Exception('Failed to load subgroups');
-    }
-  }
-
-  String? getGroupIdByName(String groupName) {
-    try {
-      return state.firstWhere((group) => group.groupName == groupName).groupId;
+      return state.firstWhere((group) => group.name == groupName).id;
     } catch (e) {
       return null; // or handle the error as needed
     }

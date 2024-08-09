@@ -17,17 +17,41 @@ class BusinessController
     extends StateNotifier<AsyncValue<BusinessUserHierarchy>> {
   BusinessController() : super(const AsyncLoading());
 
-  Future<void> fetchBusinessUserHierarchy(
-      String businessId, String departmentId) async {
+  Future<void> fetchBusinessUserHierarchy(String businessId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+
+    try {
+      final response = await http.get(
+        Uri.parse('${domain}business/get-user-hierarchy/$businessId'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      print(response.body);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body)['data']['data'];
+        final userHierarchy = BusinessUserHierarchy.fromJson(data);
+        state = AsyncValue.data(userHierarchy);
+      } else {
+        state =
+            AsyncValue.error('Failed to fetch hierarchy', StackTrace.current);
+      }
+    } catch (e, stackTrace) {
+      state = AsyncValue.error('Error: $e', stackTrace);
+    }
+  }
+
+  Future<void> fetchBusinessUserHierarchyDepartment(
+      String businessId, String departmentId, String paramId) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
     try {
       final response = await http.get(
         Uri.parse(
-            '${domain}business/get-sub-hierarchy-new/$businessId/$departmentId'),
+            '${domain}business/get-sub-hierarchy-new/$businessId/$departmentId/$paramId'),
         headers: {'Authorization': 'Bearer $token'},
       );
+      print('This is departmentId :-$departmentId');
       print(response.body);
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['data']['data'];
