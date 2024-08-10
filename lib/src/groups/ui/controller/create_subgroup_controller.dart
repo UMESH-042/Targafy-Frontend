@@ -79,13 +79,14 @@ class BusinessLogoController {
     final mimeType = lookupMimeType(image.path);
 
     final request = http.MultipartRequest('POST', url)
-      ..fields['folder'] = 'chats'
+      ..fields['folder'] = 'businessprofile'
       ..files.add(await http.MultipartFile.fromPath(
         'file',
         image.path,
         contentType: MediaType.parse(mimeType!),
       ));
     final response = await request.send();
+    print(response.statusCode);
 
     if (response.statusCode == 200) {
       final responseBody = await response.stream.bytesToString();

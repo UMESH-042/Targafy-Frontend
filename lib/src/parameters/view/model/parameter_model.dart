@@ -23,14 +23,14 @@ class Parameter2 {
 
   factory Parameter2.fromJson(Map<String, dynamic> json) {
     return Parameter2(
-      id: json['_id'],
+      id: json['id'],
       name: json['name'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      '_id': id,
+      'id': id,
       'name': name,
     };
   }

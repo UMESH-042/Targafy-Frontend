@@ -574,30 +574,31 @@ class _UserProfileState extends ConsumerState<UserProfile> {
   //     }
   //   }
   // }
-   Future<File> compressImage(File imageFile) async {
-  // Define the target file size in bytes (100 KB in this example)
-  int targetSize = 100 * 1024;
+  Future<File> compressImage(File imageFile) async {
+    // Define the target file size in bytes (100 KB in this example)
+    int targetSize = 100 * 1024;
 
-  Uint8List? compressedBytes = await FlutterImageCompress.compressWithFile(
-    imageFile.path,
-    minWidth: 800,
-    minHeight: 600,
-    quality: 85,
-  );
-
-  if (compressedBytes!.lengthInBytes > targetSize) {
-    compressedBytes = await FlutterImageCompress.compressWithList(
-      compressedBytes,
+    Uint8List? compressedBytes = await FlutterImageCompress.compressWithFile(
+      imageFile.path,
       minWidth: 800,
       minHeight: 600,
-      quality: 70,
+      quality: 85,
     );
+
+    if (compressedBytes!.lengthInBytes > targetSize) {
+      compressedBytes = await FlutterImageCompress.compressWithList(
+        compressedBytes,
+        minWidth: 800,
+        minHeight: 600,
+        quality: 70,
+      );
+    }
+
+    File compressedFile = File(imageFile.path)
+      ..writeAsBytesSync(compressedBytes);
+
+    return compressedFile;
   }
-
-  File compressedFile = File(imageFile.path)..writeAsBytesSync(compressedBytes);
-
-  return compressedFile;
-}
 
   Future<void> _changePicture() async {
     final picker = ImagePicker();
@@ -626,8 +627,6 @@ class _UserProfileState extends ConsumerState<UserProfile> {
       }
     }
   }
-
-
 }
 
 

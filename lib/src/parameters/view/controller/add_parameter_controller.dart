@@ -186,6 +186,26 @@ class ParametersNotifierHome extends StateNotifier<List<Parameter2>> {
       throw Exception('Failed to load parameters');
     }
   }
+
+  Future<void> fetchParametersforHomeDepartment(
+      String businessId, String departmentId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+
+    final response = await http.get(
+      Uri.parse('${domain}department/get-params/$businessId/$departmentId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+    print('This is response for department parameters :- ${response.body}');
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body)['data'] as List;
+      state = data.map((json) => Parameter2.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load parameters');
+    }
+  }
 }
 
 // Create a provider for the ParametersNotifier

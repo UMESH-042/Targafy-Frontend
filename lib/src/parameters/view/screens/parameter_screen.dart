@@ -812,8 +812,7 @@ class _ParameterScreenState extends ConsumerState<ParameterScreen> {
     }
 
     if (_selectedUsersNames.isEmpty) {
-      return const SizedBox
-          .shrink(); // Return an empty widget if there are no selected users
+      return const SizedBox.shrink();
     }
     return Wrap(
       spacing: 8.0,

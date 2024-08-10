@@ -45,7 +45,7 @@ class UserProfileLogoController {
     final mimeType = lookupMimeType(image.path);
 
     final request = http.MultipartRequest('POST', url)
-      ..fields['folder'] = 'chats'
+      ..fields['folder'] = 'userprofile'
       ..files.add(await http.MultipartFile.fromPath(
         'file',
         image.path,

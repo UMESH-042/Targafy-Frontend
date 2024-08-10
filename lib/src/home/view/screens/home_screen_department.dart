@@ -51,14 +51,28 @@ final paramPairsProvider = FutureProvider<List<ParamPair>>((ref) {
   return repository.fetchParamPairs(businessId);
 });
 
-final parameterListProvider =
-    FutureProvider.autoDispose<List<Parameter2>>((ref) async {
+// final parameterListProvider =
+//     FutureProvider.autoDispose<List<Parameter2>>((ref) async {
+//   final selectedBusinessData = ref.watch(currentBusinessProvider);
+//   final businessId = selectedBusinessData?['business']?.id;
+
+//   if (businessId != null) {
+//     final notifier = ref.read(parametersProviderHome.notifier);
+//     await notifier.fetchParametersforHomeDepartment(businessId);
+//     return ref.watch(parametersProviderHome);
+//   } else {
+//     return <Parameter2>[];
+//   }
+// });
+
+final parameterListProvider = FutureProvider.autoDispose
+    .family<List<Parameter2>, String?>((ref, departmentId) async {
   final selectedBusinessData = ref.watch(currentBusinessProvider);
   final businessId = selectedBusinessData?['business']?.id;
 
-  if (businessId != null) {
+  if (businessId != null && departmentId != null) {
     final notifier = ref.read(parametersProviderHome.notifier);
-    await notifier.fetchParametersforHome(businessId);
+    await notifier.fetchParametersforHomeDepartment(businessId, departmentId);
     return ref.watch(parametersProviderHome);
   } else {
     return <Parameter2>[];
@@ -382,7 +396,8 @@ class _DepartmentPageState extends ConsumerState<DepartmentPage> {
   Widget build(BuildContext context) {
     // print(currentMonth);
 
-    final parameterListAsync = ref.watch(parameterListProvider);
+    final parameterListAsync =
+        ref.watch(parameterListProvider(widget.department.id));
     final selectedBusinessData = ref.watch(currentBusinessProvider);
     final dataAddedController = ref.watch(dataAddedControllerProvider);
 
@@ -473,12 +488,12 @@ class _DepartmentPageState extends ConsumerState<DepartmentPage> {
                     children: [
                       parameterListAsync.when(
                         data: (parameterList) {
-                          if (selectedParameter.isEmpty &&
-                              selectedParameterId.isEmpty &&
-                              parameterList.isNotEmpty) {
-                            selectedParameter = parameterList[0].name;
-                            selectedParameterId = parameterList[0].id;  
-                          }
+                          // if (selectedParameterId.isEmpty &&
+                          //     selectedParameter.isEmpty &&
+                          //     parameterList.isNotEmpty) {
+                          //   selectedParameter = parameterList[0].name;
+                          //   selectedParameterId = parameterList[0].id;
+                          // }
                           return Container(
                             height: MediaQuery.of(context).size.height * 0.04,
                             margin: EdgeInsets.symmetric(

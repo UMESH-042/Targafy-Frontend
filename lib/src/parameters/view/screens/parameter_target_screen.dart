@@ -2065,6 +2065,38 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                               },
                             ),
                             SizedBox(height: height * 0.02),
+                            // Wrap(
+                            //   children: allSelected
+                            //       ? [
+                            //           Chip(
+                            //             label: const Text('All Selected'),
+                            //             onDeleted: () {
+                            //               setState(() {
+                            //                 AssingSelectedUserIds.clear();
+                            //                 allSelected = false;
+                            //               });
+                            //             },
+                            //           ),
+                            //         ]
+                            //       : AssingSelectedUserIds.map((userId) {
+                            //           return Chip(
+                            //             label: Text(users.when(
+                            //               data: (userList) => userList
+                            //                   .firstWhere((user) =>
+                            //                       user.userId == userId)
+                            //                   .name,
+                            //               loading: () => '',
+                            //               error: (error, stackTrace) => '',
+                            //             )),
+                            //             onDeleted: () {
+                            //               setState(() {
+                            //                 AssingSelectedUserIds.remove(
+                            //                     userId);
+                            //               });
+                            //             },
+                            //           );
+                            //         }).toList(),
+                            // ),
                             Wrap(
                               children: allSelected
                                   ? [
@@ -2079,22 +2111,36 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                       ),
                                     ]
                                   : AssingSelectedUserIds.map((userId) {
-                                      return Chip(
-                                        label: Text(users.when(
-                                          data: (userList) => userList
-                                              .firstWhere((user) =>
-                                                  user.userId == userId)
-                                              .name,
-                                          loading: () => '',
-                                          error: (error, stackTrace) => '',
-                                        )),
-                                        onDeleted: () {
-                                          setState(() {
-                                            AssingSelectedUserIds.remove(
-                                                userId);
-                                          });
-                                        },
-                                      );
+                                      User? user;
+                                      try {
+                                        user = users.when(
+                                          data: (userList) =>
+                                              userList.firstWhere(
+                                            (user) => user.userId == userId,
+                                          ),
+                                          loading: () =>
+                                              null, // Handle loading state
+                                          error: (error, stackTrace) =>
+                                              null, // Handle error state
+                                        );
+                                      } catch (e) {
+                                        user = null; // User not found
+                                      }
+
+                                      // Only create a Chip if the user is found
+                                      if (user != null) {
+                                        return Chip(
+                                          label: Text(user.name),
+                                          onDeleted: () {
+                                            setState(() {
+                                              AssingSelectedUserIds.remove(
+                                                  userId);
+                                            });
+                                          },
+                                        );
+                                      } else {
+                                        return Container();
+                                      }
                                     }).toList(),
                             ),
                           ],
@@ -2419,8 +2465,7 @@ class _ParameterTargetScreenState extends ConsumerState<ParameterTargetScreen> {
                                   ),
                                   IconButton(
                                     icon: Icon(Icons.edit),
-                                    iconSize:
-                                        18.0, 
+                                    iconSize: 18.0,
                                     onPressed: () {
                                       toggleEditing(userId);
                                     },
