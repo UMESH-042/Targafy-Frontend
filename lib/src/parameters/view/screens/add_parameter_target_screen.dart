@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lottie/lottie.dart';
 
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/core/constants/colors.dart';
@@ -242,7 +243,7 @@ class _AddParameterTargetScreenState
 
 class AddParameterMainScreen extends ConsumerStatefulWidget {
   final String departmentId;
-  
+
   const AddParameterMainScreen({
     required this.departmentId,
   });
@@ -294,7 +295,21 @@ class _AddParameterMainScreenState extends ConsumerState<AddParameterMainScreen>
             if (role == 'User') {
               return Scaffold(
                 body: Center(
-                  child: Text('You don\'t have access to this page'),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Lottie.asset('assets/animations/empty_list.json',
+                          height: 200, width: 200),
+                      const Text(
+                        'You don\'t have access to this page',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
@@ -440,7 +455,21 @@ class _AddTargetMainScreenState extends ConsumerState<AddTargetMainScreen>
             if (role == 'User') {
               return Scaffold(
                 body: Center(
-                  child: Text('You don\'t have access to this page'),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Lottie.asset('assets/animations/empty_list.json',
+                          height: 200, width: 200),
+                      const Text(
+                        'You don\'t have access to this page',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }

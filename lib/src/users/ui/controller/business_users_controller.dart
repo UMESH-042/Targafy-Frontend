@@ -189,7 +189,7 @@ final businessUsersStreamProvider2 = StreamProvider.autoDispose
   yield users;
 
   // Simulate real-time updates
-  await for (final _ in Stream.periodic(const Duration(seconds: 10))) {
+  await for (final _ in Stream.periodic(const Duration(seconds: 5))) {
     final response = await http.get(
       Uri.parse(
           '${domain}business/get-all-subordinate-businessusers/$businessId/$departmentId'),

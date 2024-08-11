@@ -79,10 +79,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:targafy/business_home_page/controller/business_controller.dart';
 import 'package:targafy/core/constants/colors.dart';
-import 'package:targafy/core/constants/dimensions.dart';
 import 'package:targafy/src/groups/ui/Create_group.dart';
 import 'package:targafy/src/groups/ui/widget/group_tile.dart';
-import 'package:targafy/src/home/view/screens/controller/Department_controller.dart'; // Import the department provider
+import 'package:targafy/src/home/view/screens/controller/Department_controller.dart';
+import 'package:targafy/src/home/view/screens/controller/user_role_controller.dart'; // Import the department provider
 
 class GroupScreen extends ConsumerStatefulWidget {
   const GroupScreen({super.key});
@@ -94,19 +94,41 @@ class GroupScreen extends ConsumerStatefulWidget {
 class _GroupScreenState extends ConsumerState<GroupScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(top: 20),
-        child: Consumer(
-          builder: (context, ref, child) {
+    return Consumer(
+      builder: (context, ref, _) {
+        final userRoleAsyncValue = ref.watch(userRoleProvider);
+
+        return userRoleAsyncValue.when(
+          data: (role) {
+            if (role == 'User' || role == 'MiniAdmin') {
+              return Scaffold(
+                body: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Lottie.asset('assets/animations/empty_list.json',
+                          height: 200, width: 200),
+                      const Text(
+                        'You don\'t have access to this page',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
             final selectedBusinessData = ref.watch(currentBusinessProvider);
             final businessId = selectedBusinessData?['business']?.id;
 
             if (businessId == null) {
-              return const Center(
-                child: Text(
-                  'No business created',
-                  style: TextStyle(fontSize: 18, color: Colors.red),
+              return const Scaffold(
+                body: Center(
+                  child: Text('No business selected'),
                 ),
               );
             }
@@ -136,45 +158,34 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
               },
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) => Center(
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Lottie.asset('assets/animations/empty_list.json',
-                          height: 200, width: 200),
-                      const Text(
-                        "Nothing to display",
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Lottie.asset('assets/animations/empty_list.json',
+                        height: 200, width: 200),
+                    const Text(
+                      "Nothing to display",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             );
           },
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: lightblue,
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => DepartmentCreatePage()),
-          );
-
-          final selectedBusinessData = ref.read(currentBusinessProvider);
-          final businessId = selectedBusinessData?['business']?.id;
-
-          if (result == true && businessId != null) {
-            ref.invalidate(departmentProvider(businessId));
-          }
-        },
-        child: const Icon(Icons.add),
-      ),
+          loading: () => const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          ),
+          error: (error, stack) => Scaffold(
+            body: Center(
+              child: Text('Failed to load user role: $error'),
+            ),
+          ),
+        );
+      },
     );
   }
 }

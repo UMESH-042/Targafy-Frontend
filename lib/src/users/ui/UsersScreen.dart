@@ -1757,43 +1757,67 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BusinessRequestsPage(
-                                  businessId: businessId,
-                                  departmentId: widget.departmentId,
-                                ),
-                              ),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final userRoleAsyncValue =
+                                ref.watch(userRoleProvider);
+
+                            return userRoleAsyncValue.when(
+                              data: (role) {
+                                // Only display the button if the role is not 'User'
+                                if (role != 'User') {
+                                  return ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              BusinessRequestsPage(
+                                            businessId: businessId,
+                                            departmentId: widget.departmentId,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 16),
+                                      backgroundColor: lightblue,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                        side: BorderSide(
+                                            color: primaryColor, width: 2),
+                                      ),
+                                    ),
+                                    child: acceptCounter > 0
+                                        ? badges.Badge(
+                                            badgeContent: Text(
+                                              '$acceptCounter',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            child: Text(
+                                              'Accept Users',
+                                              style: TextStyle(
+                                                  color: primaryColor),
+                                            ),
+                                          )
+                                        : Text(
+                                            'Accept Users',
+                                            style:
+                                                TextStyle(color: primaryColor),
+                                          ),
+                                  );
+                                } else {
+                                  return SizedBox.shrink();
+                                }
+                              },
+                              loading: () => const CircularProgressIndicator(),
+                              error: (error, stack) =>
+                                  Center(child: Text('Error: $error')),
                             );
                           },
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 16),
-                            backgroundColor: lightblue,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                              side: BorderSide(color: primaryColor, width: 2),
-                            ),
-                          ),
-                          child: acceptCounter > 0
-                              ? badges.Badge(
-                                  badgeContent: Text(
-                                    '$acceptCounter',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  child: Text(
-                                    'Accept Users',
-                                    style: TextStyle(color: primaryColor),
-                                  ),
-                                )
-                              : Text(
-                                  'Accept Users',
-                                  style: TextStyle(color: primaryColor),
-                                ),
-                        ),
+                        )
                       ],
                     )
                   ],
@@ -1808,6 +1832,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                         SizedBox(height: getScreenheight(context) * 0.016),
                     itemBuilder: (context, index) {
                       final user = users[index];
+
                       return GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -1830,6 +1855,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                                 builder: (context, ref, _) {
                                   final avatarUrlAsyncValue = ref
                                       .watch(userAvatarProvider(user.userId));
+
                                   return avatarUrlAsyncValue.when(
                                     data: (avatarUrl) {
                                       return CachedNetworkImage(
@@ -1882,86 +1908,127 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                                   ],
                                 ),
                               ),
-                              PopupMenuButton<int>(
-                                icon: const Icon(Icons.more_vert),
-                                color: Colors.white,
-                                surfaceTintColor: Colors.white,
-                                position: PopupMenuPosition.under,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(15).copyWith(
-                                    topRight: const Radius.circular(0),
-                                  ),
-                                ),
-                                onSelected: (value) async {
-                                  switch (value) {
-                                    case 1:
-                                      ref
-                                          .read(promoteUserToAdminProvider)
-                                          .promote(
-                                              businessId, user.userId, context);
-                                      break;
-                                    case 2:
-                                      ref
-                                          .read(promoteUserToMiniAdminProvider)
-                                          .promote(
-                                              businessId, user.userId, context);
-                                      break;
-                                    case 3:
-                                      ref.read(demoteUserProvider).demoteUser(
-                                          businessId, user.userId, context);
-                                      break;
-                                    case 4:
-                                      ref
-                                          .read(removeUserProvider)
-                                          .removeUser(businessId, user.userId);
-                                      break;
-                                    case 5:
-                                      // Change Manager functionality
-                                      _showManagerSelectionDialog(
-                                          context, user.userId, businessId!);
-                                      break;
-                                  }
+                              Consumer(
+                                builder: (context, ref, _) {
+                                  final userRoleAsyncValue = ref.watch(
+                                      userRoleProvider); // Fetch the user role
+
+                                  return userRoleAsyncValue.when(
+                                    data: (role) {
+                                      // Display the three-dot icon only if the role is not "User"
+                                      return role != 'User'
+                                          ? PopupMenuButton<int>(
+                                              icon: const Icon(Icons.more_vert),
+                                              color: Colors.white,
+                                              surfaceTintColor: Colors.white,
+                                              position: PopupMenuPosition.under,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(15)
+                                                        .copyWith(
+                                                  topRight:
+                                                      const Radius.circular(0),
+                                                ),
+                                              ),
+                                              onSelected: (value) async {
+                                                switch (value) {
+                                                  case 1:
+                                                    ref
+                                                        .read(
+                                                            promoteUserToAdminProvider)
+                                                        .promote(
+                                                            businessId,
+                                                            user.userId,
+                                                            context);
+                                                    break;
+                                                  case 2:
+                                                    ref
+                                                        .read(
+                                                            promoteUserToMiniAdminProvider)
+                                                        .promote(
+                                                            businessId,
+                                                            user.userId,
+                                                            context);
+                                                    break;
+                                                  case 3:
+                                                    ref
+                                                        .read(
+                                                            demoteUserProvider)
+                                                        .demoteUser(
+                                                            businessId,
+                                                            user.userId,
+                                                            context);
+                                                    break;
+                                                  case 4:
+                                                    ref
+                                                        .read(
+                                                            removeUserProvider)
+                                                        .removeUser(
+                                                            businessId,
+                                                            user.userId,
+                                                            context);
+                                                    break;
+                                                  case 5:
+                                                    _showManagerSelectionDialog(
+                                                        context,
+                                                        user.userId,
+                                                        businessId!);
+                                                    break;
+                                                }
+                                              },
+                                              itemBuilder:
+                                                  (BuildContext context) =>
+                                                      <PopupMenuEntry<int>>[
+                                                PopupMenuItem<int>(
+                                                  value: 1,
+                                                  child: Text(
+                                                    'Promote to Admin',
+                                                    style: TextStyle(
+                                                        color: primaryColor),
+                                                  ),
+                                                ),
+                                                PopupMenuItem<int>(
+                                                  value: 2,
+                                                  child: Text(
+                                                    'Promote to MiniAdmin',
+                                                    style: TextStyle(
+                                                        color: primaryColor),
+                                                  ),
+                                                ),
+                                                PopupMenuItem<int>(
+                                                  value: 3,
+                                                  child: Text(
+                                                    'Demote to User',
+                                                    style: TextStyle(
+                                                        color: primaryColor),
+                                                  ),
+                                                ),
+                                                PopupMenuItem<int>(
+                                                  value: 4,
+                                                  child: Text(
+                                                    'Remove User',
+                                                    style: TextStyle(
+                                                        color: primaryColor),
+                                                  ),
+                                                ),
+                                                PopupMenuItem<int>(
+                                                  value: 5,
+                                                  child: Text(
+                                                    'Change Manager',
+                                                    style: TextStyle(
+                                                        color: primaryColor),
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : const SizedBox.shrink();
+                                    },
+                                    loading: () => const SizedBox.shrink(),
+                                    error: (error, stack) =>
+                                        const SizedBox.shrink(),
+                                  );
                                 },
-                                itemBuilder: (BuildContext context) =>
-                                    <PopupMenuEntry<int>>[
-                                  PopupMenuItem<int>(
-                                    value: 1,
-                                    child: Text(
-                                      'Promote to Admin',
-                                      style: TextStyle(color: primaryColor),
-                                    ),
-                                  ),
-                                  PopupMenuItem<int>(
-                                    value: 2,
-                                    child: Text(
-                                      'Promote to MiniAdmin',
-                                      style: TextStyle(color: primaryColor),
-                                    ),
-                                  ),
-                                  PopupMenuItem<int>(
-                                    value: 3,
-                                    child: Text(
-                                      'Demote to User',
-                                      style: TextStyle(color: primaryColor),
-                                    ),
-                                  ),
-                                  PopupMenuItem<int>(
-                                    value: 4,
-                                    child: Text(
-                                      'Remove User',
-                                      style: TextStyle(color: primaryColor),
-                                    ),
-                                  ),
-                                  PopupMenuItem<int>(
-                                    value: 5,
-                                    child: Text(
-                                      'Change Manager',
-                                      style: TextStyle(color: primaryColor),
-                                    ),
-                                  ),
-                                ],
-                              )
+                              ),
                             ],
                           ),
                         ),

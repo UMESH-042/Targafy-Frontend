@@ -443,6 +443,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:targafy/business_home_page/controller/business_controller.dart';
@@ -940,7 +941,21 @@ class _AddChartsMainPageState extends ConsumerState<AddChartsMainPage> {
             if (role == 'User') {
               return Scaffold(
                 body: Center(
-                  child: Text('You don\'t have access to this page'),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Lottie.asset('assets/animations/empty_list.json',
+                          height: 200, width: 200),
+                      const Text(
+                        'You don\'t have access to this page',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }

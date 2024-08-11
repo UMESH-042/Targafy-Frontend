@@ -313,7 +313,6 @@ class _BottomNavigationAndAppBarState
     final selectedUserType = selectedBusinessData?['userType'] as String?;
     final selectedbusinessCode =
         selectedBusinessData?['businessCode'] as String?;
-    final selectedRole = selectedBusinessData?['role'] as String?;
 
     // print(selectedbusinessCode);
 
@@ -437,6 +436,8 @@ class _BottomNavigationAndAppBarState
                       .fetchTotalNotificationsForBusinesses(
                           widget.token!, businesses.map((b) => b.id).toList());
 
+                  final userRoleAsyncValue = ref.watch(userRoleProvider);
+
                   return Column(
                     children: [
                       SizedBox(
@@ -494,7 +495,7 @@ class _BottomNavigationAndAppBarState
                             ),
                             Padding(
                               padding: EdgeInsets.only(
-                                  left: getScreenWidth(context) * 0.02),
+                                  left: getScreenWidth(context) * 0.05),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -509,13 +510,22 @@ class _BottomNavigationAndAppBarState
                                       ),
                                     ),
                                   Center(
-                                    child: CustomText(
-                                      // text: role, // Display the role here
-                                      text: '',
-                                      fontSize: getScreenWidth(context) * 0.04,
-                                      color: primaryColor,
-                                      fontWeight: FontWeight.w400,
-                                    ),
+                                    child: userRoleAsyncValue.when(
+                                        data: (role) => Text(
+                                              role,
+                                              style: TextStyle(
+                                                fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.042,
+                                                color: primaryColor,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                        loading: () => Text(''),
+                                        error: (error, stack) => Text(
+                                              'Role',
+                                            )),
                                   ),
                                 ],
                               ),
