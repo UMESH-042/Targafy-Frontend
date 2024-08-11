@@ -28,7 +28,7 @@ class ActivityScreen extends ConsumerWidget {
       return const Scaffold(
         body: Center(
           child: Text(
-            "Business not selected",
+            "Please select a business",
             style: TextStyle(
               color: Colors.red,
               fontSize: 20,

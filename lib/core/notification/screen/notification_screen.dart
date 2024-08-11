@@ -335,7 +335,7 @@ class NotificationPage extends ConsumerWidget {
       return Scaffold(
         body: Center(
           child: Text(
-            "Business not selected",
+            "Please select a business",
             style: TextStyle(
               color: Colors.red,
               fontSize: 20,

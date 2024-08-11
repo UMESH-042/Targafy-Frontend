@@ -64,6 +64,7 @@ class _MandatoryFieldPageState extends ConsumerState<MandatoryFieldPage> {
               Expanded(
                 child: Center(
                   child: TextField(
+                    textCapitalization: TextCapitalization.words,
                     controller: nameController,
                     decoration: InputDecoration(
                       labelText: 'Enter your name',

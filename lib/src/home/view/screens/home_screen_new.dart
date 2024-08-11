@@ -281,7 +281,15 @@ class _AllTwoImpPageState extends ConsumerState<AllTwoImpPage>
 
     return Scaffold(
       body: selectedBusiness == null
-          ? const Center(child: Text('Please select a business.'))
+          ? const Center(
+              child: Text(
+              'Please select a business',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
+            ))
           : _buildDepartmentContent(selectedBusiness),
     );
   }

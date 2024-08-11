@@ -42,24 +42,17 @@ class _AllFourImpPageState extends ConsumerState<AllFourImpPage>
     if (businessId == null) {
       return Scaffold(
         body: Center(
-          child: Text('Please select a business.'),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => DepartmentCreatePage()));
-          },
-          backgroundColor: lightblue,
-          child: const Icon(
-            Icons.add,
-            color: Colors.black,
+          child: Text(
+            'Please select a business',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.red,
+            ),
           ),
         ),
       );
     }
-
     return Scaffold(
       body: Column(
         children: [
