@@ -13,7 +13,8 @@ String domain = AppRemoteRoutes.baseUrl;
 // Class to hold the reference for promoting a user to Mini Admin
 class PromoteUserToMiniAdmin {
   // Function to promote a user to Mini Admin
-  Future<void> promote(String businessId, String userId, BuildContext context) async {
+  Future<void> promote(
+      String businessId, String userId, BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
     final url = '${domain}business/promotion/$businessId';
@@ -23,13 +24,14 @@ class PromoteUserToMiniAdmin {
         Uri.parse(url),
         headers: {
           'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json', // Specify the content type
+          'Content-Type': 'application/json',
         },
         body: jsonEncode({
           'role': 'MiniAdmin',
           'userIdToPromote': userId,
         }),
       );
+      print(response.body);
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -70,7 +70,7 @@ class DemoteUserController {
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('User demoted successfully'),
+            content: Text('Admin demoted successfully'),
             duration: Duration(seconds: 2),
           ),
         );
@@ -94,3 +94,5 @@ class DemoteUserController {
     }
   }
 }
+
+

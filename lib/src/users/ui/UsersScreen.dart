@@ -1982,13 +1982,55 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                                                       }
                                                       break;
                                                     case 4:
-                                                      ref
-                                                          .read(
-                                                              removeUserProvider)
-                                                          .removeUser(
+                                                      bool confirmRemove =
+                                                          await showDialog<
+                                                                  bool>(
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  return AlertDialog(
+                                                                    title: Text(
+                                                                        'Confirm Removal'),
+                                                                    content: Text(
+                                                                        'Do you really want to remove this user?'),
+                                                                    actions: <Widget>[
+                                                                      TextButton(
+                                                                        child: Text(
+                                                                            'No'),
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.of(context)
+                                                                              .pop(false);
+                                                                        },
+                                                                      ),
+                                                                      TextButton(
+                                                                        child: Text(
+                                                                            'Yes'),
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.of(context)
+                                                                              .pop(true);
+                                                                        },
+                                                                      ),
+                                                                    ],
+                                                                  );
+                                                                },
+                                                              ) ??
+                                                              false;
+
+                                                      // If user confirms, proceed with removal
+                                                      if (confirmRemove) {
+                                                        await ref
+                                                            .read(
+                                                                removeUserProvider)
+                                                            .removeUser(
                                                               businessId,
                                                               user.userId,
-                                                              context);
+                                                              context,
+                                                            );
+                                                      }
                                                       break;
                                                     case 5:
                                                       _showManagerSelectionDialog(
