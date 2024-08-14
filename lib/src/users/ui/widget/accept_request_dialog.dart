@@ -765,6 +765,331 @@ import 'package:tuple/tuple.dart';
 //     );
 //   }
 // }
+// import 'package:http/http.dart' as http;
+
+// String domain = AppRemoteRoutes.baseUrl;
+
+// final businessUsersProvider =
+//     FutureProvider.family<List<BusinessUserModel2>, String>(
+//   (ref, businessId) async {
+//     final prefs = await SharedPreferences.getInstance();
+//     final token = prefs.getString('authToken');
+
+//     if (token == null) {
+//       throw Exception('Authorization token not found');
+//     }
+
+//     final response = await http.get(
+//       Uri.parse(
+//           '${domain}business/get-all-subordinate-businessusers/$businessId'),
+//       headers: {
+//         'Authorization': 'Bearer $token',
+//       },
+//     );
+
+//     if (response.statusCode != 200) {
+//       throw Exception('Failed to load users');
+//     }
+
+//     final data = json.decode(response.body);
+//     return (data['data']['users'] as List)
+//         .map((user) => BusinessUserModel2.fromJson(user))
+//         .toList();
+//   },
+// );
+
+// class UserSelectionDialog extends ConsumerStatefulWidget {
+//   final String userId;
+//   final Function(bool) userRequestCallback;
+//   final String businessId;
+
+//   const UserSelectionDialog({
+//     required this.userId,
+//     required this.userRequestCallback,
+//     required this.businessId,
+//   });
+
+//   @override
+//   _UserSelectionDialogState createState() => _UserSelectionDialogState();
+// }
+
+// class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
+//   List<String> roles = ["MiniAdmin", "User"];
+//   BusinessUserModel2? selectedUserListItem;
+//   String? selectedRole;
+//   List<String> selectedParameterIds = [];
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       ref
+//           .read(parameterNotifierProvider.notifier)
+//           .fetchParameters(widget.businessId);
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final usersListState = ref.watch(businessUsersProvider(widget.businessId));
+//     final userRequestState = ref.watch(userRequestProvider);
+//     final parametersState = ref.watch(parameterNotifierProvider);
+
+//     double height = MediaQuery.of(context).size.height;
+//     double width = MediaQuery.of(context).size.width;
+
+//     return Dialog(
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.circular(10.0),
+//       ),
+//       child: Padding(
+//         padding: const EdgeInsets.all(16.0),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           crossAxisAlignment: CrossAxisAlignment.stretch,
+//           children: [
+//             const SizedBox(height: 16),
+//             const Row(
+//               children: [
+//                 SizedBox(width: 5),
+//                 Text(
+//                   "Select Role",
+//                   style: TextStyle(
+//                       color: Colors.black,
+//                       fontFamily: "Poppins",
+//                       fontSize: 14,
+//                       fontWeight: FontWeight.w600),
+//                 ),
+//               ],
+//             ),
+//             SizedBox(height: height * 0.01),
+//             Container(
+//               height: height * 0.06,
+//               width: double.maxFinite - 10,
+//               decoration: BoxDecoration(
+//                 border: Border.all(
+//                   style: BorderStyle.solid,
+//                   color: Colors.grey,
+//                 ),
+//                 borderRadius: BorderRadius.circular(12),
+//               ),
+//               child: DropdownButtonHideUnderline(
+//                 child: DropdownButton<String>(
+//                   icon: const Align(
+//                     alignment: Alignment.centerRight,
+//                     child: Icon(
+//                       Icons.keyboard_arrow_down_sharp,
+//                       color: Colors.grey,
+//                     ),
+//                   ),
+//                   elevation: 4,
+//                   style: const TextStyle(color: Colors.black, fontSize: 14),
+//                   value: selectedRole,
+//                   onChanged: (String? newValue) {
+//                     setState(() {
+//                       selectedRole = newValue;
+//                     });
+//                   },
+//                   items: roles.map<DropdownMenuItem<String>>((String s) {
+//                     return DropdownMenuItem<String>(
+//                       value: s,
+//                       child: Text("  $s"),
+//                     );
+//                   }).toList(),
+//                 ),
+//               ),
+//             ),
+//             SizedBox(height: height * 0.02),
+//             const Row(
+//               children: [
+//                 SizedBox(width: 5),
+//                 Text(
+//                   "Assign To",
+//                   style: TextStyle(
+//                       color: Colors.black,
+//                       fontFamily: "Poppins",
+//                       fontSize: 14,
+//                       fontWeight: FontWeight.w600),
+//                 ),
+//               ],
+//             ),
+//             SizedBox(height: height * 0.01),
+//             Container(
+//               height: height * 0.06,
+//               width: width - 41,
+//               decoration: BoxDecoration(
+//                 border: Border.all(
+//                   style: BorderStyle.solid,
+//                   color: Colors.grey,
+//                 ),
+//                 borderRadius: BorderRadius.circular(12),
+//               ),
+//               child: usersListState.when(
+//                 data: (usersList) => DropdownButtonHideUnderline(
+//                   child: DropdownButton<BusinessUserModel2>(
+//                     icon: const Align(
+//                       alignment: Alignment.centerRight,
+//                       child: Icon(
+//                         Icons.keyboard_arrow_down_sharp,
+//                         color: Colors.grey,
+//                       ),
+//                     ),
+//                     elevation: 4,
+//                     style: const TextStyle(color: Colors.black, fontSize: 14),
+//                     value: selectedUserListItem,
+//                     onChanged: (BusinessUserModel2? newValue) {
+//                       setState(() {
+//                         selectedUserListItem = newValue;
+//                       });
+//                     },
+//                     items: usersList.map<DropdownMenuItem<BusinessUserModel2>>(
+//                         (BusinessUserModel2 user) {
+//                       return DropdownMenuItem<BusinessUserModel2>(
+//                         value: user,
+//                         child: Text("  ${user.name}"),
+//                       );
+//                     }).toList(),
+//                   ),
+//                 ),
+//                 loading: () => const Center(
+//                   child: CircularProgressIndicator(),
+//                 ),
+//                 error: (error, stackTrace) => Center(
+//                   child: Text('No Users'),
+//                 ),
+//               ),
+//             ),
+//             const SizedBox(height: 16),
+//             // const Row(
+//             //   children: [
+//             //     SizedBox(width: 5),
+//             //     Text(
+//             //       "Select Parameter List",
+//             //       style: TextStyle(
+//             //           color: Colors.black,
+//             //           fontFamily: "Poppins",
+//             //           fontSize: 14,
+//             //           fontWeight: FontWeight.w600),
+//             //     ),
+//             //   ],
+//             // ),
+
+//             const Row(
+//               children: [
+//                 SizedBox(width: 5),
+//                 Text(
+//                   "Select Parameter List",
+//                   style: TextStyle(
+//                       color: Colors.black,
+//                       fontFamily: "Poppins",
+//                       fontSize: 14,
+//                       fontWeight: FontWeight.w600),
+//                 ),
+//               ],
+//             ),
+//             SizedBox(height: height * 0.01),
+//             Container(
+//               height: height * 0.2,
+//               width: width - 41,
+//               decoration: BoxDecoration(
+//                 border: Border.all(
+//                   style: BorderStyle.solid,
+//                   color: Colors.grey,
+//                 ),
+//                 borderRadius: BorderRadius.circular(12),
+//               ),
+//               child: DropdownButtonHideUnderline(
+//                 child: MultiSelectDialogField<String>(
+//                   items: parametersState
+//                       .map((parameter) =>
+//                           MultiSelectItem<String>(parameter.id, parameter.name))
+//                       .toList(),
+//                   listType: MultiSelectListType.CHIP,
+//                   onConfirm: (values) {
+//                     setState(() {
+//                       selectedParameterIds = values;
+//                     });
+//                   },
+//                   chipDisplay: MultiSelectChipDisplay(
+//                     onTap: (value) {
+//                       setState(() {
+//                         selectedParameterIds.remove(value);
+//                       });
+//                     },
+//                   ),
+//                   buttonText: Text(
+//                     "Select Parameters",
+//                     style: TextStyle(color: Colors.grey[700], fontSize: 14),
+//                   ),
+//                   decoration: BoxDecoration(
+//                     borderRadius: BorderRadius.circular(12),
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             SizedBox(height: height * 0.01),
+//             // Implement your parameter list dropdown here similar to the roles and users
+//             const SizedBox(height: 16),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.end,
+//               children: [
+//                 TextButton(
+//                   onPressed: () {
+//                     Navigator.pop(context);
+//                   },
+//                   child: const Text("Close"),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: userRequestState is AsyncLoading
+//                       ? null
+//                       : () async {
+//                           if (selectedUserListItem != null &&
+//                               selectedRole != null) {
+//                             try {
+//                               await ref
+//                                   .read(userRequestProvider.notifier)
+//                                   .submitUserRequest(
+//                                       widget.businessId,
+//                                       widget.userId,
+//                                       selectedRole!,
+//                                       selectedUserListItem!.userId,
+//                                       selectedParameterIds);
+//                               Navigator.pop(context);
+//                               widget.userRequestCallback(
+//                                   true); // Notify parent widget
+//                             } catch (e) {
+//                               widget.userRequestCallback(false);
+//                             }
+//                           } else {
+//                             showDialog(
+//                               context: context,
+//                               builder: (context) => AlertDialog(
+//                                 title: const Text("Error"),
+//                                 content: const Text(
+//                                     "Please select a role and user."),
+//                                 actions: [
+//                                   TextButton(
+//                                     onPressed: () {
+//                                       Navigator.pop(context);
+//                                     },
+//                                     child: const Text("OK"),
+//                                   ),
+//                                 ],
+//                               ),
+//                             );
+//                           }
+//                         },
+//                   child: const Text("Submit"),
+//                 ),
+//               ],
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 import 'package:http/http.dart' as http;
 
 String domain = AppRemoteRoutes.baseUrl;
@@ -818,6 +1143,7 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
   BusinessUserModel2? selectedUserListItem;
   String? selectedRole;
   List<String> selectedParameterIds = [];
+  String? dummyAdminId;
 
   @override
   void initState() {
@@ -925,32 +1251,51 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: usersListState.when(
-                data: (usersList) => DropdownButtonHideUnderline(
-                  child: DropdownButton<BusinessUserModel2>(
-                    icon: const Align(
-                      alignment: Alignment.centerRight,
-                      child: Icon(
-                        Icons.keyboard_arrow_down_sharp,
-                        color: Colors.grey,
+                data: (usersList) {
+                  // Find the DummyAdmin user and store its ID
+                  dummyAdminId = usersList
+                      .firstWhere((user) => user.name == 'DummyAdmin',
+                          orElse: () => BusinessUserModel2(
+                              userId: '',
+                              name: '',
+                              role: '',
+                              userType: '',
+                              lastSeen: '',
+                              unseenMessagesCount: 0))
+                      .userId;
+                  // Filter out the DummyAdmin from the list for display
+                  final filteredUsersList = usersList
+                      .where((user) => user.name != 'DummyAdmin')
+                      .toList();
+
+                  return DropdownButtonHideUnderline(
+                    child: DropdownButton<BusinessUserModel2>(
+                      icon: const Align(
+                        alignment: Alignment.centerRight,
+                        child: Icon(
+                          Icons.keyboard_arrow_down_sharp,
+                          color: Colors.grey,
+                        ),
                       ),
+                      elevation: 4,
+                      style: const TextStyle(color: Colors.black, fontSize: 14),
+                      value: selectedUserListItem,
+                      onChanged: (BusinessUserModel2? newValue) {
+                        setState(() {
+                          selectedUserListItem = newValue;
+                        });
+                      },
+                      items: filteredUsersList
+                          .map<DropdownMenuItem<BusinessUserModel2>>(
+                              (BusinessUserModel2 user) {
+                        return DropdownMenuItem<BusinessUserModel2>(
+                          value: user,
+                          child: Text("  ${user.name}"),
+                        );
+                      }).toList(),
                     ),
-                    elevation: 4,
-                    style: const TextStyle(color: Colors.black, fontSize: 14),
-                    value: selectedUserListItem,
-                    onChanged: (BusinessUserModel2? newValue) {
-                      setState(() {
-                        selectedUserListItem = newValue;
-                      });
-                    },
-                    items: usersList.map<DropdownMenuItem<BusinessUserModel2>>(
-                        (BusinessUserModel2 user) {
-                      return DropdownMenuItem<BusinessUserModel2>(
-                        value: user,
-                        child: Text("  ${user.name}"),
-                      );
-                    }).toList(),
-                  ),
-                ),
+                  );
+                },
                 loading: () => const Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -960,20 +1305,6 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
               ),
             ),
             const SizedBox(height: 16),
-            // const Row(
-            //   children: [
-            //     SizedBox(width: 5),
-            //     Text(
-            //       "Select Parameter List",
-            //       style: TextStyle(
-            //           color: Colors.black,
-            //           fontFamily: "Poppins",
-            //           fontSize: 14,
-            //           fontWeight: FontWeight.w600),
-            //     ),
-            //   ],
-            // ),
-
             const Row(
               children: [
                 SizedBox(width: 5),
@@ -1028,7 +1359,6 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
               ),
             ),
             SizedBox(height: height * 0.01),
-            // Implement your parameter list dropdown here similar to the roles and users
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -1046,40 +1376,32 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
                           if (selectedUserListItem != null &&
                               selectedRole != null) {
                             try {
+                              // Use DummyAdmin ID if an Admin is selected
+                              final userIdToSubmit =
+                                  selectedUserListItem!.role == 'Admin'
+                                      ? dummyAdminId ??
+                                          selectedUserListItem!.userId
+                                      : selectedUserListItem!.userId;
+
                               await ref
                                   .read(userRequestProvider.notifier)
                                   .submitUserRequest(
                                       widget.businessId,
                                       widget.userId,
                                       selectedRole!,
-                                      selectedUserListItem!.userId,
+                                      userIdToSubmit,
                                       selectedParameterIds);
                               Navigator.pop(context);
                               widget.userRequestCallback(
-                                  true); // Notify parent widget
+                                  true); // Notify the parent widget of success
                             } catch (e) {
-                              widget.userRequestCallback(false);
+                              print('Failed to submit user request: $e');
                             }
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text("Error"),
-                                content: const Text(
-                                    "Please select a role and user."),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: const Text("OK"),
-                                  ),
-                                ],
-                              ),
-                            );
                           }
                         },
-                  child: const Text("Submit"),
+                  child: userRequestState is AsyncLoading
+                      ? const CircularProgressIndicator()
+                      : const Text("Submit"),
                 ),
               ],
             ),
@@ -1089,6 +1411,7 @@ class _UserSelectionDialogState extends ConsumerState<UserSelectionDialog> {
     );
   }
 }
+
 
 
 

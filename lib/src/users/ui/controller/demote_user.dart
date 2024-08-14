@@ -52,4 +52,45 @@ class DemoteUserController {
       );
     }
   }
+
+  Future<void> demoteAdminToUser(
+      String businessId, String userId, BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+    final url = '${domain}business/demote/admin/$businessId/$userId';
+
+    try {
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+      print(response.body);
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('User demoted successfully'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else if (response.statusCode == 400) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Only admin allowed to perform this operation'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        throw Exception('Failed to demote user: ${response.statusCode}');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to demote user: $e'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
 }

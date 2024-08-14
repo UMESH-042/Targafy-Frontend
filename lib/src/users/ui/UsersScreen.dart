@@ -1825,217 +1825,240 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
               ),
               SizedBox(height: getScreenheight(context) * 0.03),
               usersStream2.when(
-                data: (users) => Expanded(
-                  child: ListView.separated(
-                    itemCount: users.length,
-                    separatorBuilder: (context, index) =>
-                        SizedBox(height: getScreenheight(context) * 0.016),
-                    itemBuilder: (context, index) {
-                      final user = users[index];
+                data: (users) {
+                  final filteredUsers =
+                      users.where((user) => user.name != "DummyAdmin").toList();
 
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  UserBusinessProfilePage(userId: user.userId),
+                  return Expanded(
+                    child: ListView.separated(
+                      itemCount: filteredUsers.length,
+                      separatorBuilder: (context, index) =>
+                          SizedBox(height: getScreenheight(context) * 0.016),
+                      itemBuilder: (context, index) {
+                        final user = filteredUsers[index];
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UserBusinessProfilePage(
+                                    userId: user.userId),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(color: primaryColor, width: 2),
                             ),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: primaryColor, width: 2),
-                          ),
-                          child: Row(
-                            children: [
-                              Consumer(
-                                builder: (context, ref, _) {
-                                  final avatarUrlAsyncValue = ref
-                                      .watch(userAvatarProvider(user.userId));
+                            child: Row(
+                              children: [
+                                Consumer(
+                                  builder: (context, ref, _) {
+                                    final avatarUrlAsyncValue = ref
+                                        .watch(userAvatarProvider(user.userId));
 
-                                  return avatarUrlAsyncValue.when(
-                                    data: (avatarUrl) {
-                                      return CachedNetworkImage(
-                                        imageUrl: avatarUrl,
-                                        placeholder: (context, url) =>
-                                            CircleAvatar(
-                                          backgroundImage:
-                                              NetworkImage(placeholderImageUrl),
-                                          radius: 20,
-                                        ),
-                                        errorWidget: (context, url, error) =>
-                                            CircleAvatar(
-                                          backgroundImage:
-                                              NetworkImage(placeholderImageUrl),
-                                          radius: 20,
-                                        ),
-                                        imageBuilder:
-                                            (context, imageProvider) =>
-                                                CircleAvatar(
-                                          backgroundImage: imageProvider,
-                                          radius: 20,
-                                        ),
-                                      );
-                                    },
-                                    loading: () => CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(placeholderImageUrl),
-                                      radius: 20,
-                                    ),
-                                    error: (error, stack) => CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(placeholderImageUrl),
-                                      radius: 20,
-                                    ),
-                                  );
-                                },
-                              ),
-                              SizedBox(width: getScreenheight(context) * 0.02),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${user.name} (${_getRoleShortForm(user.role)})',
-                                      style: TextStyle(
-                                        color: primaryColor,
-                                        fontWeight: FontWeight.bold,
+                                    return avatarUrlAsyncValue.when(
+                                      data: (avatarUrl) {
+                                        return CachedNetworkImage(
+                                          imageUrl: avatarUrl,
+                                          placeholder: (context, url) =>
+                                              CircleAvatar(
+                                            backgroundImage: NetworkImage(
+                                                placeholderImageUrl),
+                                            radius: 20,
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              CircleAvatar(
+                                            backgroundImage: NetworkImage(
+                                                placeholderImageUrl),
+                                            radius: 20,
+                                          ),
+                                          imageBuilder:
+                                              (context, imageProvider) =>
+                                                  CircleAvatar(
+                                            backgroundImage: imageProvider,
+                                            radius: 20,
+                                          ),
+                                        );
+                                      },
+                                      loading: () => CircleAvatar(
+                                        backgroundImage:
+                                            NetworkImage(placeholderImageUrl),
+                                        radius: 20,
                                       ),
-                                    ),
-                                  ],
+                                      error: (error, stack) => CircleAvatar(
+                                        backgroundImage:
+                                            NetworkImage(placeholderImageUrl),
+                                        radius: 20,
+                                      ),
+                                    );
+                                  },
                                 ),
-                              ),
-                              Consumer(
-                                builder: (context, ref, _) {
-                                  final userRoleAsyncValue = ref.watch(
-                                      userRoleProvider); // Fetch the user role
+                                SizedBox(
+                                    width: getScreenheight(context) * 0.02),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${user.name} (${_getRoleShortForm(user.role)})',
+                                        style: TextStyle(
+                                          color: primaryColor,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Consumer(
+                                  builder: (context, ref, _) {
+                                    final userRoleAsyncValue = ref.watch(
+                                        userRoleProvider); // Fetch the user role
 
-                                  return userRoleAsyncValue.when(
-                                    data: (role) {
-                                      // Display the three-dot icon only if the role is not "User"
-                                      return role != 'User'
-                                          ? PopupMenuButton<int>(
-                                              icon: const Icon(Icons.more_vert),
-                                              color: Colors.white,
-                                              surfaceTintColor: Colors.white,
-                                              position: PopupMenuPosition.under,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(15)
-                                                        .copyWith(
-                                                  topRight:
-                                                      const Radius.circular(0),
-                                                ),
-                                              ),
-                                              onSelected: (value) async {
-                                                switch (value) {
-                                                  case 1:
-                                                    ref
-                                                        .read(
-                                                            promoteUserToAdminProvider)
-                                                        .promote(
-                                                            businessId,
-                                                            user.userId,
-                                                            context);
-                                                    break;
-                                                  case 2:
-                                                    ref
-                                                        .read(
-                                                            promoteUserToMiniAdminProvider)
-                                                        .promote(
-                                                            businessId,
-                                                            user.userId,
-                                                            context);
-                                                    break;
-                                                  case 3:
-                                                    ref
-                                                        .read(
-                                                            demoteUserProvider)
-                                                        .demoteUser(
-                                                            businessId,
-                                                            user.userId,
-                                                            context);
-                                                    break;
-                                                  case 4:
-                                                    ref
-                                                        .read(
-                                                            removeUserProvider)
-                                                        .removeUser(
-                                                            businessId,
-                                                            user.userId,
-                                                            context);
-                                                    break;
-                                                  case 5:
-                                                    _showManagerSelectionDialog(
-                                                        context,
-                                                        user.userId,
-                                                        businessId!);
-                                                    break;
-                                                }
-                                              },
-                                              itemBuilder:
-                                                  (BuildContext context) =>
-                                                      <PopupMenuEntry<int>>[
-                                                PopupMenuItem<int>(
-                                                  value: 1,
-                                                  child: Text(
-                                                    'Promote to Admin',
-                                                    style: TextStyle(
-                                                        color: primaryColor),
+                                    return userRoleAsyncValue.when(
+                                      data: (role) {
+                                        // Display the three-dot icon only if the role is not "User"
+                                        return role != 'User'
+                                            ? PopupMenuButton<int>(
+                                                icon:
+                                                    const Icon(Icons.more_vert),
+                                                color: Colors.white,
+                                                surfaceTintColor: Colors.white,
+                                                position:
+                                                    PopupMenuPosition.under,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15)
+                                                          .copyWith(
+                                                    topRight:
+                                                        const Radius.circular(
+                                                            0),
                                                   ),
                                                 ),
-                                                PopupMenuItem<int>(
-                                                  value: 2,
-                                                  child: Text(
-                                                    'Promote to MiniAdmin',
-                                                    style: TextStyle(
-                                                        color: primaryColor),
+                                                onSelected: (value) async {
+                                                  switch (value) {
+                                                    case 1:
+                                                      ref
+                                                          .read(
+                                                              promoteUserToAdminProvider)
+                                                          .promote(
+                                                              businessId,
+                                                              user.userId,
+                                                              context);
+                                                      break;
+                                                    case 2:
+                                                      ref
+                                                          .read(
+                                                              promoteUserToMiniAdminProvider)
+                                                          .promote(
+                                                              businessId,
+                                                              user.userId,
+                                                              context);
+                                                      break;
+                                                    case 3:
+                                                      if (user.role ==
+                                                          'Admin') {
+                                                        // Use a new provider for demoting Admin to User
+                                                        ref
+                                                            .read(
+                                                                demoteUserProvider)
+                                                            .demoteAdminToUser(
+                                                                businessId,
+                                                                user.userId,
+                                                                context);
+                                                      } else {
+                                                        // Use existing provider for demoting other roles
+                                                        ref
+                                                            .read(
+                                                                demoteUserProvider)
+                                                            .demoteUser(
+                                                                businessId,
+                                                                user.userId,
+                                                                context);
+                                                      }
+                                                      break;
+                                                    case 4:
+                                                      ref
+                                                          .read(
+                                                              removeUserProvider)
+                                                          .removeUser(
+                                                              businessId,
+                                                              user.userId,
+                                                              context);
+                                                      break;
+                                                    case 5:
+                                                      _showManagerSelectionDialog(
+                                                          context,
+                                                          user.userId,
+                                                          businessId!);
+                                                      break;
+                                                  }
+                                                },
+                                                itemBuilder:
+                                                    (BuildContext context) =>
+                                                        <PopupMenuEntry<int>>[
+                                                  PopupMenuItem<int>(
+                                                    value: 1,
+                                                    child: Text(
+                                                      'Promote to Admin',
+                                                      style: TextStyle(
+                                                          color: primaryColor),
+                                                    ),
                                                   ),
-                                                ),
-                                                PopupMenuItem<int>(
-                                                  value: 3,
-                                                  child: Text(
-                                                    'Demote to User',
-                                                    style: TextStyle(
-                                                        color: primaryColor),
+                                                  PopupMenuItem<int>(
+                                                    value: 2,
+                                                    child: Text(
+                                                      'Promote to MiniAdmin',
+                                                      style: TextStyle(
+                                                          color: primaryColor),
+                                                    ),
                                                   ),
-                                                ),
-                                                PopupMenuItem<int>(
-                                                  value: 4,
-                                                  child: Text(
-                                                    'Remove User',
-                                                    style: TextStyle(
-                                                        color: primaryColor),
+                                                  PopupMenuItem<int>(
+                                                    value: 3,
+                                                    child: Text(
+                                                      'Demote to User',
+                                                      style: TextStyle(
+                                                          color: primaryColor),
+                                                    ),
                                                   ),
-                                                ),
-                                                PopupMenuItem<int>(
-                                                  value: 5,
-                                                  child: Text(
-                                                    'Change Manager',
-                                                    style: TextStyle(
-                                                        color: primaryColor),
+                                                  PopupMenuItem<int>(
+                                                    value: 4,
+                                                    child: Text(
+                                                      'Remove User',
+                                                      style: TextStyle(
+                                                          color: primaryColor),
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
-                                            )
-                                          : const SizedBox.shrink();
-                                    },
-                                    loading: () => const SizedBox.shrink(),
-                                    error: (error, stack) =>
-                                        const SizedBox.shrink(),
-                                  );
-                                },
-                              ),
-                            ],
+                                                  PopupMenuItem<int>(
+                                                    value: 5,
+                                                    child: Text(
+                                                      'Change Manager',
+                                                      style: TextStyle(
+                                                          color: primaryColor),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            : const SizedBox.shrink();
+                                      },
+                                      loading: () => const SizedBox.shrink(),
+                                      error: (error, stack) =>
+                                          const SizedBox.shrink(),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                        );
+                      },
+                    ),
+                  );
+                },
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (error, stack) => Center(child: Text('Error: $error')),
               ),
