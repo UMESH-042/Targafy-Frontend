@@ -75,7 +75,10 @@ class _ManagerSelectionDialogState
                 data: (usersList) {
                   // Filter out the current user's name from the list
                   List<BusinessUserModel> filteredUsers = usersList
-                      .where((user) => user.userId != currentUserId)
+                      .where((user) =>
+                          user.userId != currentUserId &&
+                          user.role != "Admin" &&
+                          user.name != 'DummyAdmin')
                       .toList();
 
                   return DropdownButtonHideUnderline(
